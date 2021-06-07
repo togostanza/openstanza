@@ -4,6 +4,7 @@
   "license": "MIT",
   "repository": "https://github.com/togostanza/openstanza",
   "dependencies": {
+    "d3": "^6.7.0",
     "togostanza": "github:togostanza/togostanza"
   },
   "engines": {
