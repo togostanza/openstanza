@@ -1,33 +1,35 @@
 import Stanza from "togostanza/stanza";
 
 import * as d3 from "d3";
-import data from "./gwas.var2.json";
+// import data from "./gwas.var2.json";
 import { pagination } from "./table.js";
 import {
   downloadSvgMenuItem,
   downloadPngMenuItem,
   appendCustomCss,
+  getFormatedJson,
 } from "@/lib/metastanza_utils.js";
 
 //when you put json url
+let dataset, studyName, project, projectName, stageData, stageNames, getVariants, variants;
 // console.log(params["data-url"]]);
-// const dataset = await getFormatedJson(
-//   params["data-url"],
+// let dataset = await getFormatedJson(
+//   this.params["data-url"],
 //   stanza.root.querySelector("#chart")
 // );
 // console.log("dataset", dataset);
 
-// study name(single per a json)
-const dataset = data.dataset;
-const studyName = Object.keys(dataset)[0];
+// // study name(single per a json)
+// // const dataset = data.dataset;
+// let studyName = Object.keys(dataset)[0];
 
-//project data and project names (single per a json)
-const project = Object.values(dataset)[0][0];
-const projectName = Object.keys(project)[0];
+// //project data and project names (single per a json)
+// let project = Object.values(dataset)[0][0];
+// let projectName = Object.keys(project)[0];
 
-// stage data and stage names
-const stageData = Object.values(project)[0];
-let stageNames = Object.keys(stageData);
+// // stage data and stage names
+// let stageData = Object.values(project)[0];
+// let stageNames = Object.keys(stageData);
 
 const fixedStageNamesOrder = [
   "discovery",
@@ -36,38 +38,7 @@ const fixedStageNamesOrder = [
   "meta analysis",
   "not provided",
 ];
-stageNames = fixedStageNamesOrder.filter((stageName) => {
-  if (stageData[stageName]) {
-    return true;
-  } else {
-    return false;
-  }
-});
 
-//add stage information to each plot
-for (let i = 0; i < stageNames.length; i++) {
-  for (let j = 0; j < stageData[stageNames[i]].variants.length; j++) {
-    stageData[stageNames[i]].variants[j].stage = stageNames[i];
-  }
-}
-
-//combine variants to display
-let totalVariants = [];
-stageNames.forEach(
-  (stage) => (totalVariants = totalVariants.concat(stageData[stage].variants))
-);
-
-// get stage information
-const getVariants = () => {
-  let variantsArray = [];
-  stageNames.forEach((stage) => {
-    if (stageData[stage].checked) {
-      variantsArray = variantsArray.concat(stageData[stage].variants);
-    }
-  });
-  return variantsArray;
-};
-let variants = totalVariants; //init
 
 export default class ManhattanPlot extends Stanza {
   menu() {
@@ -78,6 +49,77 @@ export default class ManhattanPlot extends Stanza {
   }
 
   async render() {
+
+    console.log(this.params)
+
+    dataset = await getFormatedJson(
+      this.params["data-url"],
+      this.root.querySelector("#chart")
+    );
+    console.log("dataset", dataset);
+    
+    // study name(single per a json)
+    // studyName = Object.keys(dataset)[0];
+    studyName = dataset.studyLabel;
+    console.log("studyName", studyName);
+    
+    //project data and project names (single per a json)
+    // project = Object.values(dataset)[0][0];
+    // console.log("project", project);
+    // projectName = Object.keys(project)[0];
+    projectName = dataset.projectLabel;
+    
+    // stage data and stage names
+    // stageData = Object.values(project)[0];
+    stageData = dataset.stages;
+    stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
+    console.log("stageData", stageData);
+    // stageNames = Object.keys(stageData);
+    stageNames = dataset.stages.map(stage => stage.label);
+
+    // stageNames = fixedStageNamesOrder.filter((stageName) => {
+    //   if (stageData[stageName]) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // });
+    
+    //add stage information to each plot
+    // for (let i = 0; i < stageNames.length; i++) {
+    //   for (let j = 0; j < stageData[stageNames[i]].variants.length; j++) {
+    //     stageData[stageNames[i]].variants[j].stage = stageNames[i];
+    //   }
+    // }
+
+    //combine variants to display
+    // totalVariants = [];
+    // stageNames.forEach(
+    //   (stage) => (totalVariants = totalVariants.concat(stageData[stage].variants))
+    // );
+    let totalVariants = dataset.stages.map(stage => {
+      const variants = stage.variants.map(variant => {
+        return Object.assign({stage: stage.label}, variant)
+      });
+      return variants;
+    }).flat();
+    console.log(totalVariants)
+
+    // get stage information
+    getVariants = () => {
+      let variantsArray = [];
+      stageNames.forEach((stage) => {
+        if (stageData[stage].checked) {
+          variantsArray = variantsArray.concat(stageData[stage].variants);
+        }
+      });
+      return variantsArray;
+    };
+    variants = totalVariants; //init
+
+
+    
+
     appendCustomCss(this, this.params["custom-css-url"]);
 
     this.renderTemplate({
