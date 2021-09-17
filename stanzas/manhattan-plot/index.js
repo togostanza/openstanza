@@ -10,6 +10,63 @@ import {
   getFormatedJson,
 } from "@/lib/metastanza_utils.js";
 
+const chromosomes = [
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "10",
+  "11",
+  "12",
+  "13",
+  "14",
+  "15",
+  "16",
+  "17",
+  "18",
+  "19",
+  "20",
+  "21",
+  "22",
+  "X",
+  "Y",
+];
+
+const chromosomeNtLength = {
+  hg38: {
+    1: 248956422,
+    2: 242193529,
+    3: 198295559,
+    4: 190214555,
+    5: 181538259,
+    6: 170805979,
+    7: 159345973,
+    8: 145138636,
+    9: 138394717,
+    10: 133797422,
+    11: 135086622,
+    12: 133275309,
+    13: 114364328,
+    14: 107043718,
+    15: 101991189,
+    16: 90338345,
+    17: 83257441,
+    18: 80373285,
+    19: 58617616,
+    20: 64444167,
+    21: 46709983,
+    22: 50818468,
+    X: 156040895,
+    Y: 57227415,
+  },
+};
+
+
 //when you put json url
 let dataset, studyName, project, projectName, stageData, stageNames, getVariants, variants;
 // console.log(params["data-url"]]);
@@ -52,6 +109,22 @@ export default class ManhattanPlot extends Stanza {
 
     console.log(this.params)
 
+    if (this.params.lowThresh === "") {
+      this.params.lowThresh = 4;
+    }
+    if (this.params.highThresh === "") {
+      this.params.highThresh = Infinity;
+    }
+    if (this.params.chromosomeKey === "") {
+      this.params.chromosomeKey = "chr";
+    }
+    if (this.params.positionKey === "") {
+      this.params.positionKey = "position";
+    }
+    if (this.params.pValueKey === "") {
+      this.params.pValueKey = "p-value";
+    }
+
     dataset = await getFormatedJson(
       this.params["data-url"],
       this.root.querySelector("#chart")
@@ -86,6 +159,30 @@ export default class ManhattanPlot extends Stanza {
     // });
     
     //add stage information to each plot
+    const chromosomeKey = this.params.chromosomeKey;
+    const positionKey = this.params.positionKey;
+    console.log(chromosomeNtLength)
+    console.log(chromosomeNtLength.hg38)
+    for (const stage of dataset.stages) {
+      for (const variant of stage.variants) {
+        variant.stage = stage.label;
+        // convert chromosome data from 'chrnum' to 'num'
+        variant[chromosomeKey] = variant[chromosomeKey].replace("chr", "");
+        // set position
+        let pos = 0;
+        console.log(variant)
+        console.log(variant[chromosomeKey])
+        for (const ch of chromosomes) {
+          if (ch === variant[chromosomeKey]) {
+            break;
+          }
+          console.log(ch, chromosomeNtLength.hg38[ch])
+          pos += chromosomeNtLength.hg38[ch];
+        }
+        console.log(pos)
+        variant.pos = pos + parseInt(variant[positionKey]);
+      }
+    }
     // for (let i = 0; i < stageNames.length; i++) {
     //   for (let j = 0; j < stageData[stageNames[i]].variants.length; j++) {
     //     stageData[stageNames[i]].variants[j].stage = stageNames[i];
@@ -99,7 +196,7 @@ export default class ManhattanPlot extends Stanza {
     // );
     let totalVariants = dataset.stages.map(stage => {
       const variants = stage.variants.map(variant => {
-        return Object.assign({stage: stage.label}, variant)
+        return Object.assign({}, variant)
       });
       return variants;
     }).flat();
@@ -176,18 +273,18 @@ export default class ManhattanPlot extends Stanza {
     );
 
     // adjust data
-    for (let i = 0; i < variants.length; i++) {
-      // convert chromosome data from 'chrnum' to 'num'
-      let chr = variants[i].chr;
-      chr = chr.replace("chr", "");
-      variants[i].chr = chr;
+    // for (let i = 0; i < variants.length; i++) {
+    //   // convert chromosome data from 'chrnum' to 'num'
+    //   let chr = variants[i].chr;
+    //   chr = chr.replace("chr", "");
+    //   variants[i].chr = chr;
 
-      const pValue = variants[i]["p-value"];
-      String(pValue);
+    //   const pValue = variants[i]["p-value"];
+    //   String(pValue);
 
-      const physicalPosition = variants[i]["stop"];
-      String(physicalPosition);
-    }
+    //   const physicalPosition = variants[i]["stop"];
+    //   String(physicalPosition);
+    // }
 
     if (typeof variants === "object") {
       draw(this, this.params);
@@ -209,84 +306,11 @@ async function draw(stanza, params) {
   const controlElement = stanza.root.querySelector("#control");
   let overThreshArray;
 
-  if (params.lowThresh === "") {
-    params.lowThresh = 4;
-  }
-  if (params.highThresh === "") {
-    params.highThresh = Infinity;
-  }
-  if (params.chromosomeKey === "") {
-    params.chromosomeKey = "chr";
-  }
-  if (params.positionKey === "") {
-    params.positionKey = "position";
-  }
-  if (params.pValueKey === "") {
-    params.pValueKey = "p-value";
-  }
 
   const lowThresh = parseFloat(params.lowThresh);
   let highThresh = parseFloat(params.highThresh);
 
-  const chromosomeKey = params.chromosomeKey;
-  const positionKey = params.positionKey;
   const pValueKey = params.pValueKey;
-
-  const chromosomes = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "X",
-    "Y",
-  ];
-
-  const chromosomeNtLength = {
-    hg38: {
-      1: 248956422,
-      2: 242193529,
-      3: 198295559,
-      4: 190214555,
-      5: 181538259,
-      6: 170805979,
-      7: 159345973,
-      8: 145138636,
-      9: 138394717,
-      10: 133797422,
-      11: 135086622,
-      12: 133275309,
-      13: 114364328,
-      14: 107043718,
-      15: 101991189,
-      16: 90338345,
-      17: 83257441,
-      18: 80373285,
-      19: 58617616,
-      20: 64444167,
-      21: 46709983,
-      22: 50818468,
-      X: 156040895,
-      Y: 57227415,
-    },
-  };
 
   const chromosomeSumLength = {};
   Object.keys(chromosomeNtLength).forEach((ref) => {
@@ -740,29 +764,40 @@ async function draw(stanza, params) {
     if (verticalRange[0] === undefined) {
       verticalRange = [lowThresh, maxLogPInt];
     }
+    console.log(horizonalRange, verticalRange)
 
     xLabelGroup.html("");
     yLabelGroup.html("");
     plotGroup.html("");
 
+    console.log(variants)
     plotGroup
       .selectAll(".plot")
       .data(variants)
       .enter()
       // filter: displayed range
       .filter(function (d) {
-        if (!d.pos) {
-          // calculate  accumulated position
-          let pos = 0;
-          for (const ch of chromosomes) {
-            if (ch === d[chromosomeKey]) {
-              break;
-            }
-            pos += chromosomeNtLength.hg38[ch];
-          }
-          d.pos = pos + parseInt(d[positionKey]);
-        }
+        console.log(d)
+        console.log(d.pos)
+        // if (!d.pos) {
+        //   // calculate  accumulated position
+        //   let pos = 0;
+        //   for (const ch of chromosomes) {
+        //     if (ch === d[chromosomeKey]) {
+        //       break;
+        //     }
+        //     pos += chromosomeNtLength.hg38[ch];
+        //   }
+        //   d.pos = pos + parseInt(d[positionKey]);
+        // }
         const logValue = Math.log10(parseFloat(d[pValueKey])) * -1;
+        console.log(d.pos, logValue)
+        console.log(
+          horizonalRange[0] <= d.pos &&
+          d.pos <= horizonalRange[1] &&
+          verticalRange[0] <= logValue &&
+          logValue <= verticalRange[1]
+        )
         return (
           horizonalRange[0] <= d.pos &&
           d.pos <= horizonalRange[1] &&
@@ -771,6 +806,7 @@ async function draw(stanza, params) {
         );
       })
       .filter(function (d) {
+        console.log(Math.log10(parseFloat(d[pValueKey])) * -1 > lowThresh)
         return Math.log10(parseFloat(d[pValueKey])) * -1 > lowThresh;
       })
       .append("circle")

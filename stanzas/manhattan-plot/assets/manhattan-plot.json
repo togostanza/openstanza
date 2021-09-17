@@ -8297,6 +8297,22 @@
           "chr":"chr22"
         }
       ]
+    },
+    {
+      "condition1":"discovery",
+      "condition2":"hepatitis B",
+      "label":"discovery",
+      "variants":[
+        {
+          "ref":"A",
+          "stop":12705100,
+          "p-value":4.67E-7,
+          "start":12705100,
+          "alt":"C",
+          "rsId":"rs7511708",
+          "chr":"chr1"
+        }
+      ]
     }
   ]
 }
