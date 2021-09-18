@@ -64,9 +64,19 @@ const CHROMOSOME_NT_LENGTH = {
     Y: 57227415,
   },
 };
+const CHROMOSOME_POSIITONS = {};
+Object.keys(CHROMOSOME_NT_LENGTH).forEach(refKey => {
+  let pos = 0;
+  CHROMOSOME_POSIITONS[refKey] = Object.fromEntries( Object.keys(CHROMOSOME_NT_LENGTH[refKey]).map(chrKey => {
+    const map = [chrKey, pos];
+    pos += CHROMOSOME_NT_LENGTH[refKey][chrKey];
+    return map;
+  }) );
+});
 
 
 export default class ManhattanPlot extends Stanza {
+
   menu() {
     return [
       downloadSvgMenuItem(this, "manhattan_plot"),
@@ -75,8 +85,6 @@ export default class ManhattanPlot extends Stanza {
   }
 
   async render() {
-
-    console.log(this.params)
 
     if (this.params.lowThresh === "") {
       this.params.lowThresh = 4;
@@ -99,12 +107,6 @@ export default class ManhattanPlot extends Stanza {
       this.root.querySelector("#chart")
     );
     
-    // study name(single per a json)
-    const studyName = dataset.studyLabel;
-    
-    //project data and project names (single per a json)
-    const projectName = dataset.projectLabel;
-    
     // stage data and stage names
     this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
     const fixedStageNamesOrder = [
@@ -118,7 +120,7 @@ export default class ManhattanPlot extends Stanza {
       return dataset.stages.find(stage => stage.label === stageName);
     });
     
-    //add stage information to each plot
+    // add stage information to each plot
     const chromosomeKey = this.params.chromosomeKey;
     const positionKey = this.params.positionKey;
     for (const stage of dataset.stages) {
@@ -127,55 +129,43 @@ export default class ManhattanPlot extends Stanza {
         // convert chromosome data from 'chrnum' to 'num'
         variant[chromosomeKey] = variant[chromosomeKey].replace("chr", "");
         // set position
-        let pos = 0;
-        console.log(variant)
-        console.log(variant[chromosomeKey])
-        for (const ch of CHROMOSOMES) {
-          if (ch === variant[chromosomeKey]) {
-            break;
-          }
-          console.log(ch, CHROMOSOME_NT_LENGTH.hg38[ch])
-          pos += CHROMOSOME_NT_LENGTH.hg38[ch];
-        }
-        console.log(pos)
-        variant.pos = pos + parseInt(variant[positionKey]);
+        variant.pos = CHROMOSOME_POSIITONS.hg38[variant[chromosomeKey]] + parseInt(variant[positionKey]);
       }
     }
-    // for (let i = 0; i < this._stageNames.length; i++) {
-    //   for (let j = 0; j < stageData[this._stageNames[i]].variants.length; j++) {
-    //     stageData[this._stageNames[i]].variants[j].stage = this._stageNames[i];
-    //   }
-    // }
-
-    //combine variants to display
-    // totalVariants = [];
-    // this._stageNames.forEach(
-    //   (stage) => (totalVariants = totalVariants.concat(stageData[stage].variants))
-    // );
-    let totalVariants = dataset.stages.map(stage => {
-      const variants = stage.variants.map(variant => {
-        return Object.assign({}, variant)
-      });
-      return variants;
-    }).flat();
-    console.log(totalVariants)
-
-    this._variants = totalVariants; //init
-
-
-    
 
     appendCustomCss(this, this.params["custom-css-url"]);
 
     this.renderTemplate({
       template: "stanza.html.hbs",
       parameters: {
-        studyName,
-        projectName,
+        studyName: dataset.studyLabel,
+        projectName: dataset.projectLabel,
       },
     });
 
     //append checkbox and its conditions to filter stages
+    this.makeConsole();
+
+    // combine variants to display
+    this._variants = this.getVariants(); //init
+
+    if (typeof this._variants === "object") {
+      this.draw(this, this.params);
+    }
+  }
+
+  // get stage information
+  getVariants() {
+    let variants = [];
+    this._stageNames.forEach((stage) => {
+      if (this._stageData[stage].checked) {
+        variants = variants.concat(this._stageData[stage].variants);
+      }
+    });
+    return variants;
+  };
+
+  makeConsole() {
     const stageList = this.root.querySelector("#stageList");
     const firstConditionList = this.root.querySelector("#firstConditionList");
     const secondConditionList = this.root.querySelector("#secondConditionList");
@@ -184,20 +174,19 @@ export default class ManhattanPlot extends Stanza {
     for (let i = 0; i < this._stageNames.length; i++) {
       td = document.createElement("td");
       input = document.createElement("input");
+      input.className = "stage-btn";
+      input.dataset.stage = this._stageNames[i];
       input.setAttribute("type", "checkbox");
-      input.setAttribute("class", "stage-btn");
       input.setAttribute("id", `${this._stageNames[i]}Btn`);
       input.setAttribute("name", "stage");
       input.setAttribute("value", this._stageNames[i]);
       input.setAttribute("checked", true);
-      input.setAttribute("data-stage", this._stageNames[i]);
       label = document.createElement("label");
       label.textContent = this._stageNames[i];
+      label.dataset.stage = this._stageNames[i];
       label.setAttribute("for", `${this._stageNames[i]}Btn`);
-      label.setAttribute("data-stage", this._stageNames[i]);
+      td.append(input, label);
       stageList.appendChild(td);
-      td.appendChild(input);
-      td.appendChild(label);
       this._stageData[this._stageNames[i]].checked = true;
     }
 
@@ -219,36 +208,7 @@ export default class ManhattanPlot extends Stanza {
         )
         .join("")
     );
-
-    // adjust data
-    // for (let i = 0; i < variants.length; i++) {
-    //   // convert chromosome data from 'chrnum' to 'num'
-    //   let chr = variants[i].chr;
-    //   chr = chr.replace("chr", "");
-    //   variants[i].chr = chr;
-
-    //   const pValue = variants[i]["p-value"];
-    //   String(pValue);
-
-    //   const physicalPosition = variants[i]["stop"];
-    //   String(physicalPosition);
-    // }
-
-    if (typeof this._variants === "object") {
-      this.draw(this, this.params);
-    }
   }
-
-  // get stage information
-  getVariants() {
-    let variantsArray = [];
-    this._stageNames.forEach((stage) => {
-      if (this._stageData[stage].checked) {
-        variantsArray = variantsArray.concat(this._stageData[stage].variants);
-      }
-    });
-    return variantsArray;
-  };
 
   draw(stanza, params) {
     const width = 800;
