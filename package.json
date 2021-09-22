@@ -5,6 +5,7 @@
   "repository": "https://github.com/togostanza/openstanza",
   "dependencies": {
     "d3": "^6.7.0",
+    "metastanza-utils": "github:togostanza/metastanza-utils",
     "togostanza": "github:togostanza/togostanza"
   },
   "engines": {
