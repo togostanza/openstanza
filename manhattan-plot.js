@@ -1,390 +1,3 @@
-import Stanza$1 from 'togostanza/stanza';
-
-var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-function createCommonjsModule(fn) {
-  var module = { exports: {} };
-	return fn(module, module.exports), module.exports;
-}
-
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** Used as the `TypeError` message for "Functions" methods. */
-var FUNC_ERROR_TEXT$1 = 'Expected a function';
-
-/** Used as references for various `Number` constants. */
-var NAN = 0 / 0;
-
-/** `Object#toString` result references. */
-var symbolTag$1 = '[object Symbol]';
-
-/** Used to match leading and trailing whitespace. */
-var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/** Detect free variable `global` from Node.js. */
-var freeGlobal$1 = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-
-/** Detect free variable `self`. */
-var freeSelf$1 = typeof self == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root$2 = freeGlobal$1 || freeSelf$1 || Function('return this')();
-
-/** Used for built-in method references. */
-var objectProto$1 = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString$1 = objectProto$1.toString;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max,
-    nativeMin = Math.min;
-
-/**
- * Gets the timestamp of the number of milliseconds that have elapsed since
- * the Unix epoch (1 January 1970 00:00:00 UTC).
- *
- * @static
- * @memberOf _
- * @since 2.4.0
- * @category Date
- * @returns {number} Returns the timestamp.
- * @example
- *
- * _.defer(function(stamp) {
- *   console.log(_.now() - stamp);
- * }, _.now());
- * // => Logs the number of milliseconds it took for the deferred invocation.
- */
-var now$1 = function() {
-  return root$2.Date.now();
-};
-
-/**
- * Creates a debounced function that delays invoking `func` until after `wait`
- * milliseconds have elapsed since the last time the debounced function was
- * invoked. The debounced function comes with a `cancel` method to cancel
- * delayed `func` invocations and a `flush` method to immediately invoke them.
- * Provide `options` to indicate whether `func` should be invoked on the
- * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
- * with the last arguments provided to the debounced function. Subsequent
- * calls to the debounced function return the result of the last `func`
- * invocation.
- *
- * **Note:** If `leading` and `trailing` options are `true`, `func` is
- * invoked on the trailing edge of the timeout only if the debounced function
- * is invoked more than once during the `wait` timeout.
- *
- * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
- * until to the next tick, similar to `setTimeout` with a timeout of `0`.
- *
- * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
- * for details over the differences between `_.debounce` and `_.throttle`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to debounce.
- * @param {number} [wait=0] The number of milliseconds to delay.
- * @param {Object} [options={}] The options object.
- * @param {boolean} [options.leading=false]
- *  Specify invoking on the leading edge of the timeout.
- * @param {number} [options.maxWait]
- *  The maximum time `func` is allowed to be delayed before it's invoked.
- * @param {boolean} [options.trailing=true]
- *  Specify invoking on the trailing edge of the timeout.
- * @returns {Function} Returns the new debounced function.
- * @example
- *
- * // Avoid costly calculations while the window size is in flux.
- * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
- *
- * // Invoke `sendMail` when clicked, debouncing subsequent calls.
- * jQuery(element).on('click', _.debounce(sendMail, 300, {
- *   'leading': true,
- *   'trailing': false
- * }));
- *
- * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
- * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
- * var source = new EventSource('/stream');
- * jQuery(source).on('message', debounced);
- *
- * // Cancel the trailing debounced invocation.
- * jQuery(window).on('popstate', debounced.cancel);
- */
-function debounce(func, wait, options) {
-  var lastArgs,
-      lastThis,
-      maxWait,
-      result,
-      timerId,
-      lastCallTime,
-      lastInvokeTime = 0,
-      leading = false,
-      maxing = false,
-      trailing = true;
-
-  if (typeof func != 'function') {
-    throw new TypeError(FUNC_ERROR_TEXT$1);
-  }
-  wait = toNumber(wait) || 0;
-  if (isObject$1(options)) {
-    leading = !!options.leading;
-    maxing = 'maxWait' in options;
-    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
-    trailing = 'trailing' in options ? !!options.trailing : trailing;
-  }
-
-  function invokeFunc(time) {
-    var args = lastArgs,
-        thisArg = lastThis;
-
-    lastArgs = lastThis = undefined;
-    lastInvokeTime = time;
-    result = func.apply(thisArg, args);
-    return result;
-  }
-
-  function leadingEdge(time) {
-    // Reset any `maxWait` timer.
-    lastInvokeTime = time;
-    // Start the timer for the trailing edge.
-    timerId = setTimeout(timerExpired, wait);
-    // Invoke the leading edge.
-    return leading ? invokeFunc(time) : result;
-  }
-
-  function remainingWait(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime,
-        result = wait - timeSinceLastCall;
-
-    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
-  }
-
-  function shouldInvoke(time) {
-    var timeSinceLastCall = time - lastCallTime,
-        timeSinceLastInvoke = time - lastInvokeTime;
-
-    // Either this is the first call, activity has stopped and we're at the
-    // trailing edge, the system time has gone backwards and we're treating
-    // it as the trailing edge, or we've hit the `maxWait` limit.
-    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
-      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
-  }
-
-  function timerExpired() {
-    var time = now$1();
-    if (shouldInvoke(time)) {
-      return trailingEdge(time);
-    }
-    // Restart the timer.
-    timerId = setTimeout(timerExpired, remainingWait(time));
-  }
-
-  function trailingEdge(time) {
-    timerId = undefined;
-
-    // Only invoke if we have `lastArgs` which means `func` has been
-    // debounced at least once.
-    if (trailing && lastArgs) {
-      return invokeFunc(time);
-    }
-    lastArgs = lastThis = undefined;
-    return result;
-  }
-
-  function cancel() {
-    if (timerId !== undefined) {
-      clearTimeout(timerId);
-    }
-    lastInvokeTime = 0;
-    lastArgs = lastCallTime = lastThis = timerId = undefined;
-  }
-
-  function flush() {
-    return timerId === undefined ? result : trailingEdge(now$1());
-  }
-
-  function debounced() {
-    var time = now$1(),
-        isInvoking = shouldInvoke(time);
-
-    lastArgs = arguments;
-    lastThis = this;
-    lastCallTime = time;
-
-    if (isInvoking) {
-      if (timerId === undefined) {
-        return leadingEdge(lastCallTime);
-      }
-      if (maxing) {
-        // Handle invocations in a tight loop.
-        timerId = setTimeout(timerExpired, wait);
-        return invokeFunc(lastCallTime);
-      }
-    }
-    if (timerId === undefined) {
-      timerId = setTimeout(timerExpired, wait);
-    }
-    return result;
-  }
-  debounced.cancel = cancel;
-  debounced.flush = flush;
-  return debounced;
-}
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject$1(value) {
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike$1(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol$1(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike$1(value) && objectToString$1.call(value) == symbolTag$1);
-}
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol$1(value)) {
-    return NAN;
-  }
-  if (isObject$1(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject$1(other) ? (other + '') : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = value.replace(reTrim, '');
-  var isBinary = reIsBinary.test(value);
-  return (isBinary || reIsOctal.test(value))
-    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-    : (reIsBadHex.test(value) ? NAN : +value);
-}
-
-var lodash_debounce = debounce;
-
 // In the absence of a WeakSet or WeakMap implementation, don't break, but don't cache either.
 function noop$2() {
     var args = [];
@@ -420,7 +33,7 @@ var has = function (obj, prop) {
     return hop.call(obj, prop);
 };
 // Copy all own enumerable properties from source to target
-function extend$1(target, source) {
+function extend$2(target, source) {
     for (var prop in source) {
         if (has(source, prop)) {
             target[prop] = source[prop];
@@ -526,10 +139,10 @@ function createInstance(options) {
         }
         else {
             // Create and return a new instance of outdent with the given options
-            return createInstance(extend$1(extend$1({}, options), stringsOrOptions || {}));
+            return createInstance(extend$2(extend$2({}, options), stringsOrOptions || {}));
         }
     }
-    var fullOutdent = extend$1(outdent, {
+    var fullOutdent = extend$2(outdent, {
         string: function (str) {
             return _outdentArray([str], false, options)[0];
         },
@@ -551,6 +164,8 @@ if (typeof module !== "undefined") {
     }
     catch (e) { }
 }
+
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 var alert = {
 	name: "alert",
@@ -626,6 +241,21 @@ var bell = {
 		"24": {
 			width: 24,
 			path: "<path fill-rule=\"evenodd\" d=\"M12 1C8.318 1 5 3.565 5 7v4.539a3.25 3.25 0 01-.546 1.803l-2.2 3.299A1.518 1.518 0 003.519 19H8.5a3.5 3.5 0 107 0h4.982a1.518 1.518 0 001.263-2.36l-2.2-3.298A3.25 3.25 0 0119 11.539V7c0-3.435-3.319-6-7-6zM6.5 7c0-2.364 2.383-4.5 5.5-4.5s5.5 2.136 5.5 4.5v4.539c0 .938.278 1.854.798 2.635l2.199 3.299a.017.017 0 01.003.01l-.001.006-.004.006-.006.004-.007.001H3.518l-.007-.001-.006-.004-.004-.006-.001-.007.003-.01 2.2-3.298a4.75 4.75 0 00.797-2.635V7zM14 19h-4a2 2 0 104 0z\"></path>"
+		}
+	}
+};
+var blocked = {
+	name: "blocked",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M4.467.22a.75.75 0 01.53-.22h6.006a.75.75 0 01.53.22l4.247 4.247c.141.14.22.331.22.53v6.006a.75.75 0 01-.22.53l-4.247 4.247a.75.75 0 01-.53.22H4.997a.75.75 0 01-.53-.22L.22 11.533a.75.75 0 01-.22-.53V4.997a.75.75 0 01.22-.53L4.467.22zm.84 1.28L1.5 5.308v5.384L5.308 14.5h5.384l3.808-3.808V5.308L10.692 1.5H5.308zM4 7.75A.75.75 0 014.75 7h6.5a.75.75 0 010 1.5h-6.5A.75.75 0 014 7.75z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M7.638 2.22a.75.75 0 01.53-.22h7.664a.75.75 0 01.53.22l5.418 5.418c.141.14.22.332.22.53v7.664a.75.75 0 01-.22.53l-5.418 5.418a.75.75 0 01-.53.22H8.168a.75.75 0 01-.53-.22l-5.42-5.418a.75.75 0 01-.219-.53V8.168a.75.75 0 01.22-.53l5.418-5.42zM8.48 3.5L3.5 8.48v7.04l4.98 4.98h7.04l4.98-4.98V8.48L15.52 3.5H8.48zM7 11.75a.75.75 0 01.75-.75h8.5a.75.75 0 010 1.5h-8.5a.75.75 0 01-.75-.75z\"></path>"
 		}
 	}
 };
@@ -727,7 +357,11 @@ var browser = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M6 3h1v1H6V3zM4 3h1v1H4V3zM2 3h1v1H2V3zm12 10H2V5h12v8zm0-9H8V3h6v1zm1-1c0-.55-.45-1-1-1H2c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V3z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0114.25 15H1.75A1.75 1.75 0 010 13.25V2.75zm1.75-.25a.25.25 0 00-.25.25V4.5h2v-2H1.75zM5 2.5v2h2v-2H5zm3.5 0v2h6V2.75a.25.25 0 00-.25-.25H8.5zm6 3.5h-13v7.25c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25V6z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 3.75C0 2.784.784 2 1.75 2h20.5c.966 0 1.75.784 1.75 1.75v16.5A1.75 1.75 0 0122.25 22H1.75A1.75 1.75 0 010 20.25V3.75zm1.75-.25a.25.25 0 00-.25.25V5.5h4v-2H1.75zM7 3.5v2h4v-2H7zm5.5 0v2h10V3.75a.25.25 0 00-.25-.25H12.5zm10 3.5h-21v13.25c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V7z\"></path>"
 		}
 	}
 };
@@ -740,7 +374,11 @@ var bug = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M11 10h3V9h-3V8l3.17-1.03-.34-.94L11 7V6c0-.55-.45-1-1-1V4c0-.48-.36-.88-.83-.97L10.2 2H12V1H9.8l-2 2h-.59L5.2 1H3v1h1.8l1.03 1.03C5.36 3.12 5 3.51 5 4v1c-.55 0-1 .45-1 1v1l-2.83-.97-.34.94L4 8v1H1v1h3v1L.83 12.03l.34.94L4 12v1c0 .55.45 1 1 1h1l1-1V6h1v7l1 1h1c.55 0 1-.45 1-1v-1l2.83.97.34-.94L11 11v-1zM9 5H6V4h3v1z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M4.72.22a.75.75 0 011.06 0l1 .999a3.492 3.492 0 012.441 0l.999-1a.75.75 0 111.06 1.061l-.775.776c.616.63.995 1.493.995 2.444v.327c0 .1-.009.197-.025.292.408.14.764.392 1.029.722l1.968-.787a.75.75 0 01.556 1.392L13 7.258V9h2.25a.75.75 0 010 1.5H13v.5c0 .409-.049.806-.141 1.186l2.17.868a.75.75 0 01-.557 1.392l-2.184-.873A4.997 4.997 0 018 16a4.997 4.997 0 01-4.288-2.427l-2.183.873a.75.75 0 01-.558-1.392l2.17-.868A5.013 5.013 0 013 11v-.5H.75a.75.75 0 010-1.5H3V7.258L.971 6.446a.75.75 0 01.558-1.392l1.967.787c.265-.33.62-.583 1.03-.722a1.684 1.684 0 01-.026-.292V4.5c0-.951.38-1.814.995-2.444L4.72 1.28a.75.75 0 010-1.06zM6.173 5h3.654A.173.173 0 0010 4.827V4.5a2 2 0 10-4 0v.327c0 .096.077.173.173.173zM5.25 6.5a.75.75 0 00-.75.75V11a3.5 3.5 0 107 0V7.25a.75.75 0 00-.75-.75h-5.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M7.72.22a.75.75 0 011.06 0l1.204 1.203A4.983 4.983 0 0112 1c.717 0 1.4.151 2.016.423L15.22.22a.75.75 0 011.06 1.06l-.971.972A4.988 4.988 0 0117 6v1.104a2.755 2.755 0 011.917 1.974l1.998-.999a.75.75 0 01.67 1.342L19 10.714V13.5l3.25.003a.75.75 0 110 1.5L19 15.001V16a7.02 7.02 0 01-.204 1.686.833.833 0 01.04.018l2.75 1.375a.75.75 0 11-.671 1.342l-2.638-1.319A7 7 0 0112 23a7 7 0 01-6.197-3.742l-2.758 1.181a.75.75 0 11-.59-1.378l2.795-1.199A7.007 7.007 0 015 16v-.996H1.75a.75.75 0 010-1.5H5v-2.79L2.415 9.42a.75.75 0 01.67-1.342l1.998.999A2.755 2.755 0 017 7.104V6a4.99 4.99 0 011.69-3.748l-.97-.972a.75.75 0 010-1.06zM8.5 7h7V6a3.5 3.5 0 10-7 0v1zm-2 3.266V9.75c0-.69.56-1.25 1.25-1.25h8.5c.69 0 1.25.56 1.25 1.25V16a5.5 5.5 0 01-11 0v-5.734z\"></path>"
 		}
 	}
 };
@@ -810,31 +448,11 @@ var circle = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M3.404 3.404a6.5 6.5 0 109.192 9.192 6.5 6.5 0 00-9.192-9.192zm-1.06 10.253A8 8 0 1113.656 2.343 8 8 0 012.343 13.657z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8z\"></path>"
 		},
 		"24": {
 			width: 24,
 			path: "<path fill-rule=\"evenodd\" d=\"M12 2.5a9.5 9.5 0 100 19 9.5 9.5 0 000-19zM1 12C1 5.925 5.925 1 12 1s11 4.925 11 11-4.925 11-11 11S1 18.075 1 12z\"></path>"
-		}
-	}
-};
-var clippy = {
-	name: "clippy",
-	keywords: [
-		"copy",
-		"paste",
-		"save",
-		"capture",
-		"clipboard"
-	],
-	heights: {
-		"16": {
-			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z\"></path>"
-		},
-		"24": {
-			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M5.962 2.513a.75.75 0 01-.475.949l-.816.272a.25.25 0 00-.171.237V21.25c0 .138.112.25.25.25h14.5a.25.25 0 00.25-.25V3.97a.25.25 0 00-.17-.236l-.817-.272a.75.75 0 01.474-1.424l.816.273A1.75 1.75 0 0121 3.97v17.28A1.75 1.75 0 0119.25 23H4.75A1.75 1.75 0 013 21.25V3.97a1.75 1.75 0 011.197-1.66l.816-.272a.75.75 0 01.949.475z\"></path><path fill-rule=\"evenodd\" d=\"M7 1.75C7 .784 7.784 0 8.75 0h6.5C16.216 0 17 .784 17 1.75v1.5A1.75 1.75 0 0115.25 5h-6.5A1.75 1.75 0 017 3.25v-1.5zm1.75-.25a.25.25 0 00-.25.25v1.5c0 .138.112.25.25.25h6.5a.25.25 0 00.25-.25v-1.5a.25.25 0 00-.25-.25h-6.5z\"></path>"
 		}
 	}
 };
@@ -871,6 +489,51 @@ var code = {
 		"24": {
 			width: 24,
 			path: "<path fill-rule=\"evenodd\" d=\"M8.78 4.97a.75.75 0 010 1.06L2.81 12l5.97 5.97a.75.75 0 11-1.06 1.06l-6.5-6.5a.75.75 0 010-1.06l6.5-6.5a.75.75 0 011.06 0zm6.44 0a.75.75 0 000 1.06L21.19 12l-5.97 5.97a.75.75 0 101.06 1.06l6.5-6.5a.75.75 0 000-1.06l-6.5-6.5a.75.75 0 00-1.06 0z\"></path>"
+		}
+	}
+};
+var codescan = {
+	name: "codescan",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M8.47 4.97a.75.75 0 000 1.06L9.94 7.5 8.47 8.97a.75.75 0 101.06 1.06l2-2a.75.75 0 000-1.06l-2-2a.75.75 0 00-1.06 0zM6.53 6.03a.75.75 0 00-1.06-1.06l-2 2a.75.75 0 000 1.06l2 2a.75.75 0 101.06-1.06L5.06 7.5l1.47-1.47z\"></path><path fill-rule=\"evenodd\" d=\"M12.246 13.307a7.5 7.5 0 111.06-1.06l2.474 2.473a.75.75 0 11-1.06 1.06l-2.474-2.473zM1.5 7.5a6 6 0 1110.386 4.094.75.75 0 00-.292.293A6 6 0 011.5 7.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M11.97 6.97a.75.75 0 000 1.06l2.47 2.47-2.47 2.47a.75.75 0 101.06 1.06l3-3a.75.75 0 000-1.06l-3-3a.75.75 0 00-1.06 0zM9.03 8.03a.75.75 0 00-1.06-1.06l-3 3a.75.75 0 000 1.06l3 3a.75.75 0 001.06-1.06L6.56 10.5l2.47-2.47z\"></path><path fill-rule=\"evenodd\" d=\"M10.5 0C4.701 0 0 4.701 0 10.5S4.701 21 10.5 21c2.63 0 5.033-.967 6.875-2.564l4.345 4.344a.75.75 0 101.06-1.06l-4.344-4.345A10.459 10.459 0 0021 10.5C21 4.701 16.299 0 10.5 0zm-9 10.5a9 9 0 1118 0 9 9 0 01-18 0z\"></path>"
+		}
+	}
+};
+var codespaces = {
+	name: "codespaces",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M2 1.75C2 .784 2.784 0 3.75 0h8.5C13.216 0 14 .784 14 1.75v5a1.75 1.75 0 01-1.75 1.75h-8.5A1.75 1.75 0 012 6.75v-5zm1.75-.25a.25.25 0 00-.25.25v5c0 .138.112.25.25.25h8.5a.25.25 0 00.25-.25v-5a.25.25 0 00-.25-.25h-8.5zM0 11.25c0-.966.784-1.75 1.75-1.75h12.5c.966 0 1.75.784 1.75 1.75v3A1.75 1.75 0 0114.25 16H1.75A1.75 1.75 0 010 14.25v-3zM1.75 11a.25.25 0 00-.25.25v3c0 .138.112.25.25.25h12.5a.25.25 0 00.25-.25v-3a.25.25 0 00-.25-.25H1.75z\"></path><path fill-rule=\"evenodd\" d=\"M3 12.75a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zm4 0a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M3.5 3.75C3.5 2.784 4.284 2 5.25 2h13.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0118.75 13H5.25a1.75 1.75 0 01-1.75-1.75v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h13.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25H5.25zM1.5 15.75c0-.966.784-1.75 1.75-1.75h17.5c.966 0 1.75.784 1.75 1.75v4a1.75 1.75 0 01-1.75 1.75H3.25a1.75 1.75 0 01-1.75-1.75v-4zm1.75-.25a.25.25 0 00-.25.25v4c0 .138.112.25.25.25h17.5a.25.25 0 00.25-.25v-4a.25.25 0 00-.25-.25H3.25z\"></path><path fill-rule=\"evenodd\" d=\"M10 17.75a.75.75 0 01.75-.75h6.5a.75.75 0 010 1.5h-6.5a.75.75 0 01-.75-.75zm-4 0a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75z\"></path>"
+		}
+	}
+};
+var columns = {
+	name: "columns",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M2.75 0A1.75 1.75 0 001 1.75v12.5c0 .966.784 1.75 1.75 1.75h2.5A1.75 1.75 0 007 14.25V1.75A1.75 1.75 0 005.25 0h-2.5zM2.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25v12.5a.25.25 0 01-.25.25h-2.5a.25.25 0 01-.25-.25V1.75zM10.75 0A1.75 1.75 0 009 1.75v12.5c0 .966.784 1.75 1.75 1.75h2.5A1.75 1.75 0 0015 14.25V1.75A1.75 1.75 0 0013.25 0h-2.5zm-.25 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25v12.5a.25.25 0 01-.25.25h-2.5a.25.25 0 01-.25-.25V1.75z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M3.75 2A1.75 1.75 0 002 3.75v16.5c0 .966.784 1.75 1.75 1.75h5.5A1.75 1.75 0 0011 20.25V3.75A1.75 1.75 0 009.25 2h-5.5zM3.5 3.75a.25.25 0 01.25-.25h5.5a.25.25 0 01.25.25v16.5a.25.25 0 01-.25.25h-5.5a.25.25 0 01-.25-.25V3.75zM14.75 2A1.75 1.75 0 0013 3.75v16.5c0 .966.784 1.75 1.75 1.75h5.5A1.75 1.75 0 0022 20.25V3.75A1.75 1.75 0 0020.25 2h-5.5zm-.25 1.75a.25.25 0 01.25-.25h5.5a.25.25 0 01.25.25v16.5a.25.25 0 01-.25.25h-5.5a.25.25 0 01-.25-.25V3.75z\"></path>"
 		}
 	}
 };
@@ -922,9 +585,13 @@ var copy = {
 	keywords: [
 	],
 	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z\"></path><path fill-rule=\"evenodd\" d=\"M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z\"></path>"
+		},
 		"24": {
 			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M4.75 3A1.75 1.75 0 003 4.75v9.5c0 .966.784 1.75 1.75 1.75h1.5a.75.75 0 000-1.5h-1.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.25-.25h9.5a.25.25 0 01.25.25v1.5a.75.75 0 001.5 0v-1.5A1.75 1.75 0 0014.25 3h-9.5zm5 5A1.75 1.75 0 008 9.75v9.5c0 .966.784 1.75 1.75 1.75h9.5A1.75 1.75 0 0021 19.25v-9.5A1.75 1.75 0 0019.25 8h-9.5zM9.5 9.75a.25.25 0 01.25-.25h9.5a.25.25 0 01.25.25v9.5a.25.25 0 01-.25.25h-9.5a.25.25 0 01-.25-.25v-9.5z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 01-1.75 1.75H8.774a1.75 1.75 0 01-1.75-1.75V3.75zm1.75-.25a.25.25 0 00-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 00.25-.25V3.75a.25.25 0 00-.25-.25H8.774z\"></path><path d=\"M1.995 10.749a1.75 1.75 0 011.75-1.751H5.25a.75.75 0 110 1.5H3.745a.25.25 0 00-.25.25L3.5 20.25c0 .138.111.25.25.25h9.5a.25.25 0 00.25-.25v-1.51a.75.75 0 111.5 0v1.51A1.75 1.75 0 0113.25 22h-9.5A1.75 1.75 0 012 20.25l-.005-9.501z\"></path>"
 		}
 	}
 };
@@ -977,6 +644,36 @@ var database = {
 		}
 	}
 };
+var dependabot = {
+	name: "dependabot",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M5.75 7.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zm5.25.75a.75.75 0 00-1.5 0v1.5a.75.75 0 001.5 0v-1.5z\"></path><path fill-rule=\"evenodd\" d=\"M6.25 0a.75.75 0 000 1.5H7.5v2H3.75A2.25 2.25 0 001.5 5.75V8H.75a.75.75 0 000 1.5h.75v2.75a2.25 2.25 0 002.25 2.25h8.5a2.25 2.25 0 002.25-2.25V9.5h.75a.75.75 0 000-1.5h-.75V5.75a2.25 2.25 0 00-2.25-2.25H9V.75A.75.75 0 008.25 0h-2zM3 5.75A.75.75 0 013.75 5h8.5a.75.75 0 01.75.75v6.5a.75.75 0 01-.75.75h-8.5a.75.75 0 01-.75-.75v-6.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M8.75 11a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5a.75.75 0 01.75-.75zm7.25.75a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z\"></path><path fill-rule=\"evenodd\" d=\"M9.813 1a.75.75 0 000 1.5H11.5V5H4.25A2.25 2.25 0 002 7.25v5.25H.75a.75.75 0 000 1.5H2v5.75A2.25 2.25 0 004.25 22h15.5A2.25 2.25 0 0022 19.75V14h1.25a.75.75 0 000-1.5H22V7.25A2.25 2.25 0 0019.75 5H13V1.75a.75.75 0 00-.75-.75H9.812zM3.5 7.25a.75.75 0 01.75-.75h15.5a.75.75 0 01.75.75v12.5a.75.75 0 01-.75.75H4.25a.75.75 0 01-.75-.75V7.25z\"></path>"
+		}
+	}
+};
+var diamond = {
+	name: "diamond",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M.527 9.237a1.75 1.75 0 010-2.474L6.777.512a1.75 1.75 0 012.475 0l6.251 6.25a1.751 1.751 0 010 2.475l-6.25 6.251a1.751 1.751 0 01-2.475 0L.527 9.238v-.001zm1.06-1.414a.25.25 0 000 .354l6.251 6.25a.25.25 0 00.354 0l6.25-6.25a.25.25 0 000-.354l-6.25-6.25a.25.25 0 00-.354 0l-6.25 6.25h-.001z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M1.527 13.237a1.75 1.75 0 010-2.474l9.272-9.273a1.75 1.75 0 012.475 0l9.272 9.273a1.75 1.75 0 010 2.474l-9.272 9.272a1.75 1.75 0 01-2.475 0l-9.272-9.272zm1.06-1.414a.25.25 0 000 .354l9.273 9.272a.25.25 0 00.353 0l9.272-9.272a.25.25 0 000-.354l-9.272-9.272a.25.25 0 00-.353 0l-9.273 9.272z\"></path>"
+		}
+	}
+};
 var diff = {
 	name: "diff",
 	keywords: [
@@ -1022,6 +719,21 @@ var download = {
 		"24": {
 			width: 24,
 			path: "<path d=\"M4.97 11.03a.75.75 0 111.06-1.06L11 14.94V2.75a.75.75 0 011.5 0v12.19l4.97-4.97a.75.75 0 111.06 1.06l-6.25 6.25a.75.75 0 01-1.06 0l-6.25-6.25zm-.22 9.47a.75.75 0 000 1.5h14.5a.75.75 0 000-1.5H4.75z\"></path>"
+		}
+	}
+};
+var duplicate = {
+	name: "duplicate",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M10.5 3a.75.75 0 01.75.75v1h1a.75.75 0 010 1.5h-1v1a.75.75 0 01-1.5 0v-1h-1a.75.75 0 010-1.5h1v-1A.75.75 0 0110.5 3z\"></path><path fill-rule=\"evenodd\" d=\"M6.75 0A1.75 1.75 0 005 1.75v7.5c0 .966.784 1.75 1.75 1.75h7.5A1.75 1.75 0 0016 9.25v-7.5A1.75 1.75 0 0014.25 0h-7.5zM6.5 1.75a.25.25 0 01.25-.25h7.5a.25.25 0 01.25.25v7.5a.25.25 0 01-.25.25h-7.5a.25.25 0 01-.25-.25v-7.5z\"></path><path d=\"M1.75 5A1.75 1.75 0 000 6.75v7.5C0 15.216.784 16 1.75 16h7.5A1.75 1.75 0 0011 14.25v-1.5a.75.75 0 00-1.5 0v1.5a.25.25 0 01-.25.25h-7.5a.25.25 0 01-.25-.25v-7.5a.25.25 0 01.25-.25h1.5a.75.75 0 000-1.5h-1.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M14.513 6a.75.75 0 01.75.75v2h1.987a.75.75 0 010 1.5h-1.987v2a.75.75 0 11-1.5 0v-2H11.75a.75.75 0 010-1.5h2.013v-2a.75.75 0 01.75-.75z\"></path><path fill-rule=\"evenodd\" d=\"M7.024 3.75c0-.966.784-1.75 1.75-1.75H20.25c.966 0 1.75.784 1.75 1.75v11.498a1.75 1.75 0 01-1.75 1.75H8.774a1.75 1.75 0 01-1.75-1.75V3.75zm1.75-.25a.25.25 0 00-.25.25v11.498c0 .139.112.25.25.25H20.25a.25.25 0 00.25-.25V3.75a.25.25 0 00-.25-.25H8.774z\"></path><path d=\"M1.995 10.749a1.75 1.75 0 011.75-1.751H5.25a.75.75 0 110 1.5H3.745a.25.25 0 00-.25.25L3.5 20.25c0 .138.111.25.25.25h9.5a.25.25 0 00.25-.25v-1.51a.75.75 0 111.5 0v1.51A1.75 1.75 0 0113.25 22h-9.5A1.75 1.75 0 012 20.25l-.005-9.501z\"></path>"
 		}
 	}
 };
@@ -1220,6 +932,21 @@ var graph = {
 		}
 	}
 };
+var hash$2 = {
+	name: "hash",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M6.368 1.01a.75.75 0 01.623.859L6.57 4.5h3.98l.46-2.868a.75.75 0 011.48.237L12.07 4.5h2.18a.75.75 0 010 1.5h-2.42l-.64 4h2.56a.75.75 0 010 1.5h-2.8l-.46 2.869a.75.75 0 01-1.48-.237l.42-2.632H5.45l-.46 2.869a.75.75 0 01-1.48-.237l.42-2.632H1.75a.75.75 0 010-1.5h2.42l.64-4H2.25a.75.75 0 010-1.5h2.8l.46-2.868a.75.75 0 01.858-.622zM9.67 10l.64-4H6.33l-.64 4h3.98z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M9.618 1.76a.75.75 0 01.623.859L9.46 7.5h6.48l.82-5.118a.75.75 0 011.48.237L17.46 7.5h3.79a.75.75 0 010 1.5h-4.03l-.96 6h3.99a.75.75 0 110 1.5h-4.23l-.78 4.869a.75.75 0 01-1.48-.237l.74-4.632H8.02l-.78 4.869a.75.75 0 01-1.48-.237L6.5 16.5H2.745a.75.75 0 010-1.5H6.74l.96-6H3.75a.75.75 0 010-1.5h4.19l.82-5.118a.75.75 0 01.858-.622zM14.741 15l.96-6H9.22l-.96 6h6.48z\"></path>"
+		}
+	}
+};
 var heading = {
 	name: "heading",
 	keywords: [
@@ -1389,17 +1116,6 @@ var info = {
 		}
 	}
 };
-var insights = {
-	name: "insights",
-	keywords: [
-	],
-	heights: {
-		"24": {
-			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M11.75 3.5a.75.75 0 01.75.75v15.5a.75.75 0 01-1.5 0V4.25a.75.75 0 01.75-.75zm6.5 3.625a.75.75 0 01.75.75V19.75a.75.75 0 01-1.5 0V7.875a.75.75 0 01.75-.75zM5.25 11a.75.75 0 01.75.75v8a.75.75 0 01-1.5 0v-8a.75.75 0 01.75-.75z\"></path>"
-		}
-	}
-};
 var italic = {
 	name: "italic",
 	keywords: [
@@ -1547,7 +1263,7 @@ var megaphone = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M15.571.572A.75.75 0 0116 1.25L14.777.668c.001 0 0 0 0 0l-.015.012-.076.056a5.508 5.508 0 01-.345.224 9.982 9.982 0 01-1.463.719c-1.322.528-3.351 1.07-6.124 1.071a1.6 1.6 0 00-.861-.25H4a4 4 0 00-1.499 7.71.758.758 0 00-.001.04c0 2.32.486 3.93.813 4.75.262.66.897 1 1.517 1h1.197c.685 0 1.228-.389 1.546-.857.317-.466.468-1.09.31-1.696-.2-.767-.382-1.835-.383-3.183 2.394.086 4.177.577 5.378 1.057a9.965 9.965 0 011.463.719 5.7 5.7 0 01.421.28l.014.012h.002A.75.75 0 0016 11.75V1.25L14.777.668a.75.75 0 01.794-.096zM4.002 10.5c.033 1.969.45 3.306.704 3.946.004.01.01.02.027.03a.185.185 0 00.097.024h1.197c.083 0 .202-.047.305-.2a.608.608 0 00.1-.475 14.036 14.036 0 01-.43-3.329 1.64 1.64 0 01-.11.004h-1.89zM7.5 8.763c2.601.087 4.573.62 5.935 1.166.41.164.766.33 1.065.483V2.588c-.3.154-.654.319-1.065.483C12.073 3.616 10.1 4.15 7.5 4.237v4.526zM14.777.668zM1.5 6.5A2.5 2.5 0 014 4h1.893c.059 0 .107.048.107.107v4.786A.107.107 0 015.893 9H4a2.5 2.5 0 01-2.5-2.5z\"></path>"
+			path: "<g fill-rule=\"evenodd\"><path d=\"M3.25 9a.75.75 0 01.75.75c0 2.142.456 3.828.733 4.653a.121.121 0 00.05.064.207.207 0 00.117.033h1.31c.085 0 .18-.042.258-.152a.448.448 0 00.075-.366A16.74 16.74 0 016 9.75a.75.75 0 011.5 0c0 1.588.25 2.926.494 3.85.293 1.113-.504 2.4-1.783 2.4H4.9c-.686 0-1.35-.41-1.589-1.12A16.42 16.42 0 012.5 9.75.75.75 0 013.25 9z\"></path><path d=\"M0 6a4 4 0 014-4h2.75a.75.75 0 01.75.75v6.5a.75.75 0 01-.75.75H4a4 4 0 01-4-4zm4-2.5a2.5 2.5 0 000 5h2v-5H4z\"></path><path d=\"M15.59.082A.75.75 0 0116 .75v10.5a.75.75 0 01-1.189.608l-.002-.001h.001l-.014-.01a5.829 5.829 0 00-.422-.25 10.58 10.58 0 00-1.469-.64C11.576 10.484 9.536 10 6.75 10a.75.75 0 110-1.5c2.964 0 5.174.516 6.658 1.043.423.151.787.302 1.092.443V2.014c-.305.14-.669.292-1.092.443C11.924 2.984 9.713 3.5 6.75 3.5a.75.75 0 110-1.5c2.786 0 4.826-.484 6.155-.957.665-.236 1.154-.47 1.47-.64a5.82 5.82 0 00.421-.25l.014-.01a.75.75 0 01.78-.061zm-.78.06zm.44 11.108l-.44.607.44-.607z\"></path></g>"
 		},
 		"24": {
 			width: 24,
@@ -1675,28 +1391,11 @@ var number = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M1 5.25a.75.75 0 01.75-.75h12.5a.75.75 0 010 1.5H1.75A.75.75 0 011 5.25zm0 5.5a.75.75 0 01.75-.75h12.5a.75.75 0 010 1.5H1.75a.75.75 0 01-.75-.75z\"></path><path fill-rule=\"evenodd\" d=\"M6.368 1.01a.75.75 0 01.623.859l-2 12.5a.75.75 0 01-1.482-.237l2-12.5a.75.75 0 01.86-.622zm5.5 0a.75.75 0 01.623.859l-2 12.5a.75.75 0 01-1.482-.237l2-12.5a.75.75 0 01.86-.622z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M5.604.089A.75.75 0 016 .75v4.77h.711a.75.75 0 110 1.5H3.759a.75.75 0 110-1.5H4.5V2.15l-.334.223a.75.75 0 01-.832-1.248l1.5-1a.75.75 0 01.77-.037zM9 4.75A.75.75 0 019.75 4h4a.75.75 0 01.53 1.28l-1.89 1.892c.312.076.604.18.867.319.742.391 1.244 1.063 1.244 2.005 0 .653-.231 1.208-.629 1.627-.386.408-.894.653-1.408.777-1.01.243-2.225.063-3.124-.527a.75.75 0 01.822-1.254c.534.35 1.32.474 1.951.322.306-.073.53-.201.67-.349.129-.136.218-.32.218-.596 0-.308-.123-.509-.444-.678-.373-.197-.98-.318-1.806-.318a.75.75 0 01-.53-1.28l1.72-1.72H9.75A.75.75 0 019 4.75zm-3.587 5.763c-.35-.05-.77.113-.983.572a.75.75 0 11-1.36-.632c.508-1.094 1.589-1.565 2.558-1.425 1 .145 1.872.945 1.872 2.222 0 1.433-1.088 2.192-1.79 2.681-.308.216-.571.397-.772.573H7a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75c0-.69.3-1.211.67-1.61.348-.372.8-.676 1.15-.92.8-.56 1.18-.904 1.18-1.474 0-.473-.267-.69-.587-.737z\"></path>"
 		},
 		"24": {
 			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M2 8.25a.75.75 0 01.75-.75h18.5a.75.75 0 010 1.5H2.75A.75.75 0 012 8.25zm-.005 7.5a.75.75 0 01.75-.75v1.5a.75.75 0 01-.75-.75zm.75 0v.75H21.25a.75.75 0 000-1.5H2.745v.75z\"></path><path fill-rule=\"evenodd\" d=\"M9.62 2.01a.75.75 0 01.62.86l-3 18.5a.75.75 0 01-1.48-.24l3-18.5a.75.75 0 01.86-.62zm8 0a.75.75 0 01.62.86l-3 18.5a.75.75 0 01-1.48-.24l3-18.5a.75.75 0 01.86-.62z\"></path>"
-		}
-	}
-};
-var octoface = {
-	name: "octoface",
-	keywords: [
-		"octocat",
-		"brand"
-	],
-	heights: {
-		"16": {
-			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M1.326 1.973a1.2 1.2 0 011.49-.832c.387.112.977.307 1.575.602.586.291 1.243.71 1.7 1.296.022.027.042.056.061.084A13.22 13.22 0 018 3c.67 0 1.289.037 1.861.108l.051-.07c.457-.586 1.114-1.004 1.7-1.295a9.654 9.654 0 011.576-.602 1.2 1.2 0 011.49.832c.14.493.356 1.347.479 2.29.079.604.123 1.28.07 1.936.541.977.773 2.11.773 3.301C16 13 14.5 15 8 15s-8-2-8-5.5c0-1.034.238-2.128.795-3.117-.08-.712-.034-1.46.052-2.12.122-.943.34-1.797.479-2.29zM8 13.065c6 0 6.5-2 6-4.27C13.363 5.905 11.25 5 8 5s-5.363.904-6 3.796c-.5 2.27 0 4.27 6 4.27z\"></path><path d=\"M4 8a1 1 0 012 0v1a1 1 0 01-2 0V8zm2.078 2.492c-.083-.264.146-.492.422-.492h3c.276 0 .505.228.422.492C9.67 11.304 8.834 12 8 12c-.834 0-1.669-.696-1.922-1.508zM10 8a1 1 0 112 0v1a1 1 0 11-2 0V8z\"></path>"
-		},
-		"24": {
-			width: 24,
-			path: "<path d=\"M7.75 11c-.69 0-1.25.56-1.25 1.25v1.5a1.25 1.25 0 102.5 0v-1.5C9 11.56 8.44 11 7.75 11zm1.27 4.5a.469.469 0 01.48-.5h5a.47.47 0 01.48.5c-.116 1.316-.759 2.5-2.98 2.5s-2.864-1.184-2.98-2.5zm7.23-4.5c-.69 0-1.25.56-1.25 1.25v1.5a1.25 1.25 0 102.5 0v-1.5c0-.69-.56-1.25-1.25-1.25z\"></path><path fill-rule=\"evenodd\" d=\"M21.255 3.82a1.725 1.725 0 00-2.141-1.195c-.557.16-1.406.44-2.264.866-.78.386-1.647.93-2.293 1.677A18.442 18.442 0 0012 5c-.93 0-1.784.059-2.569.17-.645-.74-1.505-1.28-2.28-1.664a13.876 13.876 0 00-2.265-.866 1.725 1.725 0 00-2.141 1.196 23.645 23.645 0 00-.69 3.292c-.125.97-.191 2.07-.066 3.112C1.254 11.882 1 13.734 1 15.527 1 19.915 3.13 23 12 23c8.87 0 11-3.053 11-7.473 0-1.794-.255-3.647-.99-5.29.127-1.046.06-2.15-.066-3.125a23.652 23.652 0 00-.689-3.292zM20.5 14c.5 3.5-1.5 6.5-8.5 6.5s-9-3-8.5-6.5c.583-4 3-6 8.5-6s7.928 2 8.5 6z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M8.114 2.094a.75.75 0 01.386.656V9h1.252a.75.75 0 110 1.5H5.75a.75.75 0 010-1.5H7V4.103l-.853.533a.75.75 0 01-.795-1.272l2-1.25a.75.75 0 01.762-.02zm4.889 5.66a.75.75 0 01.75-.75h5.232a.75.75 0 01.53 1.28l-2.776 2.777c.55.097 1.057.253 1.492.483.905.477 1.504 1.284 1.504 2.418 0 .966-.471 1.75-1.172 2.27-.687.511-1.587.77-2.521.77-1.367 0-2.274-.528-2.667-.756a.75.75 0 01.755-1.297c.331.193.953.553 1.912.553.673 0 1.243-.188 1.627-.473.37-.275.566-.635.566-1.067 0-.5-.219-.836-.703-1.091-.538-.284-1.375-.443-2.471-.443a.75.75 0 01-.53-1.28l2.643-2.644h-3.421a.75.75 0 01-.75-.75zM7.88 15.215a1.4 1.4 0 00-1.446.83.75.75 0 01-1.37-.61 2.9 2.9 0 012.986-1.71 2.565 2.565 0 011.557.743c.434.446.685 1.058.685 1.778 0 1.641-1.254 2.437-2.12 2.986-.538.341-1.18.694-1.495 1.273H9.75a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75c0-1.799 1.337-2.63 2.243-3.21 1.032-.659 1.55-1.031 1.55-1.8 0-.355-.116-.584-.26-.732a1.068 1.068 0 00-.652-.298z\"></path>"
 		}
 	}
 };
@@ -1726,6 +1425,21 @@ var paintbrush = {
 		"16": {
 			width: 16,
 			path: "<path fill-rule=\"evenodd\" d=\"M11.134 1.535C9.722 2.562 8.16 4.057 6.889 5.312 5.8 6.387 5.041 7.401 4.575 8.294a3.745 3.745 0 00-3.227 1.054c-.43.431-.69 1.066-.86 1.657a11.982 11.982 0 00-.358 1.914A21.263 21.263 0 000 15.203v.054l.75-.007-.007.75h.054a14.404 14.404 0 00.654-.012 21.243 21.243 0 001.63-.118c.62-.07 1.3-.18 1.914-.357.592-.17 1.226-.43 1.657-.861a3.745 3.745 0 001.055-3.217c.908-.461 1.942-1.216 3.04-2.3 1.279-1.262 2.764-2.825 3.775-4.249.501-.706.923-1.428 1.125-2.096.2-.659.235-1.469-.368-2.07-.606-.607-1.42-.55-2.069-.34-.66.213-1.376.646-2.076 1.155zm-3.95 8.48a3.76 3.76 0 00-1.19-1.192 9.758 9.758 0 011.161-1.607l1.658 1.658a9.853 9.853 0 01-1.63 1.142zM.742 16l.007-.75-.75.008A.75.75 0 00.743 16zM12.016 2.749c-1.224.89-2.605 2.189-3.822 3.384l1.718 1.718c1.21-1.205 2.51-2.597 3.387-3.833.47-.662.78-1.227.912-1.662.134-.444.032-.551.009-.575h-.001V1.78c-.014-.014-.112-.113-.548.027-.432.14-.995.462-1.655.942zM1.62 13.089a19.56 19.56 0 00-.104 1.395 19.55 19.55 0 001.396-.104 10.528 10.528 0 001.668-.309c.526-.151.856-.325 1.011-.48a2.25 2.25 0 00-3.182-3.182c-.155.155-.329.485-.48 1.01a10.515 10.515 0 00-.309 1.67z\"></path>"
+		}
+	}
+};
+var paste = {
+	name: "paste",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M5.75 1a.75.75 0 00-.75.75v3c0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75v-3a.75.75 0 00-.75-.75h-4.5zm.75 3V2.5h3V4h-3zm-2.874-.467a.75.75 0 00-.752-1.298A1.75 1.75 0 002 3.75v9.5c0 .966.784 1.75 1.75 1.75h8.5A1.75 1.75 0 0014 13.25v-9.5a1.75 1.75 0 00-.874-1.515.75.75 0 10-.752 1.298.25.25 0 01.126.217v9.5a.25.25 0 01-.25.25h-8.5a.25.25 0 01-.25-.25v-9.5a.25.25 0 01.126-.217z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M5.962 2.513a.75.75 0 01-.475.949l-.816.272a.25.25 0 00-.171.237V21.25c0 .138.112.25.25.25h14.5a.25.25 0 00.25-.25V3.97a.25.25 0 00-.17-.236l-.817-.272a.75.75 0 01.474-1.424l.816.273A1.75 1.75 0 0121 3.97v17.28A1.75 1.75 0 0119.25 23H4.75A1.75 1.75 0 013 21.25V3.97a1.75 1.75 0 011.197-1.66l.816-.272a.75.75 0 01.949.475z\"></path><path fill-rule=\"evenodd\" d=\"M7 1.75C7 .784 7.784 0 8.75 0h6.5C16.216 0 17 .784 17 1.75v1.5A1.75 1.75 0 0115.25 5h-6.5A1.75 1.75 0 017 3.25v-1.5zm1.75-.25a.25.25 0 00-.25.25v1.5c0 .138.112.25.25.25h6.5a.25.25 0 00.25-.25v-1.5a.25.25 0 00-.25-.25h-6.5z\"></path>"
 		}
 	}
 };
@@ -2000,6 +1714,21 @@ var rocket = {
 		}
 	}
 };
+var rows = {
+	name: "rows",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M16 2.75A1.75 1.75 0 0014.25 1H1.75A1.75 1.75 0 000 2.75v2.5A1.75 1.75 0 001.75 7h12.5A1.75 1.75 0 0016 5.25v-2.5zm-1.75-.25a.25.25 0 01.25.25v2.5a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25v-2.5a.25.25 0 01.25-.25h12.5zM16 10.75A1.75 1.75 0 0014.25 9H1.75A1.75 1.75 0 000 10.75v2.5A1.75 1.75 0 001.75 15h12.5A1.75 1.75 0 0016 13.25v-2.5zm-1.75-.25a.25.25 0 01.25.25v2.5a.25.25 0 01-.25.25H1.75a.25.25 0 01-.25-.25v-2.5a.25.25 0 01.25-.25h12.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M22 3.75A1.75 1.75 0 0020.25 2H3.75A1.75 1.75 0 002 3.75v5.5c0 .966.784 1.75 1.75 1.75h16.5A1.75 1.75 0 0022 9.25v-5.5zm-1.75-.25a.25.25 0 01.25.25v5.5a.25.25 0 01-.25.25H3.75a.25.25 0 01-.25-.25v-5.5a.25.25 0 01.25-.25h16.5zM22 14.75A1.75 1.75 0 0020.25 13H3.75A1.75 1.75 0 002 14.75v5.5c0 .966.784 1.75 1.75 1.75h16.5A1.75 1.75 0 0022 20.25v-5.5zm-1.75-.25a.25.25 0 01.25.25v5.5a.25.25 0 01-.25.25H3.75a.25.25 0 01-.25-.25v-5.5a.25.25 0 01.25-.25h16.5z\"></path>"
+		}
+	}
+};
 var rss = {
 	name: "rss",
 	keywords: [
@@ -2172,6 +1901,21 @@ var squirrel = {
 		}
 	}
 };
+var stack = {
+	name: "stack",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M7.122.392a1.75 1.75 0 011.756 0l5.003 2.902c.83.481.83 1.68 0 2.162L8.878 8.358a1.75 1.75 0 01-1.756 0L2.119 5.456a1.25 1.25 0 010-2.162L7.122.392zM8.125 1.69a.25.25 0 00-.25 0l-4.63 2.685 4.63 2.685a.25.25 0 00.25 0l4.63-2.685-4.63-2.685zM1.601 7.789a.75.75 0 011.025-.273l5.249 3.044a.25.25 0 00.25 0l5.249-3.044a.75.75 0 01.752 1.298l-5.248 3.044a1.75 1.75 0 01-1.756 0L1.874 8.814A.75.75 0 011.6 7.789zm0 3.5a.75.75 0 011.025-.273l5.249 3.044a.25.25 0 00.25 0l5.249-3.044a.75.75 0 01.752 1.298l-5.248 3.044a1.75 1.75 0 01-1.756 0l-5.248-3.044a.75.75 0 01-.273-1.025z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M11.063 1.456a1.75 1.75 0 011.874 0l8.383 5.316a1.75 1.75 0 010 2.956l-8.383 5.316a1.75 1.75 0 01-1.874 0L2.68 9.728a1.75 1.75 0 010-2.956l8.383-5.316zm1.071 1.267a.25.25 0 00-.268 0L3.483 8.039a.25.25 0 000 .422l8.383 5.316a.25.25 0 00.268 0l8.383-5.316a.25.25 0 000-.422l-8.383-5.316z\"></path><path fill-rule=\"evenodd\" d=\"M1.867 12.324a.75.75 0 011.035-.232l8.964 5.685a.25.25 0 00.268 0l8.964-5.685a.75.75 0 01.804 1.267l-8.965 5.685a1.75 1.75 0 01-1.874 0l-8.965-5.685a.75.75 0 01-.231-1.035z\"></path><path fill-rule=\"evenodd\" d=\"M1.867 16.324a.75.75 0 011.035-.232l8.964 5.685a.25.25 0 00.268 0l8.964-5.685a.75.75 0 01.804 1.267l-8.965 5.685a1.75 1.75 0 01-1.874 0l-8.965-5.685a.75.75 0 01-.231-1.035z\"></path>"
+		}
+	}
+};
 var star = {
 	name: "star",
 	keywords: [
@@ -2279,6 +2023,21 @@ var tab = {
 		"24": {
 			width: 24,
 			path: "<path d=\"M22 4.25a.75.75 0 00-1.5 0v15a.75.75 0 001.5 0v-15zm-9.72 14.28a.75.75 0 11-1.06-1.06l4.97-4.97H1.75a.75.75 0 010-1.5h14.44l-4.97-4.97a.75.75 0 011.06-1.06l6.25 6.25a.75.75 0 010 1.06l-6.25 6.25z\"></path>"
+		}
+	}
+};
+var table = {
+	name: "table",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v3.585a.746.746 0 010 .83v8.085A1.75 1.75 0 0114.25 16H6.309a.748.748 0 01-1.118 0H1.75A1.75 1.75 0 010 14.25V6.165a.746.746 0 010-.83V1.75zM1.5 6.5v7.75c0 .138.112.25.25.25H5v-8H1.5zM5 5H1.5V1.75a.25.25 0 01.25-.25H5V5zm1.5 1.5v8h7.75a.25.25 0 00.25-.25V6.5h-8zm8-1.5h-8V1.5h7.75a.25.25 0 01.25.25V5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M2 3.75C2 2.784 2.784 2 3.75 2h16.5c.966 0 1.75.784 1.75 1.75v16.5A1.75 1.75 0 0120.25 22H3.75A1.75 1.75 0 012 20.25V3.75zM3.5 9v11.25c0 .138.112.25.25.25H7.5V9h-4zm4-1.5h-4V3.75a.25.25 0 01.25-.25H7.5v4zM9 9v11.5h11.25a.25.25 0 00.25-.25V9H9zm11.5-1.5H9v-4h11.25a.25.25 0 01.25.25V7.5z\"></path>"
 		}
 	}
 };
@@ -2414,24 +2173,13 @@ var trash = {
 	keywords: [
 	],
 	heights: {
-		"24": {
-			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M16 1.75V3h5.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H8V1.75C8 .784 8.784 0 9.75 0h4.5C15.216 0 16 .784 16 1.75zm-6.5 0a.25.25 0 01.25-.25h4.5a.25.25 0 01.25.25V3h-5V1.75z\"></path><path d=\"M4.997 6.178a.75.75 0 10-1.493.144L4.916 20.92a1.75 1.75 0 001.742 1.58h10.684a1.75 1.75 0 001.742-1.581l1.413-14.597a.75.75 0 00-1.494-.144l-1.412 14.596a.25.25 0 01-.249.226H6.658a.25.25 0 01-.249-.226L4.997 6.178z\"></path><path d=\"M9.206 7.501a.75.75 0 01.793.705l.5 8.5A.75.75 0 119 16.794l-.5-8.5a.75.75 0 01.705-.793zm6.293.793A.75.75 0 1014 8.206l-.5 8.5a.75.75 0 001.498.088l.5-8.5z\"></path>"
-		}
-	}
-};
-var trashcan = {
-	name: "trashcan",
-	keywords: [
-		"garbage",
-		"rubbish",
-		"recycle",
-		"delete"
-	],
-	heights: {
 		"16": {
 			width: 16,
 			path: "<path fill-rule=\"evenodd\" d=\"M6.5 1.75a.25.25 0 01.25-.25h2.5a.25.25 0 01.25.25V3h-3V1.75zm4.5 0V3h2.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H5V1.75C5 .784 5.784 0 6.75 0h2.5C10.216 0 11 .784 11 1.75zM4.496 6.675a.75.75 0 10-1.492.15l.66 6.6A1.75 1.75 0 005.405 15h5.19c.9 0 1.652-.681 1.741-1.576l.66-6.6a.75.75 0 00-1.492-.149l-.66 6.6a.25.25 0 01-.249.225h-5.19a.25.25 0 01-.249-.225l-.66-6.6z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M16 1.75V3h5.25a.75.75 0 010 1.5H2.75a.75.75 0 010-1.5H8V1.75C8 .784 8.784 0 9.75 0h4.5C15.216 0 16 .784 16 1.75zm-6.5 0a.25.25 0 01.25-.25h4.5a.25.25 0 01.25.25V3h-5V1.75z\"></path><path d=\"M4.997 6.178a.75.75 0 10-1.493.144L4.916 20.92a1.75 1.75 0 001.742 1.58h10.684a1.75 1.75 0 001.742-1.581l1.413-14.597a.75.75 0 00-1.494-.144l-1.412 14.596a.25.25 0 01-.249.226H6.658a.25.25 0 01-.249-.226L4.997 6.178z\"></path><path d=\"M9.206 7.501a.75.75 0 01.793.705l.5 8.5A.75.75 0 119 16.794l-.5-8.5a.75.75 0 01.705-.793zm6.293.793A.75.75 0 1014 8.206l-.5 8.5a.75.75 0 001.498.088l.5-8.5z\"></path>"
 		}
 	}
 };
@@ -2643,7 +2391,7 @@ var zap = {
 		}
 	}
 };
-var data = {
+var require$$0 = {
 	alert: alert,
 	archive: archive,
 	"arrow-both": {
@@ -2766,7 +2514,7 @@ var data = {
 		},
 		"24": {
 			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M6.47 10.78a.75.75 0 010-1.06l5.25-5.25a.75.75 0 011.06 0l5.25 5.25a.75.75 0 11-1.06 1.06L13 6.81v12.44a.75.75 0 01-1.5 0V6.81l-3.97 3.97a.75.75 0 01-1.06 0z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M18.655 10.405a.75.75 0 000-1.06l-6.25-6.25a.75.75 0 00-1.06 0l-6.25 6.25a.75.75 0 101.06 1.06l4.97-4.97v14.44a.75.75 0 001.5 0V5.435l4.97 4.97a.75.75 0 001.06 0z\"></path>"
 		}
 	}
 },
@@ -2799,6 +2547,10 @@ var data = {
 	keywords: [
 	],
 	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M8 16c.9 0 1.7-.6 1.9-1.5.1-.3-.1-.5-.4-.5h-3c-.3 0-.5.2-.4.5.2.9 1 1.5 1.9 1.5zM3 5c0-2.8 2.2-5 5-5s5 2.2 5 5v3l1.7 2.6c.2.2.3.5.3.8 0 .8-.7 1.5-1.5 1.5h-11c-.8.1-1.5-.6-1.5-1.4 0-.3.1-.6.3-.8L3 8.1V5z\"></path>"
+		},
 		"24": {
 			width: 24,
 			path: "<path fill-rule=\"evenodd\" d=\"M6 8a6 6 0 1112 0v2.917c0 .703.228 1.387.65 1.95L20.7 15.6a1.5 1.5 0 01-1.2 2.4h-15a1.5 1.5 0 01-1.2-2.4l2.05-2.733a3.25 3.25 0 00.65-1.95V8zm6 13.5A3.502 3.502 0 018.645 19h6.71A3.502 3.502 0 0112 21.5z\"></path>"
@@ -2820,6 +2572,7 @@ var data = {
 		}
 	}
 },
+	blocked: blocked,
 	bold: bold,
 	book: book,
 	bookmark: bookmark,
@@ -2987,7 +2740,6 @@ var data = {
 		}
 	}
 },
-	clippy: clippy,
 	clock: clock$1,
 	code: code,
 	"code-review": {
@@ -3020,6 +2772,24 @@ var data = {
 		}
 	}
 },
+	codescan: codescan,
+	"codescan-checkmark": {
+	name: "codescan-checkmark",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M10.28 6.28a.75.75 0 10-1.06-1.06L6.25 8.19l-.97-.97a.75.75 0 00-1.06 1.06l1.5 1.5a.75.75 0 001.06 0l3.5-3.5z\"></path><path fill-rule=\"evenodd\" d=\"M7.5 15a7.469 7.469 0 004.746-1.693l2.474 2.473a.75.75 0 101.06-1.06l-2.473-2.474A7.5 7.5 0 107.5 15zm0-13.5a6 6 0 104.094 10.386.75.75 0 01.293-.292A6 6 0 007.5 1.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M15.03 8.28a.75.75 0 00-1.06-1.06l-5.22 5.22-2.22-2.22a.75.75 0 10-1.06 1.06l2.75 2.75a.75.75 0 001.06 0l5.75-5.75z\"></path><path fill-rule=\"evenodd\" d=\"M0 10.5C0 4.701 4.701 0 10.5 0S21 4.701 21 10.5c0 2.63-.967 5.033-2.564 6.875l4.344 4.345a.75.75 0 11-1.06 1.06l-4.345-4.344A10.459 10.459 0 0110.5 21C4.701 21 0 16.299 0 10.5zm10.5-9a9 9 0 100 18 9 9 0 000-18z\"></path>"
+		}
+	}
+},
+	codespaces: codespaces,
+	columns: columns,
 	comment: comment,
 	"comment-discussion": {
 	name: "comment-discussion",
@@ -3078,6 +2848,7 @@ var data = {
 },
 	dash: dash,
 	database: database,
+	dependabot: dependabot,
 	"desktop-download": {
 	name: "desktop-download",
 	keywords: [
@@ -3164,6 +2935,7 @@ var data = {
 		}
 	}
 },
+	diamond: diamond,
 	diff: diff,
 	"diff-added": {
 	name: "diff-added",
@@ -3249,6 +3021,7 @@ var data = {
 	}
 },
 	download: download,
+	duplicate: duplicate,
 	ellipsis: ellipsis,
 	eye: eye,
 	"eye-closed": {
@@ -3527,17 +3300,6 @@ var data = {
 		}
 	}
 },
-	"git-fork": {
-	name: "git-fork",
-	keywords: [
-	],
-	heights: {
-		"24": {
-			width: 24,
-			path: "<path fill-rule=\"evenodd\" d=\"M12 21a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zm-3.25-1.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0zm-3-12.75a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zM2.5 4.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0zM18.25 6.5a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zM15 4.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0z\"></path><path fill-rule=\"evenodd\" d=\"M6.5 7.75v1A2.25 2.25 0 008.75 11h6.5a2.25 2.25 0 002.25-2.25v-1H19v1a3.75 3.75 0 01-3.75 3.75h-6.5A3.75 3.75 0 015 8.75v-1h1.5z\"></path><path fill-rule=\"evenodd\" d=\"M11.25 16.25v-5h1.5v5h-1.5z\"></path>"
-		}
-	}
-},
 	"git-merge": {
 	name: "git-merge",
 	keywords: [
@@ -3570,9 +3332,40 @@ var data = {
 		}
 	}
 },
+	"git-pull-request-closed": {
+	name: "git-pull-request-closed",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M10.72 1.227a.75.75 0 011.06 0l.97.97.97-.97a.75.75 0 111.06 1.061l-.97.97.97.97a.75.75 0 01-1.06 1.06l-.97-.97-.97.97a.75.75 0 11-1.06-1.06l.97-.97-.97-.97a.75.75 0 010-1.06zM12.75 6.5a.75.75 0 00-.75.75v3.378a2.251 2.251 0 101.5 0V7.25a.75.75 0 00-.75-.75zm0 5.5a.75.75 0 100 1.5.75.75 0 000-1.5zM2.5 3.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.25 1a2.25 2.25 0 00-.75 4.372v5.256a2.251 2.251 0 101.5 0V5.372A2.25 2.25 0 003.25 1zm0 11a.75.75 0 100 1.5.75.75 0 000-1.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M22.266 2.711a.75.75 0 10-1.061-1.06l-1.983 1.983-1.984-1.983a.75.75 0 10-1.06 1.06l1.983 1.983-1.983 1.984a.75.75 0 001.06 1.06l1.984-1.983 1.983 1.983a.75.75 0 001.06-1.06l-1.983-1.984 1.984-1.983z\"></path><path fill-rule=\"evenodd\" d=\"M4.75 1.5a3.25 3.25 0 00-.745 6.414A.758.758 0 004 8v8a.81.81 0 00.005.086A3.251 3.251 0 004.75 22.5a3.25 3.25 0 00.745-6.414A.758.758 0 005.5 16V8a.758.758 0 00-.005-.086A3.251 3.251 0 004.75 1.5zM3 4.75a1.75 1.75 0 113.5 0 1.75 1.75 0 01-3.5 0zm0 14.5a1.75 1.75 0 113.5 0 1.75 1.75 0 01-3.5 0zm13 0a3.251 3.251 0 012.5-3.163V9.625a.75.75 0 011.5 0v6.462a3.251 3.251 0 01-.75 6.413A3.25 3.25 0 0116 19.25zm3.25-1.75a1.75 1.75 0 100 3.5 1.75 1.75 0 000-3.5z\"></path>"
+		}
+	}
+},
+	"git-pull-request-draft": {
+	name: "git-pull-request-draft",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M2.5 3.25a.75.75 0 111.5 0 .75.75 0 01-1.5 0zM3.25 1a2.25 2.25 0 00-.75 4.372v5.256a2.251 2.251 0 101.5 0V5.372A2.25 2.25 0 003.25 1zm0 11a.75.75 0 100 1.5.75.75 0 000-1.5zm9.5 3a2.25 2.25 0 100-4.5 2.25 2.25 0 000 4.5zm0-3a.75.75 0 100 1.5.75.75 0 000-1.5z\"></path><path d=\"M14 7.5a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0zm0-4.25a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M4.75 1.5a3.25 3.25 0 00-.745 6.414A.758.758 0 004 8v8a.81.81 0 00.005.086A3.251 3.251 0 004.75 22.5a3.25 3.25 0 00.745-6.414A.757.757 0 005.5 16V8a.758.758 0 00-.005-.086A3.251 3.251 0 004.75 1.5zM3 4.75a1.75 1.75 0 113.5 0 1.75 1.75 0 01-3.5 0zm0 14.5a1.75 1.75 0 113.5 0 1.75 1.75 0 01-3.5 0zm13 0a3.25 3.25 0 116.5 0 3.25 3.25 0 01-6.5 0zm3.25-1.75a1.75 1.75 0 100 3.5 1.75 1.75 0 000-3.5z\"></path><path d=\"M19.25 6a1.75 1.75 0 100-3.5 1.75 1.75 0 000 3.5zM21 11.25a1.75 1.75 0 11-3.5 0 1.75 1.75 0 013.5 0z\"></path>"
+		}
+	}
+},
 	globe: globe,
 	grabber: grabber,
 	graph: graph,
+	hash: hash$2,
 	heading: heading,
 	heart: heart,
 	"heart-fill": {
@@ -3625,7 +3418,6 @@ var data = {
 	inbox: inbox,
 	infinity: infinity,
 	info: info,
-	insights: insights,
 	"issue-closed": {
 	name: "issue-closed",
 	keywords: [
@@ -3635,11 +3427,26 @@ var data = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M1.5 8a6.5 6.5 0 0110.65-5.003.75.75 0 00.959-1.153 8 8 0 102.592 8.33.75.75 0 10-1.444-.407A6.5 6.5 0 011.5 8zM8 12a1 1 0 100-2 1 1 0 000 2zm0-8a.75.75 0 01.75.75v3.5a.75.75 0 11-1.5 0v-3.5A.75.75 0 018 4zm4.78 4.28l3-3a.75.75 0 00-1.06-1.06l-2.47 2.47-.97-.97a.749.749 0 10-1.06 1.06l1.5 1.5a.75.75 0 001.06 0z\"></path>"
+			path: "<path d=\"M11.28 6.78a.75.75 0 00-1.06-1.06L7.25 8.69 5.78 7.22a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l3.5-3.5z\"></path><path fill-rule=\"evenodd\" d=\"M16 8A8 8 0 110 8a8 8 0 0116 0zm-1.5 0a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z\"></path>"
 		},
 		"24": {
 			width: 24,
-			path: "<path d=\"M2.5 12c0-5.24 4.288-9.5 9.593-9.5a9.608 9.608 0 017.197 3.219.75.75 0 001.12-.998A11.108 11.108 0 0012.093 1C5.973 1 1 5.919 1 12s4.973 11 11.093 11c5.403 0 9.91-3.832 10.893-8.915a.75.75 0 10-1.472-.285c-.848 4.381-4.74 7.7-9.421 7.7C6.788 21.5 2.5 17.24 2.5 12z\"></path><path d=\"M12 17a1 1 0 100-2 1 1 0 000 2zm0-10a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0112 7zm11.28.78a.75.75 0 00-1.06-1.06l-3.47 3.47-1.47-1.47a.75.75 0 10-1.06 1.06l2 2a.75.75 0 001.06 0l4-4z\"></path>"
+			path: "<path d=\"M17.28 9.28a.75.75 0 00-1.06-1.06l-5.97 5.97-2.47-2.47a.75.75 0 00-1.06 1.06l3 3a.75.75 0 001.06 0l6.5-6.5z\"></path><path fill-rule=\"evenodd\" d=\"M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z\"></path>"
+		}
+	}
+},
+	"issue-draft": {
+	name: "issue-draft",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M6.749.097a8.054 8.054 0 012.502 0 .75.75 0 11-.233 1.482 6.554 6.554 0 00-2.036 0A.75.75 0 016.749.097zM4.345 1.693A.75.75 0 014.18 2.74a6.542 6.542 0 00-1.44 1.44.75.75 0 01-1.212-.883 8.042 8.042 0 011.769-1.77.75.75 0 011.048.166zm7.31 0a.75.75 0 011.048-.165 8.04 8.04 0 011.77 1.769.75.75 0 11-1.214.883 6.542 6.542 0 00-1.439-1.44.75.75 0 01-.165-1.047zM.955 6.125a.75.75 0 01.624.857 6.554 6.554 0 000 2.036.75.75 0 01-1.482.233 8.054 8.054 0 010-2.502.75.75 0 01.858-.624zm14.09 0a.75.75 0 01.858.624 8.057 8.057 0 010 2.502.75.75 0 01-1.482-.233 6.55 6.55 0 000-2.036.75.75 0 01.624-.857zm-13.352 5.53a.75.75 0 011.048.165 6.542 6.542 0 001.439 1.44.75.75 0 01-.883 1.212 8.04 8.04 0 01-1.77-1.769.75.75 0 01.166-1.048zm12.614 0a.75.75 0 01.165 1.048 8.038 8.038 0 01-1.769 1.77.75.75 0 11-.883-1.214 6.543 6.543 0 001.44-1.439.75.75 0 011.047-.165zm-8.182 3.39a.75.75 0 01.857-.624 6.55 6.55 0 002.036 0 .75.75 0 01.233 1.482 8.057 8.057 0 01-2.502 0 .75.75 0 01-.624-.858z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M10.157 1.154a11.07 11.07 0 013.686 0 .75.75 0 01-.25 1.479 9.568 9.568 0 00-3.186 0 .75.75 0 01-.25-1.48zM6.68 3.205a.75.75 0 01-.177 1.046A9.558 9.558 0 004.25 6.503a.75.75 0 01-1.223-.87 11.058 11.058 0 012.606-2.605.75.75 0 011.046.177zm10.64 0a.75.75 0 011.046-.177 11.058 11.058 0 012.605 2.606.75.75 0 11-1.222.869 9.558 9.558 0 00-2.252-2.252.75.75 0 01-.177-1.046zM2.018 9.543a.75.75 0 01.615.864 9.568 9.568 0 000 3.186.75.75 0 01-1.48.25 11.07 11.07 0 010-3.686.75.75 0 01.865-.614zm19.964 0a.75.75 0 01.864.614 11.066 11.066 0 010 3.686.75.75 0 01-1.479-.25 9.56 9.56 0 000-3.186.75.75 0 01.615-.864zM3.205 17.32a.75.75 0 011.046.177 9.558 9.558 0 002.252 2.252.75.75 0 11-.87 1.223 11.058 11.058 0 01-2.605-2.606.75.75 0 01.177-1.046zm17.59 0a.75.75 0 01.176 1.046 11.057 11.057 0 01-2.605 2.605.75.75 0 11-.869-1.222 9.558 9.558 0 002.252-2.252.75.75 0 011.046-.177zM9.543 21.982a.75.75 0 01.864-.615 9.56 9.56 0 003.186 0 .75.75 0 01.25 1.48 11.066 11.066 0 01-3.686 0 .75.75 0 01-.614-.865z\"></path>"
 		}
 	}
 },
@@ -3651,11 +3458,11 @@ var data = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M8 1.5a6.5 6.5 0 100 13 6.5 6.5 0 000-13zM0 8a8 8 0 1116 0A8 8 0 010 8zm9 3a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z\"></path>"
+			path: "<path d=\"M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z\"></path><path fill-rule=\"evenodd\" d=\"M8 0a8 8 0 100 16A8 8 0 008 0zM1.5 8a6.5 6.5 0 1113 0 6.5 6.5 0 01-13 0z\"></path>"
 		},
 		"24": {
 			width: 24,
-			path: "<path d=\"M12 7a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0112 7zm1 9a1 1 0 11-2 0 1 1 0 012 0z\"></path><path fill-rule=\"evenodd\" d=\"M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zM2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0z\"></path>"
+			path: "<path fill-rule=\"evenodd\" d=\"M2.5 12a9.5 9.5 0 1119 0 9.5 9.5 0 01-19 0zM12 1C5.925 1 1 5.925 1 12s4.925 11 11 11 11-4.925 11-11S18.075 1 12 1zm0 13a2 2 0 100-4 2 2 0 000 4z\"></path>"
 		}
 	}
 },
@@ -3667,11 +3474,11 @@ var data = {
 	heights: {
 		"16": {
 			width: 16,
-			path: "<path fill-rule=\"evenodd\" d=\"M8 1.5a6.491 6.491 0 00-5.285 2.715l1.358 1.358A.25.25 0 013.896 6H.25A.25.25 0 010 5.75V2.104a.25.25 0 01.427-.177l1.216 1.216a8 8 0 0114.315 4.03.748.748 0 01-.668.83.75.75 0 01-.824-.676A6.501 6.501 0 008 1.5zM.712 8.004a.75.75 0 01.822.67 6.501 6.501 0 0011.751 3.111l-1.358-1.358a.25.25 0 01.177-.427h3.646a.25.25 0 01.25.25v3.646a.25.25 0 01-.427.177l-1.216-1.216A8 8 0 01.042 8.827a.75.75 0 01.67-.823zM9 11a1 1 0 11-2 0 1 1 0 012 0zm-.25-6.25a.75.75 0 00-1.5 0v3.5a.75.75 0 001.5 0v-3.5z\"></path>"
+			path: "<path d=\"M5.029 2.217a6.5 6.5 0 019.437 5.11.75.75 0 101.492-.154 8 8 0 00-14.315-4.03L.427 1.927A.25.25 0 000 2.104V5.75A.25.25 0 00.25 6h3.646a.25.25 0 00.177-.427L2.715 4.215a6.491 6.491 0 012.314-1.998zM1.262 8.169a.75.75 0 00-1.22.658 8.001 8.001 0 0014.315 4.03l1.216 1.216a.25.25 0 00.427-.177V10.25a.25.25 0 00-.25-.25h-3.646a.25.25 0 00-.177.427l1.358 1.358a6.501 6.501 0 01-11.751-3.11.75.75 0 00-.272-.506z\"></path><path d=\"M9.06 9.06a1.5 1.5 0 11-2.12-2.12 1.5 1.5 0 012.12 2.12z\"></path>"
 		},
 		"24": {
 			width: 24,
-			path: "<path d=\"M3.38 8A9.502 9.502 0 0112 2.5a9.502 9.502 0 019.215 7.182.75.75 0 101.456-.364C21.473 4.539 17.15 1 12 1a10.995 10.995 0 00-9.5 5.452V4.75a.75.75 0 00-1.5 0V8.5a1 1 0 001 1h3.75a.75.75 0 000-1.5H3.38zm-.595 6.318a.75.75 0 00-1.455.364C2.527 19.461 6.85 23 12 23c4.052 0 7.592-2.191 9.5-5.451v1.701a.75.75 0 001.5 0V15.5a1 1 0 00-1-1h-3.75a.75.75 0 000 1.5h2.37A9.502 9.502 0 0112 21.5c-4.446 0-8.181-3.055-9.215-7.182z\"></path><path d=\"M12 17a1 1 0 100-2 1 1 0 000 2zm0-10a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0112 7z\"></path>"
+			path: "<path d=\"M3.38 8A9.502 9.502 0 0112 2.5a9.502 9.502 0 019.215 7.182.75.75 0 101.456-.364C21.473 4.539 17.15 1 12 1a10.995 10.995 0 00-9.5 5.452V4.75a.75.75 0 00-1.5 0V8.5a1 1 0 001 1h3.75a.75.75 0 000-1.5H3.38zm-.595 6.318a.75.75 0 00-1.455.364C2.527 19.461 6.85 23 12 23c4.052 0 7.592-2.191 9.5-5.451v1.701a.75.75 0 001.5 0V15.5a1 1 0 00-1-1h-3.75a.75.75 0 000 1.5h2.37A9.502 9.502 0 0112 21.5c-4.446 0-8.181-3.055-9.215-7.182z\"></path><path d=\"M13.414 13.414a2 2 0 11-2.828-2.828 2 2 0 012.828 2.828z\"></path>"
 		}
 	}
 },
@@ -3696,6 +3503,17 @@ var data = {
 	}
 },
 	key: key,
+	"key-asterisk": {
+	name: "key-asterisk",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 2.75A2.75 2.75 0 012.75 0h10.5A2.75 2.75 0 0116 2.75v10.5A2.75 2.75 0 0113.25 16H2.75A2.75 2.75 0 010 13.25V2.75zM2.75 1.5c-.69 0-1.25.56-1.25 1.25v10.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25V2.75c0-.69-.56-1.25-1.25-1.25H2.75z\"></path><path d=\"M8 4a.75.75 0 01.75.75V6.7l1.69-.975a.75.75 0 01.75 1.3L9.5 8l1.69.976a.75.75 0 01-.75 1.298L8.75 9.3v1.951a.75.75 0 01-1.5 0V9.299l-1.69.976a.75.75 0 01-.75-1.3L6.5 8l-1.69-.975a.75.75 0 01.75-1.3l1.69.976V4.75A.75.75 0 018 4z\"></path>"
+		}
+	}
+},
 	law: law,
 	"light-bulb": {
 	name: "light-bulb",
@@ -3844,6 +3662,21 @@ var data = {
 		}
 	}
 },
+	"multi-select": {
+	name: "multi-select",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M1.75 2.5a.75.75 0 000 1.5h6.5a.75.75 0 000-1.5h-6.5zm4 5a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5zm0 5a.75.75 0 000 1.5h7.5a.75.75 0 000-1.5h-7.5zM3 8a1 1 0 11-2 0 1 1 0 012 0zm-1 6a1 1 0 100-2 1 1 0 000 2z\"></path><path d=\"M13.314 4.918L11.07 2.417A.25.25 0 0111.256 2h4.488a.25.25 0 01.186.417l-2.244 2.5a.25.25 0 01-.372 0z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M3.75 5.5a.75.75 0 000 1.5h10a.75.75 0 000-1.5h-10zm5 6a.75.75 0 000 1.5h11.5a.75.75 0 000-1.5H8.75zm0 6a.75.75 0 000 1.5h11.5a.75.75 0 000-1.5H8.75zM5 12a1 1 0 11-2 0 1 1 0 012 0zm-1 7a1 1 0 100-2 1 1 0 000 2z\"></path><path d=\"M19.309 7.918l-2.245-2.501A.25.25 0 0117.25 5h4.49a.25.25 0 01.185.417l-2.244 2.5a.25.25 0 01-.372 0z\"></path>"
+		}
+	}
+},
 	mute: mute,
 	"no-entry": {
 	name: "no-entry",
@@ -3880,7 +3713,6 @@ var data = {
 },
 	note: note,
 	number: number,
-	octoface: octoface,
 	organization: organization,
 	"package": {
 	name: "package",
@@ -3945,9 +3777,40 @@ var data = {
 		}
 	}
 },
+	paste: paste,
 	pencil: pencil,
 	people: people,
 	person: person,
+	"person-add": {
+	name: "person-add",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M13.25 0a.75.75 0 01.75.75V2h1.25a.75.75 0 010 1.5H14v1.25a.75.75 0 01-1.5 0V3.5h-1.25a.75.75 0 010-1.5h1.25V.75a.75.75 0 01.75-.75zM5.5 4a2 2 0 100 4 2 2 0 000-4zm2.4 4.548a3.5 3.5 0 10-4.799 0 5.527 5.527 0 00-3.1 4.66.75.75 0 101.498.085A4.01 4.01 0 015.5 9.5a4.01 4.01 0 014.001 3.793.75.75 0 101.498-.086 5.527 5.527 0 00-3.1-4.659z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M19.25 1a.75.75 0 01.75.75V4h2.25a.75.75 0 010 1.5H20v2.25a.75.75 0 01-1.5 0V5.5h-2.25a.75.75 0 010-1.5h2.25V1.75a.75.75 0 01.75-.75zM9 6a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM4 9.5a5 5 0 117.916 4.062 7.973 7.973 0 015.018 7.166.75.75 0 11-1.499.044 6.469 6.469 0 00-12.932 0 .75.75 0 01-1.499-.044 7.973 7.973 0 015.059-7.181A4.993 4.993 0 014 9.5z\"></path>"
+		}
+	}
+},
+	"person-fill": {
+	name: "person-fill",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M4.243 4.757a3.757 3.757 0 115.851 3.119 6.006 6.006 0 013.9 5.339.75.75 0 01-.715.784H2.721a.75.75 0 01-.714-.784 6.006 6.006 0 013.9-5.34 3.753 3.753 0 01-1.664-3.118z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M12 2.5a5.25 5.25 0 00-2.519 9.857 9.005 9.005 0 00-6.477 8.37.75.75 0 00.727.773H20.27a.75.75 0 00.727-.772 9.005 9.005 0 00-6.477-8.37A5.25 5.25 0 0012 2.5z\"></path>"
+		}
+	}
+},
 	pin: pin,
 	play: play,
 	plug: plug,
@@ -3998,6 +3861,10 @@ var data = {
 		"16": {
 			width: 16,
 			path: "<path fill-rule=\"evenodd\" d=\"M5 3.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm0 2.122a2.25 2.25 0 10-1.5 0v.878A2.25 2.25 0 005.75 8.5h1.5v2.128a2.251 2.251 0 101.5 0V8.5h1.5a2.25 2.25 0 002.25-2.25v-.878a2.25 2.25 0 10-1.5 0v.878a.75.75 0 01-.75.75h-4.5A.75.75 0 015 6.25v-.878zm3.75 7.378a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm3-8.75a.75.75 0 100-1.5.75.75 0 000 1.5z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M12 21a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zm-3.25-1.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0zm-3-12.75a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zM2.5 4.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0zM18.25 6.5a1.75 1.75 0 110-3.5 1.75 1.75 0 010 3.5zM15 4.75a3.25 3.25 0 106.5 0 3.25 3.25 0 00-6.5 0z\"></path><path fill-rule=\"evenodd\" d=\"M6.5 7.75v1A2.25 2.25 0 008.75 11h6.5a2.25 2.25 0 002.25-2.25v-1H19v1a3.75 3.75 0 01-3.75 3.75h-6.5A3.75 3.75 0 015 8.75v-1h1.5z\"></path><path fill-rule=\"evenodd\" d=\"M11.25 16.25v-5h1.5v5h-1.5z\"></path>"
 		}
 	}
 },
@@ -4055,6 +3922,7 @@ var data = {
 },
 	report: report,
 	rocket: rocket,
+	rows: rows,
 	rss: rss,
 	ruby: ruby,
 	"screen-full": {
@@ -4093,6 +3961,17 @@ var data = {
 	}
 },
 	search: search,
+	"select-single": {
+	name: "select-single",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path d=\"M5.06 7.356l2.795 2.833c.08.081.21.081.29 0l2.794-2.833c.13-.131.038-.356-.145-.356H5.206c-.183 0-.275.225-.145.356z\"></path><path fill-rule=\"evenodd\" d=\"M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0113.25 15H2.75A1.75 1.75 0 011 13.25V2.75zm1.75-.25a.25.25 0 00-.25.25v10.5c0 .138.112.25.25.25h10.5a.25.25 0 00.25-.25V2.75a.25.25 0 00-.25-.25H2.75z\"></path>"
+		}
+	}
+},
 	server: server,
 	share: share,
 	"share-android": {
@@ -4168,6 +4047,36 @@ var data = {
 		}
 	}
 },
+	"sidebar-collapse": {
+	name: "sidebar-collapse",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M6.823 7.823L4.427 5.427A.25.25 0 004 5.604v4.792c0 .223.27.335.427.177l2.396-2.396a.25.25 0 000-.354z\"></path><path fill-rule=\"evenodd\" d=\"M1.75 0A1.75 1.75 0 000 1.75v12.5C0 15.216.784 16 1.75 16h12.5A1.75 1.75 0 0016 14.25V1.75A1.75 1.75 0 0014.25 0H1.75zM1.5 1.75a.25.25 0 01.25-.25H9.5v13H1.75a.25.25 0 01-.25-.25V1.75zM11 14.5v-13h3.25a.25.25 0 01.25.25v12.5a.25.25 0 01-.25.25H11z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M7.22 14.47L9.69 12 7.22 9.53a.75.75 0 111.06-1.06l3 3a.75.75 0 010 1.06l-3 3a.75.75 0 01-1.06-1.06z\"></path><path fill-rule=\"evenodd\" d=\"M3.75 2A1.75 1.75 0 002 3.75v16.5c0 .966.784 1.75 1.75 1.75h16.5A1.75 1.75 0 0022 20.25V3.75A1.75 1.75 0 0020.25 2H3.75zM3.5 3.75a.25.25 0 01.25-.25H15v17H3.75a.25.25 0 01-.25-.25V3.75zm13 16.75v-17h3.75a.25.25 0 01.25.25v16.5a.25.25 0 01-.25.25H16.5z\"></path>"
+		}
+	}
+},
+	"sidebar-expand": {
+	name: "sidebar-expand",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M4.177 7.823l2.396-2.396A.25.25 0 017 5.604v4.792a.25.25 0 01-.427.177L4.177 8.177a.25.25 0 010-.354z\"></path><path fill-rule=\"evenodd\" d=\"M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v12.5A1.75 1.75 0 0114.25 16H1.75A1.75 1.75 0 010 14.25V1.75zm1.75-.25a.25.25 0 00-.25.25v12.5c0 .138.112.25.25.25H9.5v-13H1.75zm12.5 13H11v-13h3.25a.25.25 0 01.25.25v12.5a.25.25 0 01-.25.25z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path fill-rule=\"evenodd\" d=\"M11.28 9.53L8.81 12l2.47 2.47a.75.75 0 11-1.06 1.06l-3-3a.75.75 0 010-1.06l3-3a.75.75 0 111.06 1.06z\"></path><path fill-rule=\"evenodd\" d=\"M3.75 2A1.75 1.75 0 002 3.75v16.5c0 .966.784 1.75 1.75 1.75h16.5A1.75 1.75 0 0022 20.25V3.75A1.75 1.75 0 0020.25 2H3.75zM3.5 3.75a.25.25 0 01.25-.25H15v17H3.75a.25.25 0 01-.25-.25V3.75zm13 16.75v-17h3.75a.25.25 0 01.25.25v16.5a.25.25 0 01-.25.25H16.5z\"></path>"
+		}
+	}
+},
 	"sign-in": {
 	name: "sign-in",
 	keywords: [
@@ -4208,8 +4117,49 @@ var data = {
 		}
 	}
 },
+	"single-select": {
+	name: "single-select",
+	keywords: [
+	],
+	heights: {
+		"24": {
+			width: 24,
+			path: "<path d=\"M7.854 10.854l3.792 3.792a.5.5 0 00.708 0l3.793-3.792a.5.5 0 00-.354-.854H8.207a.5.5 0 00-.353.854z\"></path><path fill-rule=\"evenodd\" d=\"M2 3.75C2 2.784 2.784 2 3.75 2h16.5c.966 0 1.75.784 1.75 1.75v16.5A1.75 1.75 0 0120.25 22H3.75A1.75 1.75 0 012 20.25V3.75zm1.75-.25a.25.25 0 00-.25.25v16.5c0 .138.112.25.25.25h16.5a.25.25 0 00.25-.25V3.75a.25.25 0 00-.25-.25H3.75z\"></path>"
+		}
+	}
+},
 	skip: skip,
 	smiley: smiley,
+	"sort-asc": {
+	name: "sort-asc",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 4.25a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5H.75A.75.75 0 010 4.25zm0 4a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5H.75A.75.75 0 010 8.25zm0 4a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5H.75a.75.75 0 01-.75-.75zm12.927-9.677a.25.25 0 00-.354 0l-3 3A.25.25 0 009.75 6H12v6.75a.75.75 0 001.5 0V6h2.25a.25.25 0 00.177-.427l-3-3z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M18.5 17.25a.75.75 0 01-1.5 0V7.56l-2.22 2.22a.75.75 0 11-1.06-1.06l3.5-3.5a.75.75 0 011.06 0l3.5 3.5a.75.75 0 01-1.06 1.06L18.5 7.56v9.69zm-15.75.25a.75.75 0 010-1.5h9.5a.75.75 0 010 1.5h-9.5zm0-5a.75.75 0 010-1.5h5.5a.75.75 0 010 1.5h-5.5zm0-5a.75.75 0 010-1.5h3.5a.75.75 0 010 1.5h-3.5z\"></path>"
+		}
+	}
+},
+	"sort-desc": {
+	name: "sort-desc",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M0 4.25a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5H.75A.75.75 0 010 4.25zm0 4a.75.75 0 01.75-.75h4.5a.75.75 0 010 1.5H.75A.75.75 0 010 8.25zm0 4a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5H.75a.75.75 0 01-.75-.75z\"></path><path d=\"M13.5 10h2.25a.25.25 0 01.177.427l-3 3a.25.25 0 01-.354 0l-3-3A.25.25 0 019.75 10H12V3.75a.75.75 0 011.5 0V10z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M18.5 16.44V6.75a.75.75 0 00-1.5 0v9.69l-2.22-2.22a.75.75 0 10-1.06 1.06l3.5 3.5a.75.75 0 001.06 0l3.5-3.5a.75.75 0 10-1.06-1.06l-2.22 2.22zM2 7.25a.75.75 0 01.75-.75h9.5a.75.75 0 010 1.5h-9.5A.75.75 0 012 7.25zm0 5a.75.75 0 01.75-.75h5.5a.75.75 0 010 1.5h-5.5a.75.75 0 01-.75-.75zm0 5a.75.75 0 01.75-.75h3.5a.75.75 0 010 1.5h-3.5a.75.75 0 01-.75-.75z\"></path>"
+		}
+	}
+},
 	square: square,
 	"square-fill": {
 	name: "square-fill",
@@ -4227,6 +4177,7 @@ var data = {
 	}
 },
 	squirrel: squirrel,
+	stack: stack,
 	star: star,
 	"star-fill": {
 	name: "star-fill",
@@ -4249,9 +4200,25 @@ var data = {
 	sun: sun,
 	sync: sync,
 	tab: tab,
+	table: table,
 	tag: tag,
 	tasklist: tasklist,
 	telescope: telescope,
+	"telescope-fill": {
+	name: "telescope-fill",
+	keywords: [
+	],
+	heights: {
+		"16": {
+			width: 16,
+			path: "<path fill-rule=\"evenodd\" d=\"M8.531 10.21a.75.75 0 01.944.253l2.644 3.864a.75.75 0 11-1.238.847L9 12.424v2.826a.75.75 0 01-1.5 0v-2.826l-1.881 2.75a.75.75 0 01-1.238-.848l2.048-2.992a.75.75 0 01.293-.252l1.81-.871zM11.905.42a1.5 1.5 0 012.144.49l1.692 2.93a1.5 1.5 0 01-.649 2.102L2.895 11.815a1.5 1.5 0 01-1.95-.602l-.68-1.176a1.5 1.5 0 01.455-1.99L11.905.422zM3.279 8.119l.835 1.445 1.355-.653-.947-1.64-1.243.848zm7.728-1.874L9.6 3.808l1.243-.848 1.52 2.631-1.356.653z\"></path>"
+		},
+		"24": {
+			width: 24,
+			path: "<path d=\"M17.155 22.87a.75.75 0 00.226-1.036l-4-6.239a.75.75 0 00-.941-.277l-2.75 1.25a.75.75 0 00-.318.273l-3.25 4.989a.75.75 0 001.256.819l3.131-4.806.51-.232v5.64a.75.75 0 101.5 0v-6.22l3.6 5.613a.75.75 0 001.036.226z\"></path><path fill-rule=\"evenodd\" d=\"M.408 15.13a2 2 0 01.59-2.642L17.038 1.33a2 2 0 012.85.602l2.828 4.644a2 2 0 01-.851 2.847l-17.762 8.43a2 2 0 01-2.59-.807L.408 15.13zm5.263-4.066l1.987 3.44-1.36.645-1.862-3.225 1.235-.86zm7.842-5.455l2.857 4.76 1.361-.646-2.984-4.973-1.234.859z\"></path>"
+		}
+	}
+},
 	terminal: terminal,
 	"three-bars": {
 	name: "three-bars",
@@ -4271,7 +4238,6 @@ var data = {
 	thumbsup: thumbsup,
 	tools: tools,
 	trash: trash,
-	trashcan: trashcan,
 	"triangle-down": {
 	name: "triangle-down",
 	keywords: [
@@ -4450,7 +4416,7 @@ function shouldUseNative() {
 	}
 }
 
-var objectAssign = shouldUseNative() ? Object.assign : function (target, source) {
+var objectAssign$1 = shouldUseNative() ? Object.assign : function (target, source) {
 	var from;
 	var to = toObject(target);
 	var symbols;
@@ -4476,6 +4442,9 @@ var objectAssign = shouldUseNative() ? Object.assign : function (target, source)
 
 	return to;
 };
+
+const data = require$$0;
+const objectAssign = objectAssign$1;
 
 const DEFAULT_HEIGHT = 16;
 
@@ -4536,7 +4505,7 @@ for (const key of Object.keys(data)) {
   }
 
   // Function to return an SVG object
-  data[key].toSVG = function(options = {}) {
+  data[key].toSVG = function (options = {}) {
     const {height, width} = options;
     const naturalHeight = closestNaturalHeight(Object.keys(data[key].heights), height || width || DEFAULT_HEIGHT);
     return `<svg ${htmlAttributes(data[key], data[key].heights[naturalHeight].options, options)}>${
@@ -7221,6 +7190,1744 @@ const unsafeSVG = directive((value) => (part) => {
     previousValues.set(part, { value, fragment });
 });
 
+var top = 'top';
+var bottom = 'bottom';
+var right = 'right';
+var left = 'left';
+var auto = 'auto';
+var basePlacements = [top, bottom, right, left];
+var start$1 = 'start';
+var end = 'end';
+var clippingParents = 'clippingParents';
+var viewport = 'viewport';
+var popper = 'popper';
+var reference = 'reference';
+var variationPlacements = /*#__PURE__*/basePlacements.reduce(function (acc, placement) {
+  return acc.concat([placement + "-" + start$1, placement + "-" + end]);
+}, []);
+var placements = /*#__PURE__*/[].concat(basePlacements, [auto]).reduce(function (acc, placement) {
+  return acc.concat([placement, placement + "-" + start$1, placement + "-" + end]);
+}, []); // modifiers that need to read the DOM
+
+var beforeRead = 'beforeRead';
+var read = 'read';
+var afterRead = 'afterRead'; // pure-logic modifiers
+
+var beforeMain = 'beforeMain';
+var main = 'main';
+var afterMain = 'afterMain'; // modifier with the purpose to write to the DOM (or write into a framework state)
+
+var beforeWrite = 'beforeWrite';
+var write = 'write';
+var afterWrite = 'afterWrite';
+var modifierPhases = [beforeRead, read, afterRead, beforeMain, main, afterMain, beforeWrite, write, afterWrite];
+
+function getNodeName(element) {
+  return element ? (element.nodeName || '').toLowerCase() : null;
+}
+
+function getWindow(node) {
+  if (node == null) {
+    return window;
+  }
+
+  if (node.toString() !== '[object Window]') {
+    var ownerDocument = node.ownerDocument;
+    return ownerDocument ? ownerDocument.defaultView || window : window;
+  }
+
+  return node;
+}
+
+function isElement(node) {
+  var OwnElement = getWindow(node).Element;
+  return node instanceof OwnElement || node instanceof Element;
+}
+
+function isHTMLElement(node) {
+  var OwnElement = getWindow(node).HTMLElement;
+  return node instanceof OwnElement || node instanceof HTMLElement;
+}
+
+function isShadowRoot(node) {
+  // IE 11 has no ShadowRoot
+  if (typeof ShadowRoot === 'undefined') {
+    return false;
+  }
+
+  var OwnElement = getWindow(node).ShadowRoot;
+  return node instanceof OwnElement || node instanceof ShadowRoot;
+}
+
+// and applies them to the HTMLElements such as popper and arrow
+
+function applyStyles(_ref) {
+  var state = _ref.state;
+  Object.keys(state.elements).forEach(function (name) {
+    var style = state.styles[name] || {};
+    var attributes = state.attributes[name] || {};
+    var element = state.elements[name]; // arrow is optional + virtual elements
+
+    if (!isHTMLElement(element) || !getNodeName(element)) {
+      return;
+    } // Flow doesn't support to extend this property, but it's the most
+    // effective way to apply styles to an HTMLElement
+    // $FlowFixMe[cannot-write]
+
+
+    Object.assign(element.style, style);
+    Object.keys(attributes).forEach(function (name) {
+      var value = attributes[name];
+
+      if (value === false) {
+        element.removeAttribute(name);
+      } else {
+        element.setAttribute(name, value === true ? '' : value);
+      }
+    });
+  });
+}
+
+function effect$2(_ref2) {
+  var state = _ref2.state;
+  var initialStyles = {
+    popper: {
+      position: state.options.strategy,
+      left: '0',
+      top: '0',
+      margin: '0'
+    },
+    arrow: {
+      position: 'absolute'
+    },
+    reference: {}
+  };
+  Object.assign(state.elements.popper.style, initialStyles.popper);
+  state.styles = initialStyles;
+
+  if (state.elements.arrow) {
+    Object.assign(state.elements.arrow.style, initialStyles.arrow);
+  }
+
+  return function () {
+    Object.keys(state.elements).forEach(function (name) {
+      var element = state.elements[name];
+      var attributes = state.attributes[name] || {};
+      var styleProperties = Object.keys(state.styles.hasOwnProperty(name) ? state.styles[name] : initialStyles[name]); // Set all values to an empty string to unset them
+
+      var style = styleProperties.reduce(function (style, property) {
+        style[property] = '';
+        return style;
+      }, {}); // arrow is optional + virtual elements
+
+      if (!isHTMLElement(element) || !getNodeName(element)) {
+        return;
+      }
+
+      Object.assign(element.style, style);
+      Object.keys(attributes).forEach(function (attribute) {
+        element.removeAttribute(attribute);
+      });
+    });
+  };
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var applyStyles$1 = {
+  name: 'applyStyles',
+  enabled: true,
+  phase: 'write',
+  fn: applyStyles,
+  effect: effect$2,
+  requires: ['computeStyles']
+};
+
+function getBasePlacement(placement) {
+  return placement.split('-')[0];
+}
+
+var round$1 = Math.round;
+function getBoundingClientRect(element, includeScale) {
+  if (includeScale === void 0) {
+    includeScale = false;
+  }
+
+  var rect = element.getBoundingClientRect();
+  var scaleX = 1;
+  var scaleY = 1;
+
+  if (isHTMLElement(element) && includeScale) {
+    var offsetHeight = element.offsetHeight;
+    var offsetWidth = element.offsetWidth; // Do not attempt to divide by 0, otherwise we get `Infinity` as scale
+    // Fallback to 1 in case both values are `0`
+
+    if (offsetWidth > 0) {
+      scaleX = rect.width / offsetWidth || 1;
+    }
+
+    if (offsetHeight > 0) {
+      scaleY = rect.height / offsetHeight || 1;
+    }
+  }
+
+  return {
+    width: round$1(rect.width / scaleX),
+    height: round$1(rect.height / scaleY),
+    top: round$1(rect.top / scaleY),
+    right: round$1(rect.right / scaleX),
+    bottom: round$1(rect.bottom / scaleY),
+    left: round$1(rect.left / scaleX),
+    x: round$1(rect.left / scaleX),
+    y: round$1(rect.top / scaleY)
+  };
+}
+
+// means it doesn't take into account transforms.
+
+function getLayoutRect(element) {
+  var clientRect = getBoundingClientRect(element); // Use the clientRect sizes if it's not been transformed.
+  // Fixes https://github.com/popperjs/popper-core/issues/1223
+
+  var width = element.offsetWidth;
+  var height = element.offsetHeight;
+
+  if (Math.abs(clientRect.width - width) <= 1) {
+    width = clientRect.width;
+  }
+
+  if (Math.abs(clientRect.height - height) <= 1) {
+    height = clientRect.height;
+  }
+
+  return {
+    x: element.offsetLeft,
+    y: element.offsetTop,
+    width: width,
+    height: height
+  };
+}
+
+function contains(parent, child) {
+  var rootNode = child.getRootNode && child.getRootNode(); // First, attempt with faster native method
+
+  if (parent.contains(child)) {
+    return true;
+  } // then fallback to custom implementation with Shadow DOM support
+  else if (rootNode && isShadowRoot(rootNode)) {
+      var next = child;
+
+      do {
+        if (next && parent.isSameNode(next)) {
+          return true;
+        } // $FlowFixMe[prop-missing]: need a better way to handle this...
+
+
+        next = next.parentNode || next.host;
+      } while (next);
+    } // Give up, the result is false
+
+
+  return false;
+}
+
+function getComputedStyle$1(element) {
+  return getWindow(element).getComputedStyle(element);
+}
+
+function isTableElement(element) {
+  return ['table', 'td', 'th'].indexOf(getNodeName(element)) >= 0;
+}
+
+function getDocumentElement(element) {
+  // $FlowFixMe[incompatible-return]: assume body is always available
+  return ((isElement(element) ? element.ownerDocument : // $FlowFixMe[prop-missing]
+  element.document) || window.document).documentElement;
+}
+
+function getParentNode(element) {
+  if (getNodeName(element) === 'html') {
+    return element;
+  }
+
+  return (// this is a quicker (but less type safe) way to save quite some bytes from the bundle
+    // $FlowFixMe[incompatible-return]
+    // $FlowFixMe[prop-missing]
+    element.assignedSlot || // step into the shadow DOM of the parent of a slotted node
+    element.parentNode || ( // DOM Element detected
+    isShadowRoot(element) ? element.host : null) || // ShadowRoot detected
+    // $FlowFixMe[incompatible-call]: HTMLElement is a Node
+    getDocumentElement(element) // fallback
+
+  );
+}
+
+function getTrueOffsetParent(element) {
+  if (!isHTMLElement(element) || // https://github.com/popperjs/popper-core/issues/837
+  getComputedStyle$1(element).position === 'fixed') {
+    return null;
+  }
+
+  return element.offsetParent;
+} // `.offsetParent` reports `null` for fixed elements, while absolute elements
+// return the containing block
+
+
+function getContainingBlock(element) {
+  var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') !== -1;
+  var isIE = navigator.userAgent.indexOf('Trident') !== -1;
+
+  if (isIE && isHTMLElement(element)) {
+    // In IE 9, 10 and 11 fixed elements containing block is always established by the viewport
+    var elementCss = getComputedStyle$1(element);
+
+    if (elementCss.position === 'fixed') {
+      return null;
+    }
+  }
+
+  var currentNode = getParentNode(element);
+
+  while (isHTMLElement(currentNode) && ['html', 'body'].indexOf(getNodeName(currentNode)) < 0) {
+    var css = getComputedStyle$1(currentNode); // This is non-exhaustive but covers the most common CSS properties that
+    // create a containing block.
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
+
+    if (css.transform !== 'none' || css.perspective !== 'none' || css.contain === 'paint' || ['transform', 'perspective'].indexOf(css.willChange) !== -1 || isFirefox && css.willChange === 'filter' || isFirefox && css.filter && css.filter !== 'none') {
+      return currentNode;
+    } else {
+      currentNode = currentNode.parentNode;
+    }
+  }
+
+  return null;
+} // Gets the closest ancestor positioned element. Handles some edge cases,
+// such as table ancestors and cross browser bugs.
+
+
+function getOffsetParent(element) {
+  var window = getWindow(element);
+  var offsetParent = getTrueOffsetParent(element);
+
+  while (offsetParent && isTableElement(offsetParent) && getComputedStyle$1(offsetParent).position === 'static') {
+    offsetParent = getTrueOffsetParent(offsetParent);
+  }
+
+  if (offsetParent && (getNodeName(offsetParent) === 'html' || getNodeName(offsetParent) === 'body' && getComputedStyle$1(offsetParent).position === 'static')) {
+    return window;
+  }
+
+  return offsetParent || getContainingBlock(element) || window;
+}
+
+function getMainAxisFromPlacement(placement) {
+  return ['top', 'bottom'].indexOf(placement) >= 0 ? 'x' : 'y';
+}
+
+var max = Math.max;
+var min = Math.min;
+var round = Math.round;
+
+function within(min$1, value, max$1) {
+  return max(min$1, min(value, max$1));
+}
+
+function getFreshSideObject() {
+  return {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  };
+}
+
+function mergePaddingObject(paddingObject) {
+  return Object.assign({}, getFreshSideObject(), paddingObject);
+}
+
+function expandToHashMap(value, keys) {
+  return keys.reduce(function (hashMap, key) {
+    hashMap[key] = value;
+    return hashMap;
+  }, {});
+}
+
+var toPaddingObject = function toPaddingObject(padding, state) {
+  padding = typeof padding === 'function' ? padding(Object.assign({}, state.rects, {
+    placement: state.placement
+  })) : padding;
+  return mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
+};
+
+function arrow(_ref) {
+  var _state$modifiersData$;
+
+  var state = _ref.state,
+      name = _ref.name,
+      options = _ref.options;
+  var arrowElement = state.elements.arrow;
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var basePlacement = getBasePlacement(state.placement);
+  var axis = getMainAxisFromPlacement(basePlacement);
+  var isVertical = [left, right].indexOf(basePlacement) >= 0;
+  var len = isVertical ? 'height' : 'width';
+
+  if (!arrowElement || !popperOffsets) {
+    return;
+  }
+
+  var paddingObject = toPaddingObject(options.padding, state);
+  var arrowRect = getLayoutRect(arrowElement);
+  var minProp = axis === 'y' ? top : left;
+  var maxProp = axis === 'y' ? bottom : right;
+  var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
+  var startDiff = popperOffsets[axis] - state.rects.reference[axis];
+  var arrowOffsetParent = getOffsetParent(arrowElement);
+  var clientSize = arrowOffsetParent ? axis === 'y' ? arrowOffsetParent.clientHeight || 0 : arrowOffsetParent.clientWidth || 0 : 0;
+  var centerToReference = endDiff / 2 - startDiff / 2; // Make sure the arrow doesn't overflow the popper if the center point is
+  // outside of the popper bounds
+
+  var min = paddingObject[minProp];
+  var max = clientSize - arrowRect[len] - paddingObject[maxProp];
+  var center = clientSize / 2 - arrowRect[len] / 2 + centerToReference;
+  var offset = within(min, center, max); // Prevents breaking syntax highlighting...
+
+  var axisProp = axis;
+  state.modifiersData[name] = (_state$modifiersData$ = {}, _state$modifiersData$[axisProp] = offset, _state$modifiersData$.centerOffset = offset - center, _state$modifiersData$);
+}
+
+function effect$1(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options;
+  var _options$element = options.element,
+      arrowElement = _options$element === void 0 ? '[data-popper-arrow]' : _options$element;
+
+  if (arrowElement == null) {
+    return;
+  } // CSS selector
+
+
+  if (typeof arrowElement === 'string') {
+    arrowElement = state.elements.popper.querySelector(arrowElement);
+
+    if (!arrowElement) {
+      return;
+    }
+  }
+
+  if (!contains(state.elements.popper, arrowElement)) {
+
+    return;
+  }
+
+  state.elements.arrow = arrowElement;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var arrow$1 = {
+  name: 'arrow',
+  enabled: true,
+  phase: 'main',
+  fn: arrow,
+  effect: effect$1,
+  requires: ['popperOffsets'],
+  requiresIfExists: ['preventOverflow']
+};
+
+function getVariation(placement) {
+  return placement.split('-')[1];
+}
+
+var unsetSides = {
+  top: 'auto',
+  right: 'auto',
+  bottom: 'auto',
+  left: 'auto'
+}; // Round the offsets to the nearest suitable subpixel based on the DPR.
+// Zooming can change the DPR, but it seems to report a value that will
+// cleanly divide the values into the appropriate subpixels.
+
+function roundOffsetsByDPR(_ref) {
+  var x = _ref.x,
+      y = _ref.y;
+  var win = window;
+  var dpr = win.devicePixelRatio || 1;
+  return {
+    x: round(round(x * dpr) / dpr) || 0,
+    y: round(round(y * dpr) / dpr) || 0
+  };
+}
+
+function mapToStyles(_ref2) {
+  var _Object$assign2;
+
+  var popper = _ref2.popper,
+      popperRect = _ref2.popperRect,
+      placement = _ref2.placement,
+      variation = _ref2.variation,
+      offsets = _ref2.offsets,
+      position = _ref2.position,
+      gpuAcceleration = _ref2.gpuAcceleration,
+      adaptive = _ref2.adaptive,
+      roundOffsets = _ref2.roundOffsets;
+
+  var _ref3 = roundOffsets === true ? roundOffsetsByDPR(offsets) : typeof roundOffsets === 'function' ? roundOffsets(offsets) : offsets,
+      _ref3$x = _ref3.x,
+      x = _ref3$x === void 0 ? 0 : _ref3$x,
+      _ref3$y = _ref3.y,
+      y = _ref3$y === void 0 ? 0 : _ref3$y;
+
+  var hasX = offsets.hasOwnProperty('x');
+  var hasY = offsets.hasOwnProperty('y');
+  var sideX = left;
+  var sideY = top;
+  var win = window;
+
+  if (adaptive) {
+    var offsetParent = getOffsetParent(popper);
+    var heightProp = 'clientHeight';
+    var widthProp = 'clientWidth';
+
+    if (offsetParent === getWindow(popper)) {
+      offsetParent = getDocumentElement(popper);
+
+      if (getComputedStyle$1(offsetParent).position !== 'static' && position === 'absolute') {
+        heightProp = 'scrollHeight';
+        widthProp = 'scrollWidth';
+      }
+    } // $FlowFixMe[incompatible-cast]: force type refinement, we compare offsetParent with window above, but Flow doesn't detect it
+
+
+    offsetParent = offsetParent;
+
+    if (placement === top || (placement === left || placement === right) && variation === end) {
+      sideY = bottom; // $FlowFixMe[prop-missing]
+
+      y -= offsetParent[heightProp] - popperRect.height;
+      y *= gpuAcceleration ? 1 : -1;
+    }
+
+    if (placement === left || (placement === top || placement === bottom) && variation === end) {
+      sideX = right; // $FlowFixMe[prop-missing]
+
+      x -= offsetParent[widthProp] - popperRect.width;
+      x *= gpuAcceleration ? 1 : -1;
+    }
+  }
+
+  var commonStyles = Object.assign({
+    position: position
+  }, adaptive && unsetSides);
+
+  if (gpuAcceleration) {
+    var _Object$assign;
+
+    return Object.assign({}, commonStyles, (_Object$assign = {}, _Object$assign[sideY] = hasY ? '0' : '', _Object$assign[sideX] = hasX ? '0' : '', _Object$assign.transform = (win.devicePixelRatio || 1) <= 1 ? "translate(" + x + "px, " + y + "px)" : "translate3d(" + x + "px, " + y + "px, 0)", _Object$assign));
+  }
+
+  return Object.assign({}, commonStyles, (_Object$assign2 = {}, _Object$assign2[sideY] = hasY ? y + "px" : '', _Object$assign2[sideX] = hasX ? x + "px" : '', _Object$assign2.transform = '', _Object$assign2));
+}
+
+function computeStyles(_ref4) {
+  var state = _ref4.state,
+      options = _ref4.options;
+  var _options$gpuAccelerat = options.gpuAcceleration,
+      gpuAcceleration = _options$gpuAccelerat === void 0 ? true : _options$gpuAccelerat,
+      _options$adaptive = options.adaptive,
+      adaptive = _options$adaptive === void 0 ? true : _options$adaptive,
+      _options$roundOffsets = options.roundOffsets,
+      roundOffsets = _options$roundOffsets === void 0 ? true : _options$roundOffsets;
+
+  var commonStyles = {
+    placement: getBasePlacement(state.placement),
+    variation: getVariation(state.placement),
+    popper: state.elements.popper,
+    popperRect: state.rects.popper,
+    gpuAcceleration: gpuAcceleration
+  };
+
+  if (state.modifiersData.popperOffsets != null) {
+    state.styles.popper = Object.assign({}, state.styles.popper, mapToStyles(Object.assign({}, commonStyles, {
+      offsets: state.modifiersData.popperOffsets,
+      position: state.options.strategy,
+      adaptive: adaptive,
+      roundOffsets: roundOffsets
+    })));
+  }
+
+  if (state.modifiersData.arrow != null) {
+    state.styles.arrow = Object.assign({}, state.styles.arrow, mapToStyles(Object.assign({}, commonStyles, {
+      offsets: state.modifiersData.arrow,
+      position: 'absolute',
+      adaptive: false,
+      roundOffsets: roundOffsets
+    })));
+  }
+
+  state.attributes.popper = Object.assign({}, state.attributes.popper, {
+    'data-popper-placement': state.placement
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var computeStyles$1 = {
+  name: 'computeStyles',
+  enabled: true,
+  phase: 'beforeWrite',
+  fn: computeStyles,
+  data: {}
+};
+
+var passive = {
+  passive: true
+};
+
+function effect(_ref) {
+  var state = _ref.state,
+      instance = _ref.instance,
+      options = _ref.options;
+  var _options$scroll = options.scroll,
+      scroll = _options$scroll === void 0 ? true : _options$scroll,
+      _options$resize = options.resize,
+      resize = _options$resize === void 0 ? true : _options$resize;
+  var window = getWindow(state.elements.popper);
+  var scrollParents = [].concat(state.scrollParents.reference, state.scrollParents.popper);
+
+  if (scroll) {
+    scrollParents.forEach(function (scrollParent) {
+      scrollParent.addEventListener('scroll', instance.update, passive);
+    });
+  }
+
+  if (resize) {
+    window.addEventListener('resize', instance.update, passive);
+  }
+
+  return function () {
+    if (scroll) {
+      scrollParents.forEach(function (scrollParent) {
+        scrollParent.removeEventListener('scroll', instance.update, passive);
+      });
+    }
+
+    if (resize) {
+      window.removeEventListener('resize', instance.update, passive);
+    }
+  };
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var eventListeners = {
+  name: 'eventListeners',
+  enabled: true,
+  phase: 'write',
+  fn: function fn() {},
+  effect: effect,
+  data: {}
+};
+
+var hash$1 = {
+  left: 'right',
+  right: 'left',
+  bottom: 'top',
+  top: 'bottom'
+};
+function getOppositePlacement(placement) {
+  return placement.replace(/left|right|bottom|top/g, function (matched) {
+    return hash$1[matched];
+  });
+}
+
+var hash = {
+  start: 'end',
+  end: 'start'
+};
+function getOppositeVariationPlacement(placement) {
+  return placement.replace(/start|end/g, function (matched) {
+    return hash[matched];
+  });
+}
+
+function getWindowScroll(node) {
+  var win = getWindow(node);
+  var scrollLeft = win.pageXOffset;
+  var scrollTop = win.pageYOffset;
+  return {
+    scrollLeft: scrollLeft,
+    scrollTop: scrollTop
+  };
+}
+
+function getWindowScrollBarX(element) {
+  // If <html> has a CSS width greater than the viewport, then this will be
+  // incorrect for RTL.
+  // Popper 1 is broken in this case and never had a bug report so let's assume
+  // it's not an issue. I don't think anyone ever specifies width on <html>
+  // anyway.
+  // Browsers where the left scrollbar doesn't cause an issue report `0` for
+  // this (e.g. Edge 2019, IE11, Safari)
+  return getBoundingClientRect(getDocumentElement(element)).left + getWindowScroll(element).scrollLeft;
+}
+
+function getViewportRect(element) {
+  var win = getWindow(element);
+  var html = getDocumentElement(element);
+  var visualViewport = win.visualViewport;
+  var width = html.clientWidth;
+  var height = html.clientHeight;
+  var x = 0;
+  var y = 0; // NB: This isn't supported on iOS <= 12. If the keyboard is open, the popper
+  // can be obscured underneath it.
+  // Also, `html.clientHeight` adds the bottom bar height in Safari iOS, even
+  // if it isn't open, so if this isn't available, the popper will be detected
+  // to overflow the bottom of the screen too early.
+
+  if (visualViewport) {
+    width = visualViewport.width;
+    height = visualViewport.height; // Uses Layout Viewport (like Chrome; Safari does not currently)
+    // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
+    // errors due to floating point numbers, so we need to check precision.
+    // Safari returns a number <= 0, usually < -1 when pinch-zoomed
+    // Feature detection fails in mobile emulation mode in Chrome.
+    // Math.abs(win.innerWidth / visualViewport.scale - visualViewport.width) <
+    // 0.001
+    // Fallback here: "Not Safari" userAgent
+
+    if (!/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+      x = visualViewport.offsetLeft;
+      y = visualViewport.offsetTop;
+    }
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x + getWindowScrollBarX(element),
+    y: y
+  };
+}
+
+// of the `<html>` and `<body>` rect bounds if horizontally scrollable
+
+function getDocumentRect(element) {
+  var _element$ownerDocumen;
+
+  var html = getDocumentElement(element);
+  var winScroll = getWindowScroll(element);
+  var body = (_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body;
+  var width = max(html.scrollWidth, html.clientWidth, body ? body.scrollWidth : 0, body ? body.clientWidth : 0);
+  var height = max(html.scrollHeight, html.clientHeight, body ? body.scrollHeight : 0, body ? body.clientHeight : 0);
+  var x = -winScroll.scrollLeft + getWindowScrollBarX(element);
+  var y = -winScroll.scrollTop;
+
+  if (getComputedStyle$1(body || html).direction === 'rtl') {
+    x += max(html.clientWidth, body ? body.clientWidth : 0) - width;
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x,
+    y: y
+  };
+}
+
+function isScrollParent(element) {
+  // Firefox wants us to check `-x` and `-y` variations as well
+  var _getComputedStyle = getComputedStyle$1(element),
+      overflow = _getComputedStyle.overflow,
+      overflowX = _getComputedStyle.overflowX,
+      overflowY = _getComputedStyle.overflowY;
+
+  return /auto|scroll|overlay|hidden/.test(overflow + overflowY + overflowX);
+}
+
+function getScrollParent(node) {
+  if (['html', 'body', '#document'].indexOf(getNodeName(node)) >= 0) {
+    // $FlowFixMe[incompatible-return]: assume body is always available
+    return node.ownerDocument.body;
+  }
+
+  if (isHTMLElement(node) && isScrollParent(node)) {
+    return node;
+  }
+
+  return getScrollParent(getParentNode(node));
+}
+
+/*
+given a DOM element, return the list of all scroll parents, up the list of ancesors
+until we get to the top window object. This list is what we attach scroll listeners
+to, because if any of these parent elements scroll, we'll need to re-calculate the
+reference element's position.
+*/
+
+function listScrollParents(element, list) {
+  var _element$ownerDocumen;
+
+  if (list === void 0) {
+    list = [];
+  }
+
+  var scrollParent = getScrollParent(element);
+  var isBody = scrollParent === ((_element$ownerDocumen = element.ownerDocument) == null ? void 0 : _element$ownerDocumen.body);
+  var win = getWindow(scrollParent);
+  var target = isBody ? [win].concat(win.visualViewport || [], isScrollParent(scrollParent) ? scrollParent : []) : scrollParent;
+  var updatedList = list.concat(target);
+  return isBody ? updatedList : // $FlowFixMe[incompatible-call]: isBody tells us target will be an HTMLElement here
+  updatedList.concat(listScrollParents(getParentNode(target)));
+}
+
+function rectToClientRect(rect) {
+  return Object.assign({}, rect, {
+    left: rect.x,
+    top: rect.y,
+    right: rect.x + rect.width,
+    bottom: rect.y + rect.height
+  });
+}
+
+function getInnerBoundingClientRect(element) {
+  var rect = getBoundingClientRect(element);
+  rect.top = rect.top + element.clientTop;
+  rect.left = rect.left + element.clientLeft;
+  rect.bottom = rect.top + element.clientHeight;
+  rect.right = rect.left + element.clientWidth;
+  rect.width = element.clientWidth;
+  rect.height = element.clientHeight;
+  rect.x = rect.left;
+  rect.y = rect.top;
+  return rect;
+}
+
+function getClientRectFromMixedType(element, clippingParent) {
+  return clippingParent === viewport ? rectToClientRect(getViewportRect(element)) : isHTMLElement(clippingParent) ? getInnerBoundingClientRect(clippingParent) : rectToClientRect(getDocumentRect(getDocumentElement(element)));
+} // A "clipping parent" is an overflowable container with the characteristic of
+// clipping (or hiding) overflowing elements with a position different from
+// `initial`
+
+
+function getClippingParents(element) {
+  var clippingParents = listScrollParents(getParentNode(element));
+  var canEscapeClipping = ['absolute', 'fixed'].indexOf(getComputedStyle$1(element).position) >= 0;
+  var clipperElement = canEscapeClipping && isHTMLElement(element) ? getOffsetParent(element) : element;
+
+  if (!isElement(clipperElement)) {
+    return [];
+  } // $FlowFixMe[incompatible-return]: https://github.com/facebook/flow/issues/1414
+
+
+  return clippingParents.filter(function (clippingParent) {
+    return isElement(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
+  });
+} // Gets the maximum area that the element is visible in due to any number of
+// clipping parents
+
+
+function getClippingRect(element, boundary, rootBoundary) {
+  var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
+  var clippingParents = [].concat(mainClippingParents, [rootBoundary]);
+  var firstClippingParent = clippingParents[0];
+  var clippingRect = clippingParents.reduce(function (accRect, clippingParent) {
+    var rect = getClientRectFromMixedType(element, clippingParent);
+    accRect.top = max(rect.top, accRect.top);
+    accRect.right = min(rect.right, accRect.right);
+    accRect.bottom = min(rect.bottom, accRect.bottom);
+    accRect.left = max(rect.left, accRect.left);
+    return accRect;
+  }, getClientRectFromMixedType(element, firstClippingParent));
+  clippingRect.width = clippingRect.right - clippingRect.left;
+  clippingRect.height = clippingRect.bottom - clippingRect.top;
+  clippingRect.x = clippingRect.left;
+  clippingRect.y = clippingRect.top;
+  return clippingRect;
+}
+
+function computeOffsets(_ref) {
+  var reference = _ref.reference,
+      element = _ref.element,
+      placement = _ref.placement;
+  var basePlacement = placement ? getBasePlacement(placement) : null;
+  var variation = placement ? getVariation(placement) : null;
+  var commonX = reference.x + reference.width / 2 - element.width / 2;
+  var commonY = reference.y + reference.height / 2 - element.height / 2;
+  var offsets;
+
+  switch (basePlacement) {
+    case top:
+      offsets = {
+        x: commonX,
+        y: reference.y - element.height
+      };
+      break;
+
+    case bottom:
+      offsets = {
+        x: commonX,
+        y: reference.y + reference.height
+      };
+      break;
+
+    case right:
+      offsets = {
+        x: reference.x + reference.width,
+        y: commonY
+      };
+      break;
+
+    case left:
+      offsets = {
+        x: reference.x - element.width,
+        y: commonY
+      };
+      break;
+
+    default:
+      offsets = {
+        x: reference.x,
+        y: reference.y
+      };
+  }
+
+  var mainAxis = basePlacement ? getMainAxisFromPlacement(basePlacement) : null;
+
+  if (mainAxis != null) {
+    var len = mainAxis === 'y' ? 'height' : 'width';
+
+    switch (variation) {
+      case start$1:
+        offsets[mainAxis] = offsets[mainAxis] - (reference[len] / 2 - element[len] / 2);
+        break;
+
+      case end:
+        offsets[mainAxis] = offsets[mainAxis] + (reference[len] / 2 - element[len] / 2);
+        break;
+    }
+  }
+
+  return offsets;
+}
+
+function detectOverflow(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      _options$placement = _options.placement,
+      placement = _options$placement === void 0 ? state.placement : _options$placement,
+      _options$boundary = _options.boundary,
+      boundary = _options$boundary === void 0 ? clippingParents : _options$boundary,
+      _options$rootBoundary = _options.rootBoundary,
+      rootBoundary = _options$rootBoundary === void 0 ? viewport : _options$rootBoundary,
+      _options$elementConte = _options.elementContext,
+      elementContext = _options$elementConte === void 0 ? popper : _options$elementConte,
+      _options$altBoundary = _options.altBoundary,
+      altBoundary = _options$altBoundary === void 0 ? false : _options$altBoundary,
+      _options$padding = _options.padding,
+      padding = _options$padding === void 0 ? 0 : _options$padding;
+  var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
+  var altContext = elementContext === popper ? reference : popper;
+  var popperRect = state.rects.popper;
+  var element = state.elements[altBoundary ? altContext : elementContext];
+  var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary);
+  var referenceClientRect = getBoundingClientRect(state.elements.reference);
+  var popperOffsets = computeOffsets({
+    reference: referenceClientRect,
+    element: popperRect,
+    strategy: 'absolute',
+    placement: placement
+  });
+  var popperClientRect = rectToClientRect(Object.assign({}, popperRect, popperOffsets));
+  var elementClientRect = elementContext === popper ? popperClientRect : referenceClientRect; // positive = overflowing the clipping rect
+  // 0 or negative = within the clipping rect
+
+  var overflowOffsets = {
+    top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
+    bottom: elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom,
+    left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
+    right: elementClientRect.right - clippingClientRect.right + paddingObject.right
+  };
+  var offsetData = state.modifiersData.offset; // Offsets can be applied only to the popper element
+
+  if (elementContext === popper && offsetData) {
+    var offset = offsetData[placement];
+    Object.keys(overflowOffsets).forEach(function (key) {
+      var multiply = [right, bottom].indexOf(key) >= 0 ? 1 : -1;
+      var axis = [top, bottom].indexOf(key) >= 0 ? 'y' : 'x';
+      overflowOffsets[key] += offset[axis] * multiply;
+    });
+  }
+
+  return overflowOffsets;
+}
+
+function computeAutoPlacement(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      placement = _options.placement,
+      boundary = _options.boundary,
+      rootBoundary = _options.rootBoundary,
+      padding = _options.padding,
+      flipVariations = _options.flipVariations,
+      _options$allowedAutoP = _options.allowedAutoPlacements,
+      allowedAutoPlacements = _options$allowedAutoP === void 0 ? placements : _options$allowedAutoP;
+  var variation = getVariation(placement);
+  var placements$1 = variation ? flipVariations ? variationPlacements : variationPlacements.filter(function (placement) {
+    return getVariation(placement) === variation;
+  }) : basePlacements;
+  var allowedPlacements = placements$1.filter(function (placement) {
+    return allowedAutoPlacements.indexOf(placement) >= 0;
+  });
+
+  if (allowedPlacements.length === 0) {
+    allowedPlacements = placements$1;
+  } // $FlowFixMe[incompatible-type]: Flow seems to have problems with two array unions...
+
+
+  var overflows = allowedPlacements.reduce(function (acc, placement) {
+    acc[placement] = detectOverflow(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding
+    })[getBasePlacement(placement)];
+    return acc;
+  }, {});
+  return Object.keys(overflows).sort(function (a, b) {
+    return overflows[a] - overflows[b];
+  });
+}
+
+function getExpandedFallbackPlacements(placement) {
+  if (getBasePlacement(placement) === auto) {
+    return [];
+  }
+
+  var oppositePlacement = getOppositePlacement(placement);
+  return [getOppositeVariationPlacement(placement), oppositePlacement, getOppositeVariationPlacement(oppositePlacement)];
+}
+
+function flip(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+
+  if (state.modifiersData[name]._skip) {
+    return;
+  }
+
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? true : _options$altAxis,
+      specifiedFallbackPlacements = options.fallbackPlacements,
+      padding = options.padding,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      _options$flipVariatio = options.flipVariations,
+      flipVariations = _options$flipVariatio === void 0 ? true : _options$flipVariatio,
+      allowedAutoPlacements = options.allowedAutoPlacements;
+  var preferredPlacement = state.options.placement;
+  var basePlacement = getBasePlacement(preferredPlacement);
+  var isBasePlacement = basePlacement === preferredPlacement;
+  var fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipVariations ? [getOppositePlacement(preferredPlacement)] : getExpandedFallbackPlacements(preferredPlacement));
+  var placements = [preferredPlacement].concat(fallbackPlacements).reduce(function (acc, placement) {
+    return acc.concat(getBasePlacement(placement) === auto ? computeAutoPlacement(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding,
+      flipVariations: flipVariations,
+      allowedAutoPlacements: allowedAutoPlacements
+    }) : placement);
+  }, []);
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var checksMap = new Map();
+  var makeFallbackChecks = true;
+  var firstFittingPlacement = placements[0];
+
+  for (var i = 0; i < placements.length; i++) {
+    var placement = placements[i];
+
+    var _basePlacement = getBasePlacement(placement);
+
+    var isStartVariation = getVariation(placement) === start$1;
+    var isVertical = [top, bottom].indexOf(_basePlacement) >= 0;
+    var len = isVertical ? 'width' : 'height';
+    var overflow = detectOverflow(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      altBoundary: altBoundary,
+      padding: padding
+    });
+    var mainVariationSide = isVertical ? isStartVariation ? right : left : isStartVariation ? bottom : top;
+
+    if (referenceRect[len] > popperRect[len]) {
+      mainVariationSide = getOppositePlacement(mainVariationSide);
+    }
+
+    var altVariationSide = getOppositePlacement(mainVariationSide);
+    var checks = [];
+
+    if (checkMainAxis) {
+      checks.push(overflow[_basePlacement] <= 0);
+    }
+
+    if (checkAltAxis) {
+      checks.push(overflow[mainVariationSide] <= 0, overflow[altVariationSide] <= 0);
+    }
+
+    if (checks.every(function (check) {
+      return check;
+    })) {
+      firstFittingPlacement = placement;
+      makeFallbackChecks = false;
+      break;
+    }
+
+    checksMap.set(placement, checks);
+  }
+
+  if (makeFallbackChecks) {
+    // `2` may be desired in some cases – research later
+    var numberOfChecks = flipVariations ? 3 : 1;
+
+    var _loop = function _loop(_i) {
+      var fittingPlacement = placements.find(function (placement) {
+        var checks = checksMap.get(placement);
+
+        if (checks) {
+          return checks.slice(0, _i).every(function (check) {
+            return check;
+          });
+        }
+      });
+
+      if (fittingPlacement) {
+        firstFittingPlacement = fittingPlacement;
+        return "break";
+      }
+    };
+
+    for (var _i = numberOfChecks; _i > 0; _i--) {
+      var _ret = _loop(_i);
+
+      if (_ret === "break") break;
+    }
+  }
+
+  if (state.placement !== firstFittingPlacement) {
+    state.modifiersData[name]._skip = true;
+    state.placement = firstFittingPlacement;
+    state.reset = true;
+  }
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var flip$1 = {
+  name: 'flip',
+  enabled: true,
+  phase: 'main',
+  fn: flip,
+  requiresIfExists: ['offset'],
+  data: {
+    _skip: false
+  }
+};
+
+function getSideOffsets(overflow, rect, preventedOffsets) {
+  if (preventedOffsets === void 0) {
+    preventedOffsets = {
+      x: 0,
+      y: 0
+    };
+  }
+
+  return {
+    top: overflow.top - rect.height - preventedOffsets.y,
+    right: overflow.right - rect.width + preventedOffsets.x,
+    bottom: overflow.bottom - rect.height + preventedOffsets.y,
+    left: overflow.left - rect.width - preventedOffsets.x
+  };
+}
+
+function isAnySideFullyClipped(overflow) {
+  return [top, right, bottom, left].some(function (side) {
+    return overflow[side] >= 0;
+  });
+}
+
+function hide(_ref) {
+  var state = _ref.state,
+      name = _ref.name;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var preventedOffsets = state.modifiersData.preventOverflow;
+  var referenceOverflow = detectOverflow(state, {
+    elementContext: 'reference'
+  });
+  var popperAltOverflow = detectOverflow(state, {
+    altBoundary: true
+  });
+  var referenceClippingOffsets = getSideOffsets(referenceOverflow, referenceRect);
+  var popperEscapeOffsets = getSideOffsets(popperAltOverflow, popperRect, preventedOffsets);
+  var isReferenceHidden = isAnySideFullyClipped(referenceClippingOffsets);
+  var hasPopperEscaped = isAnySideFullyClipped(popperEscapeOffsets);
+  state.modifiersData[name] = {
+    referenceClippingOffsets: referenceClippingOffsets,
+    popperEscapeOffsets: popperEscapeOffsets,
+    isReferenceHidden: isReferenceHidden,
+    hasPopperEscaped: hasPopperEscaped
+  };
+  state.attributes.popper = Object.assign({}, state.attributes.popper, {
+    'data-popper-reference-hidden': isReferenceHidden,
+    'data-popper-escaped': hasPopperEscaped
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var hide$1 = {
+  name: 'hide',
+  enabled: true,
+  phase: 'main',
+  requiresIfExists: ['preventOverflow'],
+  fn: hide
+};
+
+function distanceAndSkiddingToXY(placement, rects, offset) {
+  var basePlacement = getBasePlacement(placement);
+  var invertDistance = [left, top].indexOf(basePlacement) >= 0 ? -1 : 1;
+
+  var _ref = typeof offset === 'function' ? offset(Object.assign({}, rects, {
+    placement: placement
+  })) : offset,
+      skidding = _ref[0],
+      distance = _ref[1];
+
+  skidding = skidding || 0;
+  distance = (distance || 0) * invertDistance;
+  return [left, right].indexOf(basePlacement) >= 0 ? {
+    x: distance,
+    y: skidding
+  } : {
+    x: skidding,
+    y: distance
+  };
+}
+
+function offset(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options,
+      name = _ref2.name;
+  var _options$offset = options.offset,
+      offset = _options$offset === void 0 ? [0, 0] : _options$offset;
+  var data = placements.reduce(function (acc, placement) {
+    acc[placement] = distanceAndSkiddingToXY(placement, state.rects, offset);
+    return acc;
+  }, {});
+  var _data$state$placement = data[state.placement],
+      x = _data$state$placement.x,
+      y = _data$state$placement.y;
+
+  if (state.modifiersData.popperOffsets != null) {
+    state.modifiersData.popperOffsets.x += x;
+    state.modifiersData.popperOffsets.y += y;
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var offset$1 = {
+  name: 'offset',
+  enabled: true,
+  phase: 'main',
+  requires: ['popperOffsets'],
+  fn: offset
+};
+
+function popperOffsets(_ref) {
+  var state = _ref.state,
+      name = _ref.name;
+  // Offsets are the actual position the popper needs to have to be
+  // properly positioned near its reference element
+  // This is the most basic placement, and will be adjusted by
+  // the modifiers in the next step
+  state.modifiersData[name] = computeOffsets({
+    reference: state.rects.reference,
+    element: state.rects.popper,
+    strategy: 'absolute',
+    placement: state.placement
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var popperOffsets$1 = {
+  name: 'popperOffsets',
+  enabled: true,
+  phase: 'read',
+  fn: popperOffsets,
+  data: {}
+};
+
+function getAltAxis(axis) {
+  return axis === 'x' ? 'y' : 'x';
+}
+
+function preventOverflow(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? false : _options$altAxis,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      padding = options.padding,
+      _options$tether = options.tether,
+      tether = _options$tether === void 0 ? true : _options$tether,
+      _options$tetherOffset = options.tetherOffset,
+      tetherOffset = _options$tetherOffset === void 0 ? 0 : _options$tetherOffset;
+  var overflow = detectOverflow(state, {
+    boundary: boundary,
+    rootBoundary: rootBoundary,
+    padding: padding,
+    altBoundary: altBoundary
+  });
+  var basePlacement = getBasePlacement(state.placement);
+  var variation = getVariation(state.placement);
+  var isBasePlacement = !variation;
+  var mainAxis = getMainAxisFromPlacement(basePlacement);
+  var altAxis = getAltAxis(mainAxis);
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var tetherOffsetValue = typeof tetherOffset === 'function' ? tetherOffset(Object.assign({}, state.rects, {
+    placement: state.placement
+  })) : tetherOffset;
+  var data = {
+    x: 0,
+    y: 0
+  };
+
+  if (!popperOffsets) {
+    return;
+  }
+
+  if (checkMainAxis || checkAltAxis) {
+    var mainSide = mainAxis === 'y' ? top : left;
+    var altSide = mainAxis === 'y' ? bottom : right;
+    var len = mainAxis === 'y' ? 'height' : 'width';
+    var offset = popperOffsets[mainAxis];
+    var min$1 = popperOffsets[mainAxis] + overflow[mainSide];
+    var max$1 = popperOffsets[mainAxis] - overflow[altSide];
+    var additive = tether ? -popperRect[len] / 2 : 0;
+    var minLen = variation === start$1 ? referenceRect[len] : popperRect[len];
+    var maxLen = variation === start$1 ? -popperRect[len] : -referenceRect[len]; // We need to include the arrow in the calculation so the arrow doesn't go
+    // outside the reference bounds
+
+    var arrowElement = state.elements.arrow;
+    var arrowRect = tether && arrowElement ? getLayoutRect(arrowElement) : {
+      width: 0,
+      height: 0
+    };
+    var arrowPaddingObject = state.modifiersData['arrow#persistent'] ? state.modifiersData['arrow#persistent'].padding : getFreshSideObject();
+    var arrowPaddingMin = arrowPaddingObject[mainSide];
+    var arrowPaddingMax = arrowPaddingObject[altSide]; // If the reference length is smaller than the arrow length, we don't want
+    // to include its full size in the calculation. If the reference is small
+    // and near the edge of a boundary, the popper can overflow even if the
+    // reference is not overflowing as well (e.g. virtual elements with no
+    // width or height)
+
+    var arrowLen = within(0, referenceRect[len], arrowRect[len]);
+    var minOffset = isBasePlacement ? referenceRect[len] / 2 - additive - arrowLen - arrowPaddingMin - tetherOffsetValue : minLen - arrowLen - arrowPaddingMin - tetherOffsetValue;
+    var maxOffset = isBasePlacement ? -referenceRect[len] / 2 + additive + arrowLen + arrowPaddingMax + tetherOffsetValue : maxLen + arrowLen + arrowPaddingMax + tetherOffsetValue;
+    var arrowOffsetParent = state.elements.arrow && getOffsetParent(state.elements.arrow);
+    var clientOffset = arrowOffsetParent ? mainAxis === 'y' ? arrowOffsetParent.clientTop || 0 : arrowOffsetParent.clientLeft || 0 : 0;
+    var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement][mainAxis] : 0;
+    var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue - clientOffset;
+    var tetherMax = popperOffsets[mainAxis] + maxOffset - offsetModifierValue;
+
+    if (checkMainAxis) {
+      var preventedOffset = within(tether ? min(min$1, tetherMin) : min$1, offset, tether ? max(max$1, tetherMax) : max$1);
+      popperOffsets[mainAxis] = preventedOffset;
+      data[mainAxis] = preventedOffset - offset;
+    }
+
+    if (checkAltAxis) {
+      var _mainSide = mainAxis === 'x' ? top : left;
+
+      var _altSide = mainAxis === 'x' ? bottom : right;
+
+      var _offset = popperOffsets[altAxis];
+
+      var _min = _offset + overflow[_mainSide];
+
+      var _max = _offset - overflow[_altSide];
+
+      var _preventedOffset = within(tether ? min(_min, tetherMin) : _min, _offset, tether ? max(_max, tetherMax) : _max);
+
+      popperOffsets[altAxis] = _preventedOffset;
+      data[altAxis] = _preventedOffset - _offset;
+    }
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+var preventOverflow$1 = {
+  name: 'preventOverflow',
+  enabled: true,
+  phase: 'main',
+  fn: preventOverflow,
+  requiresIfExists: ['offset']
+};
+
+function getHTMLElementScroll(element) {
+  return {
+    scrollLeft: element.scrollLeft,
+    scrollTop: element.scrollTop
+  };
+}
+
+function getNodeScroll(node) {
+  if (node === getWindow(node) || !isHTMLElement(node)) {
+    return getWindowScroll(node);
+  } else {
+    return getHTMLElementScroll(node);
+  }
+}
+
+function isElementScaled(element) {
+  var rect = element.getBoundingClientRect();
+  var scaleX = rect.width / element.offsetWidth || 1;
+  var scaleY = rect.height / element.offsetHeight || 1;
+  return scaleX !== 1 || scaleY !== 1;
+} // Returns the composite rect of an element relative to its offsetParent.
+// Composite means it takes into account transforms as well as layout.
+
+
+function getCompositeRect(elementOrVirtualElement, offsetParent, isFixed) {
+  if (isFixed === void 0) {
+    isFixed = false;
+  }
+
+  var isOffsetParentAnElement = isHTMLElement(offsetParent);
+  var offsetParentIsScaled = isHTMLElement(offsetParent) && isElementScaled(offsetParent);
+  var documentElement = getDocumentElement(offsetParent);
+  var rect = getBoundingClientRect(elementOrVirtualElement, offsetParentIsScaled);
+  var scroll = {
+    scrollLeft: 0,
+    scrollTop: 0
+  };
+  var offsets = {
+    x: 0,
+    y: 0
+  };
+
+  if (isOffsetParentAnElement || !isOffsetParentAnElement && !isFixed) {
+    if (getNodeName(offsetParent) !== 'body' || // https://github.com/popperjs/popper-core/issues/1078
+    isScrollParent(documentElement)) {
+      scroll = getNodeScroll(offsetParent);
+    }
+
+    if (isHTMLElement(offsetParent)) {
+      offsets = getBoundingClientRect(offsetParent, true);
+      offsets.x += offsetParent.clientLeft;
+      offsets.y += offsetParent.clientTop;
+    } else if (documentElement) {
+      offsets.x = getWindowScrollBarX(documentElement);
+    }
+  }
+
+  return {
+    x: rect.left + scroll.scrollLeft - offsets.x,
+    y: rect.top + scroll.scrollTop - offsets.y,
+    width: rect.width,
+    height: rect.height
+  };
+}
+
+function order(modifiers) {
+  var map = new Map();
+  var visited = new Set();
+  var result = [];
+  modifiers.forEach(function (modifier) {
+    map.set(modifier.name, modifier);
+  }); // On visiting object, check for its dependencies and visit them recursively
+
+  function sort(modifier) {
+    visited.add(modifier.name);
+    var requires = [].concat(modifier.requires || [], modifier.requiresIfExists || []);
+    requires.forEach(function (dep) {
+      if (!visited.has(dep)) {
+        var depModifier = map.get(dep);
+
+        if (depModifier) {
+          sort(depModifier);
+        }
+      }
+    });
+    result.push(modifier);
+  }
+
+  modifiers.forEach(function (modifier) {
+    if (!visited.has(modifier.name)) {
+      // check for visited object
+      sort(modifier);
+    }
+  });
+  return result;
+}
+
+function orderModifiers(modifiers) {
+  // order based on dependencies
+  var orderedModifiers = order(modifiers); // order based on phase
+
+  return modifierPhases.reduce(function (acc, phase) {
+    return acc.concat(orderedModifiers.filter(function (modifier) {
+      return modifier.phase === phase;
+    }));
+  }, []);
+}
+
+function debounce$1(fn) {
+  var pending;
+  return function () {
+    if (!pending) {
+      pending = new Promise(function (resolve) {
+        Promise.resolve().then(function () {
+          pending = undefined;
+          resolve(fn());
+        });
+      });
+    }
+
+    return pending;
+  };
+}
+
+function mergeByName(modifiers) {
+  var merged = modifiers.reduce(function (merged, current) {
+    var existing = merged[current.name];
+    merged[current.name] = existing ? Object.assign({}, existing, current, {
+      options: Object.assign({}, existing.options, current.options),
+      data: Object.assign({}, existing.data, current.data)
+    }) : current;
+    return merged;
+  }, {}); // IE11 does not support Object.values
+
+  return Object.keys(merged).map(function (key) {
+    return merged[key];
+  });
+}
+
+var DEFAULT_OPTIONS = {
+  placement: 'bottom',
+  modifiers: [],
+  strategy: 'absolute'
+};
+
+function areValidElements() {
+  for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return !args.some(function (element) {
+    return !(element && typeof element.getBoundingClientRect === 'function');
+  });
+}
+
+function popperGenerator(generatorOptions) {
+  if (generatorOptions === void 0) {
+    generatorOptions = {};
+  }
+
+  var _generatorOptions = generatorOptions,
+      _generatorOptions$def = _generatorOptions.defaultModifiers,
+      defaultModifiers = _generatorOptions$def === void 0 ? [] : _generatorOptions$def,
+      _generatorOptions$def2 = _generatorOptions.defaultOptions,
+      defaultOptions = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
+  return function createPopper(reference, popper, options) {
+    if (options === void 0) {
+      options = defaultOptions;
+    }
+
+    var state = {
+      placement: 'bottom',
+      orderedModifiers: [],
+      options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions),
+      modifiersData: {},
+      elements: {
+        reference: reference,
+        popper: popper
+      },
+      attributes: {},
+      styles: {}
+    };
+    var effectCleanupFns = [];
+    var isDestroyed = false;
+    var instance = {
+      state: state,
+      setOptions: function setOptions(setOptionsAction) {
+        var options = typeof setOptionsAction === 'function' ? setOptionsAction(state.options) : setOptionsAction;
+        cleanupModifierEffects();
+        state.options = Object.assign({}, defaultOptions, state.options, options);
+        state.scrollParents = {
+          reference: isElement(reference) ? listScrollParents(reference) : reference.contextElement ? listScrollParents(reference.contextElement) : [],
+          popper: listScrollParents(popper)
+        }; // Orders the modifiers based on their dependencies and `phase`
+        // properties
+
+        var orderedModifiers = orderModifiers(mergeByName([].concat(defaultModifiers, state.options.modifiers))); // Strip out disabled modifiers
+
+        state.orderedModifiers = orderedModifiers.filter(function (m) {
+          return m.enabled;
+        }); // Validate the provided modifiers so that the consumer will get warned
+
+        runModifierEffects();
+        return instance.update();
+      },
+      // Sync update – it will always be executed, even if not necessary. This
+      // is useful for low frequency updates where sync behavior simplifies the
+      // logic.
+      // For high frequency updates (e.g. `resize` and `scroll` events), always
+      // prefer the async Popper#update method
+      forceUpdate: function forceUpdate() {
+        if (isDestroyed) {
+          return;
+        }
+
+        var _state$elements = state.elements,
+            reference = _state$elements.reference,
+            popper = _state$elements.popper; // Don't proceed if `reference` or `popper` are not valid elements
+        // anymore
+
+        if (!areValidElements(reference, popper)) {
+
+          return;
+        } // Store the reference and popper rects to be read by modifiers
+
+
+        state.rects = {
+          reference: getCompositeRect(reference, getOffsetParent(popper), state.options.strategy === 'fixed'),
+          popper: getLayoutRect(popper)
+        }; // Modifiers have the ability to reset the current update cycle. The
+        // most common use case for this is the `flip` modifier changing the
+        // placement, which then needs to re-run all the modifiers, because the
+        // logic was previously ran for the previous placement and is therefore
+        // stale/incorrect
+
+        state.reset = false;
+        state.placement = state.options.placement; // On each update cycle, the `modifiersData` property for each modifier
+        // is filled with the initial data specified by the modifier. This means
+        // it doesn't persist and is fresh on each update.
+        // To ensure persistent data, use `${name}#persistent`
+
+        state.orderedModifiers.forEach(function (modifier) {
+          return state.modifiersData[modifier.name] = Object.assign({}, modifier.data);
+        });
+
+        for (var index = 0; index < state.orderedModifiers.length; index++) {
+
+          if (state.reset === true) {
+            state.reset = false;
+            index = -1;
+            continue;
+          }
+
+          var _state$orderedModifie = state.orderedModifiers[index],
+              fn = _state$orderedModifie.fn,
+              _state$orderedModifie2 = _state$orderedModifie.options,
+              _options = _state$orderedModifie2 === void 0 ? {} : _state$orderedModifie2,
+              name = _state$orderedModifie.name;
+
+          if (typeof fn === 'function') {
+            state = fn({
+              state: state,
+              options: _options,
+              name: name,
+              instance: instance
+            }) || state;
+          }
+        }
+      },
+      // Async and optimistically optimized update – it will not be executed if
+      // not necessary (debounced to run at most once-per-tick)
+      update: debounce$1(function () {
+        return new Promise(function (resolve) {
+          instance.forceUpdate();
+          resolve(state);
+        });
+      }),
+      destroy: function destroy() {
+        cleanupModifierEffects();
+        isDestroyed = true;
+      }
+    };
+
+    if (!areValidElements(reference, popper)) {
+
+      return instance;
+    }
+
+    instance.setOptions(options).then(function (state) {
+      if (!isDestroyed && options.onFirstUpdate) {
+        options.onFirstUpdate(state);
+      }
+    }); // Modifiers have the ability to execute arbitrary code before the first
+    // update cycle runs. They will be executed in the same order as the update
+    // cycle. This is useful when a modifier adds some persistent data that
+    // other modifiers need to use, but the modifier is run after the dependent
+    // one.
+
+    function runModifierEffects() {
+      state.orderedModifiers.forEach(function (_ref3) {
+        var name = _ref3.name,
+            _ref3$options = _ref3.options,
+            options = _ref3$options === void 0 ? {} : _ref3$options,
+            effect = _ref3.effect;
+
+        if (typeof effect === 'function') {
+          var cleanupFn = effect({
+            state: state,
+            name: name,
+            instance: instance,
+            options: options
+          });
+
+          var noopFn = function noopFn() {};
+
+          effectCleanupFns.push(cleanupFn || noopFn);
+        }
+      });
+    }
+
+    function cleanupModifierEffects() {
+      effectCleanupFns.forEach(function (fn) {
+        return fn();
+      });
+      effectCleanupFns = [];
+    }
+
+    return instance;
+  };
+}
+
+var defaultModifiers = [eventListeners, popperOffsets$1, computeStyles$1, applyStyles$1, offset$1, flip$1, preventOverflow$1, arrow$1, hide$1];
+var createPopper = /*#__PURE__*/popperGenerator({
+  defaultModifiers: defaultModifiers
+}); // eslint-disable-next-line import/no-unused-modules
+
 class MenuElement extends LitElement {
   constructor() {
     super();
@@ -7239,8 +8946,7 @@ class MenuElement extends LitElement {
       :host {
         position: absolute;
         background-color: white;
-        opacity: 0.5;
-        transition: opacity 0.2s ease-in-out;
+        opacity: 0.8;
 
         width: 24px;
         height: 24px;
@@ -7252,16 +8958,12 @@ class MenuElement extends LitElement {
         left: initial;
       }
 
-      :host(:hover) {
-        opacity: 0.8;
-      }
-
-      a {
+      #info-button {
         display: block;
         padding: 4px;
       }
 
-      a svg {
+      #info-button svg {
         display: block;
         transform: translateY(0.5px);
       }
@@ -7290,18 +8992,134 @@ class MenuElement extends LitElement {
       :host([placement='none']) {
         display: none;
       }
+
+      .menu {
+        min-width: 6rem;
+        padding: 0.5rem 0;
+        color: #212529;
+        background-color: #fff;
+        background-clip: padding-box;
+        list-style: none;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 0.25rem;
+        display: none;
+      }
+
+      .menu[data-show] {
+        display: block;
+      }
+
+      .menu-item {
+        display: block;
+        padding: 0.25rem 1rem;
+        font-size: 12px;
+        font-weight: 400;
+        color: #212529;
+        text-decoration: none;
+        white-space: nowrap;
+        background-color: transparent;
+        border: 0;
+      }
+
+      .menu-item:focus,
+      .menu-item:hover {
+        color: #1e2125;
+        background-color: #e9ecef;
+      }
+
+      .menu .divider {
+        height: 1px;
+        margin: 4px 1px;
+        background-color: #e5e5e5;
+        border-bottom: 1px solid #ffffff;
+      }
     `;
   }
 
+  _hideMenu() {
+    const menu = this.shadowRoot.querySelector('.menu');
+    menu.removeAttribute('data-show');
+  }
+
+  firstUpdated() {
+    const infoButton = this.shadowRoot.querySelector('#info-button');
+    const menu = this.shadowRoot.querySelector('.menu');
+
+    const popperInstance = createPopper(infoButton, menu, {
+      placement: this._menuPlacement(),
+    });
+
+    infoButton.addEventListener('click', () => {
+      if (menu.getAttribute('data-show') === null) {
+        this.requestUpdate(); // update menu contents
+        menu.setAttribute('data-show', '');
+        popperInstance.update();
+      } else {
+        menu.removeAttribute('data-show');
+      }
+    });
+  }
+
+  _menuPlacement() {
+    switch (this.placement) {
+      case 'top-left':
+        return 'bottom-start';
+      case 'top-right':
+        return 'bottom-end';
+      case 'bottom-left':
+        return 'top-start';
+      case 'bottom-right':
+        return 'top-end';
+      case 'none':
+      default:
+        return 'top-end';
+    }
+  }
+
+  _handlerForMenuItem(menuItem) {
+    return () => {
+      this._hideMenu();
+      menuItem.handler();
+    };
+  }
+
+  _renderMenuItem(item) {
+    switch (item.type) {
+      case 'item':
+        return html`<li>
+          <a class="menu-item" @click="${this._handlerForMenuItem(item)}"
+            >${item.label}</a
+          >
+        </li>`;
+
+      case 'divider':
+        return html`<li class="divider"></li>`;
+
+      default:
+        throw new Error(`unknown menu item type specified: ${item.type}`);
+    }
+  }
+
   render() {
-    return html`<a
-      class="dropdown-item"
-      href=${this.href}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ${unsafeSVG(octicons.info.toSVG({ width: 16 }))}
-    </a>`;
+    const menuDefinition = this.menuDefinition();
+    return html`<div id="info-button">
+        ${unsafeSVG(octicons.info.toSVG({ width: 16 }))}
+      </div>
+      <ul class="menu">
+        ${menuDefinition.map((item) => this._renderMenuItem(item))}
+        ${menuDefinition.length > 0 ? html`<li class="divider"></li>` : ''}
+        <li>
+          <a
+            class="menu-item"
+            href=${this.href}
+            @click="${this._hideMenu}"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            About this stanza</a
+          >
+        </li>
+      </ul>`;
   }
 }
 
@@ -7317,7 +9135,7 @@ MenuElement.customElementName = 'togostanza--menu';
  */
 
 /** Used as the `TypeError` message for "Functions" methods. */
-var FUNC_ERROR_TEXT = 'Expected a function';
+var FUNC_ERROR_TEXT$1 = 'Expected a function';
 
 /** Used to stand-in for `undefined` hash values. */
 var HASH_UNDEFINED = '__lodash_hash_undefined__';
@@ -7328,7 +9146,7 @@ var INFINITY = 1 / 0;
 /** `Object#toString` result references. */
 var funcTag = '[object Function]',
     genTag = '[object GeneratorFunction]',
-    symbolTag = '[object Symbol]';
+    symbolTag$1 = '[object Symbol]';
 
 /** Used to match property names within property paths. */
 var reIsDeepProp = /\.|\[(?:[^[\]]*|(["'])(?:(?!\1)[^\\]|\\.)*?\1)\]/,
@@ -7349,13 +9167,13 @@ var reEscapeChar = /\\(\\)?/g;
 var reIsHostCtor = /^\[object .+?Constructor\]$/;
 
 /** Detect free variable `global` from Node.js. */
-var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+var freeGlobal$1 = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
 
 /** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+var freeSelf$1 = typeof self == 'object' && self && self.Object === Object && self;
 
 /** Used as a reference to the global object. */
-var root$1 = freeGlobal || freeSelf || Function('return this')();
+var root$2 = freeGlobal$1 || freeSelf$1 || Function('return this')();
 
 /**
  * Gets the value at `key` of `object`.
@@ -7391,10 +9209,10 @@ function isHostObject(value) {
 /** Used for built-in method references. */
 var arrayProto = Array.prototype,
     funcProto = Function.prototype,
-    objectProto = Object.prototype;
+    objectProto$1 = Object.prototype;
 
 /** Used to detect overreaching core-js shims. */
-var coreJsData = root$1['__core-js_shared__'];
+var coreJsData = root$2['__core-js_shared__'];
 
 /** Used to detect methods masquerading as native. */
 var maskSrcKey = (function() {
@@ -7406,14 +9224,14 @@ var maskSrcKey = (function() {
 var funcToString = funcProto.toString;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
+var hasOwnProperty = objectProto$1.hasOwnProperty;
 
 /**
  * Used to resolve the
  * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
  * of values.
  */
-var objectToString = objectProto.toString;
+var objectToString$1 = objectProto$1.toString;
 
 /** Used to detect if a method is native. */
 var reIsNative = RegExp('^' +
@@ -7422,11 +9240,11 @@ var reIsNative = RegExp('^' +
 );
 
 /** Built-in value references. */
-var Symbol$1 = root$1.Symbol,
+var Symbol$1 = root$2.Symbol,
     splice = arrayProto.splice;
 
 /* Built-in method references that are verified to be native. */
-var Map$1 = getNative(root$1, 'Map'),
+var Map$1 = getNative(root$2, 'Map'),
     nativeCreate = getNative(Object, 'create');
 
 /** Used to convert symbols to primitives and strings. */
@@ -7784,10 +9602,10 @@ function baseGet(object, path) {
  *  else `false`.
  */
 function baseIsNative(value) {
-  if (!isObject(value) || isMasked(value)) {
+  if (!isObject$1(value) || isMasked(value)) {
     return false;
   }
-  var pattern = (isFunction(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
+  var pattern = (isFunction$1(value) || isHostObject(value)) ? reIsNative : reIsHostCtor;
   return pattern.test(toSource(value));
 }
 
@@ -7804,7 +9622,7 @@ function baseToString(value) {
   if (typeof value == 'string') {
     return value;
   }
-  if (isSymbol(value)) {
+  if (isSymbol$1(value)) {
     return symbolToString ? symbolToString.call(value) : '';
   }
   var result = (value + '');
@@ -7819,7 +9637,7 @@ function baseToString(value) {
  * @returns {Array} Returns the cast property path array.
  */
 function castPath(value) {
-  return isArray(value) ? value : stringToPath(value);
+  return isArray$1(value) ? value : stringToPath(value);
 }
 
 /**
@@ -7859,12 +9677,12 @@ function getNative(object, key) {
  * @returns {boolean} Returns `true` if `value` is a property name, else `false`.
  */
 function isKey(value, object) {
-  if (isArray(value)) {
+  if (isArray$1(value)) {
     return false;
   }
   var type = typeof value;
   if (type == 'number' || type == 'symbol' || type == 'boolean' ||
-      value == null || isSymbol(value)) {
+      value == null || isSymbol$1(value)) {
     return true;
   }
   return reIsPlainProp.test(value) || !reIsDeepProp.test(value) ||
@@ -7904,7 +9722,7 @@ function isMasked(func) {
  * @returns {Array} Returns the property path array.
  */
 var stringToPath = memoize(function(string) {
-  string = toString(string);
+  string = toString$1(string);
 
   var result = [];
   if (reLeadingDot.test(string)) {
@@ -7924,7 +9742,7 @@ var stringToPath = memoize(function(string) {
  * @returns {string|symbol} Returns the key.
  */
 function toKey(value) {
-  if (typeof value == 'string' || isSymbol(value)) {
+  if (typeof value == 'string' || isSymbol$1(value)) {
     return value;
   }
   var result = (value + '');
@@ -7996,7 +9814,7 @@ function toSource(func) {
  */
 function memoize(func, resolver) {
   if (typeof func != 'function' || (resolver && typeof resolver != 'function')) {
-    throw new TypeError(FUNC_ERROR_TEXT);
+    throw new TypeError(FUNC_ERROR_TEXT$1);
   }
   var memoized = function() {
     var args = arguments,
@@ -8076,7 +9894,7 @@ function eq(value, other) {
  * _.isArray(_.noop);
  * // => false
  */
-var isArray = Array.isArray;
+var isArray$1 = Array.isArray;
 
 /**
  * Checks if `value` is classified as a `Function` object.
@@ -8095,11 +9913,666 @@ var isArray = Array.isArray;
  * _.isFunction(/abc/);
  * // => false
  */
-function isFunction(value) {
+function isFunction$1(value) {
   // The use of `Object#toString` avoids issues with the `typeof` operator
   // in Safari 8-9 which returns 'object' for typed array and other constructors.
-  var tag = isObject(value) ? objectToString.call(value) : '';
+  var tag = isObject$1(value) ? objectToString$1.call(value) : '';
   return tag == funcTag || tag == genTag;
+}
+
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject$1(value) {
+  var type = typeof value;
+  return !!value && (type == 'object' || type == 'function');
+}
+
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike$1(value) {
+  return !!value && typeof value == 'object';
+}
+
+/**
+ * Checks if `value` is classified as a `Symbol` primitive or object.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
+ * @example
+ *
+ * _.isSymbol(Symbol.iterator);
+ * // => true
+ *
+ * _.isSymbol('abc');
+ * // => false
+ */
+function isSymbol$1(value) {
+  return typeof value == 'symbol' ||
+    (isObjectLike$1(value) && objectToString$1.call(value) == symbolTag$1);
+}
+
+/**
+ * Converts `value` to a string. An empty string is returned for `null`
+ * and `undefined` values. The sign of `-0` is preserved.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {string} Returns the string.
+ * @example
+ *
+ * _.toString(null);
+ * // => ''
+ *
+ * _.toString(-0);
+ * // => '-0'
+ *
+ * _.toString([1, 2, 3]);
+ * // => '1,2,3'
+ */
+function toString$1(value) {
+  return value == null ? '' : baseToString(value);
+}
+
+/**
+ * Gets the value at `path` of `object`. If the resolved value is
+ * `undefined`, the `defaultValue` is returned in its place.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.7.0
+ * @category Object
+ * @param {Object} object The object to query.
+ * @param {Array|string} path The path of the property to get.
+ * @param {*} [defaultValue] The value returned for `undefined` resolved values.
+ * @returns {*} Returns the resolved value.
+ * @example
+ *
+ * var object = { 'a': [{ 'b': { 'c': 3 } }] };
+ *
+ * _.get(object, 'a[0].b.c');
+ * // => 3
+ *
+ * _.get(object, ['a', '0', 'b', 'c']);
+ * // => 3
+ *
+ * _.get(object, 'a.b.c', 'default');
+ * // => 'default'
+ */
+function get$2(object, path, defaultValue) {
+  var result = object == null ? undefined : baseGet(object, path);
+  return result === undefined ? defaultValue : result;
+}
+
+var lodash_get = get$2;
+
+class ContainerElement extends HTMLElement {
+  dataSourceUrls = {};
+
+  connectedCallback() {
+    setTimeout(() => {
+      // wait until stanzas ready
+      const stanzaElements = Array.from(this.querySelectorAll('*')).filter(
+        (el) => el.tagName.startsWith('TOGOSTANZA-') && 'stanzaInstance' in el
+      );
+      connectStanzasWithAttributes(this, stanzaElements);
+      connectStanzasWithHandler(stanzaElements);
+      connectDataSource(this);
+    }, 0);
+  }
+
+  disconnectedCallback() {
+    for (const entry of Object.values(this.dataSourceUrls)) {
+      URL.revokeObjectURL(entry.value);
+    }
+  }
+
+  async dataSourceUrlChanged(oldUrl, newUrl, receiver, targetAttribute) {
+    this.disposeDataSourceUrl(oldUrl);
+
+    const receiverElements = this.querySelectorAll(receiver);
+
+    if (newUrl) {
+      const objectUrl = await this.getOrCreateObjectUrl(newUrl);
+
+      setEach(receiverElements, targetAttribute, objectUrl);
+    } else {
+      removeEach(receiverElements, targetAttribute);
+    }
+  }
+
+  async getOrCreateObjectUrl(url) {
+    const entry = this.dataSourceUrls[url];
+
+    if (entry) {
+      entry.count++;
+      return entry.value;
+    }
+
+    const blob = await fetch(url).then((res) => res.blob());
+    const objectUrl = URL.createObjectURL(blob);
+
+    this.dataSourceUrls[url] = {
+      value: objectUrl,
+      count: 1,
+    };
+
+    return objectUrl;
+  }
+
+  disposeDataSourceUrl(url) {
+    const entry = this.dataSourceUrls[url];
+
+    if (!entry) {
+      return;
+    }
+
+    entry.count--;
+
+    if (entry.count === 0) {
+      URL.revokeObjectURL(entry.value);
+
+      delete this.dataSourceUrls[url];
+    }
+  }
+}
+
+ContainerElement.customElementName = 'togostanza--container';
+
+function connectStanzasWithHandler(stanzaElements) {
+  for (const srcEl of stanzaElements) {
+    for (const eventName of outgoingEventNames(srcEl.stanzaInstance)) {
+      srcEl.addEventListener(eventName, (event) => {
+        for (const destEl of stanzaElements) {
+          if (incomingEventNames(destEl.stanzaInstance).includes(eventName)) {
+            destEl.stanzaInstance.handleEvent(event);
+          }
+        }
+      });
+    }
+  }
+}
+
+function connectStanzasWithAttributes(container, stanzaElements) {
+  for (const mapElement of container.querySelectorAll(
+    'togostanza--event-map'
+  )) {
+    const on = mapElement.getAttribute('on');
+    const receiver = mapElement.getAttribute('receiver');
+    const targetAttribute = mapElement.getAttribute('target-attribute');
+    const valuePath = mapElement.getAttribute('value-path');
+
+    const receiverElements = container.querySelectorAll(receiver);
+
+    for (const srcEl of stanzaElements) {
+      if (!outgoingEventNames(srcEl.stanzaInstance).includes(on)) {
+        continue;
+      }
+
+      srcEl.addEventListener(on, (event) => {
+        const value = valuePath ? lodash_get(event.detail, valuePath) : event.detail;
+
+        if (value === true) {
+          setEach(receiverElements, targetAttribute, '');
+        } else if (value === false || value === undefined) {
+          removeEach(receiverElements, targetAttribute);
+        } else if (value.constructor === String) {
+          // a bit weird, but a unified way to determine string literals and objects
+          setEach(receiverElements, targetAttribute, value);
+        } else {
+          setEach(receiverElements, targetAttribute, JSON.stringify(value));
+        }
+      });
+    }
+  }
+}
+
+function connectDataSource(container) {
+  for (const dataSource of container.querySelectorAll(
+    'togostanza--data-source'
+  )) {
+    dataSource.containerElement = container;
+
+    const url = dataSource.getAttribute('url');
+    const receiver = dataSource.getAttribute('receiver');
+    const targetAttribute = dataSource.getAttribute('target-attribute');
+
+    container.dataSourceUrlChanged(null, url, receiver, targetAttribute);
+  }
+}
+
+function setEach(elements, key, value) {
+  for (const el of elements) {
+    el.setAttribute(key, value);
+  }
+}
+
+function removeEach(elements, key) {
+  for (const el of elements) {
+    el.removeAttribute(key);
+  }
+}
+
+function outgoingEventNames(stanzaInstance) {
+  return (
+    stanzaInstance.metadata['stanza:outgoingEvent']?.map(
+      (e) => e['stanza:key']
+    ) || []
+  );
+}
+
+function incomingEventNames(stanzaInstance) {
+  return (
+    stanzaInstance.metadata['stanza:incomingEvent']?.map(
+      (e) => e['stanza:key']
+    ) || []
+  );
+}
+
+class DataSourceElement extends HTMLElement {
+  attributeChangedCallback(key, oldVal, newVal) {
+    if (key !== 'url') { return; }
+
+    const receiver        = this.getAttribute('receiver');
+    const targetAttribute = this.getAttribute('target-attribute');
+
+    this.containerElement?.dataSourceUrlChanged(oldVal, newVal, receiver, targetAttribute);
+  }
+}
+
+DataSourceElement.observedAttributes = ['url'];
+DataSourceElement.customElementName = 'togostanza--data-source';
+
+async function defineStanzaElement({
+  stanzaModule,
+  metadata,
+  templates,
+  url,
+}) {
+  const id = metadata['@id'];
+  const paramKeys = metadata['stanza:parameter'].map(
+    (param) => param['stanza:key']
+  );
+
+  class StanzaElement extends HTMLElement {
+    constructor() {
+      super(...arguments);
+
+      ensureBuiltinElementsDefined();
+
+      this.attachShadow({ mode: 'open' });
+
+      this.stanzaInstance = new stanzaModule.default(
+        this,
+        metadata,
+        templates,
+        url
+      );
+    }
+
+    connectedCallback() {
+      const hostStyle = document.createElement('style');
+      hostStyle.append(cssVariableDefaults(metadata['stanza:style']) || '');
+      this.shadowRoot.append(hostStyle);
+
+      const shadowStyleLink = document.createElement('link');
+      shadowStyleLink.rel = 'stylesheet';
+      shadowStyleLink.href = url.replace(/\.js$/, '.css');
+      this.shadowRoot.append(shadowStyleLink);
+
+      this.stanzaInstance.renderDebounced();
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (name === 'togostanza-menu-placement') {
+        if (newValue) {
+          this.stanzaInstance.menuElement.setAttribute('placement', newValue);
+        } else {
+          this.stanzaInstance.menuElement.removeAttribute('placement');
+        }
+        return;
+      }
+      this.stanzaInstance.handleAttributeChange(name, oldValue, newValue);
+    }
+
+    render() {
+      this.stanzaInstance.render();
+    }
+  }
+
+  StanzaElement.observedAttributes = [
+    ...paramKeys,
+    'togostanza-menu-placement',
+  ];
+
+  customElements.define(`togostanza-${id}`, StanzaElement);
+}
+
+function cssVariableDefaults(defs) {
+  if (!defs) {
+    return null;
+  }
+
+  return defaultOutdent`
+    :host {
+    ${defs
+      .map((def) => `  ${def['stanza:key']}: ${def['stanza:default']};`)
+      .join('\n')}
+    }
+  `;
+}
+
+function ensureBuiltinElementsDefined() {
+  for (const el of [MenuElement, ContainerElement, DataSourceElement]) {
+    const name = el.customElementName;
+
+    if (!customElements.get(name)) {
+      customElements.define(name, el);
+    }
+  }
+}
+
+/**
+ * lodash (Custom Build) <https://lodash.com/>
+ * Build: `lodash modularize exports="npm" -o ./`
+ * Copyright jQuery Foundation and other contributors <https://jquery.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */
+
+/** Used as the `TypeError` message for "Functions" methods. */
+var FUNC_ERROR_TEXT = 'Expected a function';
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** `Object#toString` result references. */
+var symbolTag = '[object Symbol]';
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root$1 = freeGlobal || freeSelf || Function('return this')();
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max,
+    nativeMin = Math.min;
+
+/**
+ * Gets the timestamp of the number of milliseconds that have elapsed since
+ * the Unix epoch (1 January 1970 00:00:00 UTC).
+ *
+ * @static
+ * @memberOf _
+ * @since 2.4.0
+ * @category Date
+ * @returns {number} Returns the timestamp.
+ * @example
+ *
+ * _.defer(function(stamp) {
+ *   console.log(_.now() - stamp);
+ * }, _.now());
+ * // => Logs the number of milliseconds it took for the deferred invocation.
+ */
+var now$1 = function() {
+  return root$1.Date.now();
+};
+
+/**
+ * Creates a debounced function that delays invoking `func` until after `wait`
+ * milliseconds have elapsed since the last time the debounced function was
+ * invoked. The debounced function comes with a `cancel` method to cancel
+ * delayed `func` invocations and a `flush` method to immediately invoke them.
+ * Provide `options` to indicate whether `func` should be invoked on the
+ * leading and/or trailing edge of the `wait` timeout. The `func` is invoked
+ * with the last arguments provided to the debounced function. Subsequent
+ * calls to the debounced function return the result of the last `func`
+ * invocation.
+ *
+ * **Note:** If `leading` and `trailing` options are `true`, `func` is
+ * invoked on the trailing edge of the timeout only if the debounced function
+ * is invoked more than once during the `wait` timeout.
+ *
+ * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+ * until to the next tick, similar to `setTimeout` with a timeout of `0`.
+ *
+ * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+ * for details over the differences between `_.debounce` and `_.throttle`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Function
+ * @param {Function} func The function to debounce.
+ * @param {number} [wait=0] The number of milliseconds to delay.
+ * @param {Object} [options={}] The options object.
+ * @param {boolean} [options.leading=false]
+ *  Specify invoking on the leading edge of the timeout.
+ * @param {number} [options.maxWait]
+ *  The maximum time `func` is allowed to be delayed before it's invoked.
+ * @param {boolean} [options.trailing=true]
+ *  Specify invoking on the trailing edge of the timeout.
+ * @returns {Function} Returns the new debounced function.
+ * @example
+ *
+ * // Avoid costly calculations while the window size is in flux.
+ * jQuery(window).on('resize', _.debounce(calculateLayout, 150));
+ *
+ * // Invoke `sendMail` when clicked, debouncing subsequent calls.
+ * jQuery(element).on('click', _.debounce(sendMail, 300, {
+ *   'leading': true,
+ *   'trailing': false
+ * }));
+ *
+ * // Ensure `batchLog` is invoked once after 1 second of debounced calls.
+ * var debounced = _.debounce(batchLog, 250, { 'maxWait': 1000 });
+ * var source = new EventSource('/stream');
+ * jQuery(source).on('message', debounced);
+ *
+ * // Cancel the trailing debounced invocation.
+ * jQuery(window).on('popstate', debounced.cancel);
+ */
+function debounce(func, wait, options) {
+  var lastArgs,
+      lastThis,
+      maxWait,
+      result,
+      timerId,
+      lastCallTime,
+      lastInvokeTime = 0,
+      leading = false,
+      maxing = false,
+      trailing = true;
+
+  if (typeof func != 'function') {
+    throw new TypeError(FUNC_ERROR_TEXT);
+  }
+  wait = toNumber(wait) || 0;
+  if (isObject(options)) {
+    leading = !!options.leading;
+    maxing = 'maxWait' in options;
+    maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+    trailing = 'trailing' in options ? !!options.trailing : trailing;
+  }
+
+  function invokeFunc(time) {
+    var args = lastArgs,
+        thisArg = lastThis;
+
+    lastArgs = lastThis = undefined;
+    lastInvokeTime = time;
+    result = func.apply(thisArg, args);
+    return result;
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time;
+    // Start the timer for the trailing edge.
+    timerId = setTimeout(timerExpired, wait);
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result;
+  }
+
+  function remainingWait(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime,
+        result = wait - timeSinceLastCall;
+
+    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+  }
+
+  function shouldInvoke(time) {
+    var timeSinceLastCall = time - lastCallTime,
+        timeSinceLastInvoke = time - lastInvokeTime;
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait));
+  }
+
+  function timerExpired() {
+    var time = now$1();
+    if (shouldInvoke(time)) {
+      return trailingEdge(time);
+    }
+    // Restart the timer.
+    timerId = setTimeout(timerExpired, remainingWait(time));
+  }
+
+  function trailingEdge(time) {
+    timerId = undefined;
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time);
+    }
+    lastArgs = lastThis = undefined;
+    return result;
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+    }
+    lastInvokeTime = 0;
+    lastArgs = lastCallTime = lastThis = timerId = undefined;
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(now$1());
+  }
+
+  function debounced() {
+    var time = now$1(),
+        isInvoking = shouldInvoke(time);
+
+    lastArgs = arguments;
+    lastThis = this;
+    lastCallTime = time;
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime);
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = setTimeout(timerExpired, wait);
+        return invokeFunc(lastCallTime);
+      }
+    }
+    if (timerId === undefined) {
+      timerId = setTimeout(timerExpired, wait);
+    }
+    return result;
+  }
+  debounced.cancel = cancel;
+  debounced.flush = flush;
+  return debounced;
 }
 
 /**
@@ -8183,232 +10656,65 @@ function isSymbol(value) {
 }
 
 /**
- * Converts `value` to a string. An empty string is returned for `null`
- * and `undefined` values. The sign of `-0` is preserved.
+ * Converts `value` to a number.
  *
  * @static
  * @memberOf _
  * @since 4.0.0
  * @category Lang
  * @param {*} value The value to process.
- * @returns {string} Returns the string.
+ * @returns {number} Returns the number.
  * @example
  *
- * _.toString(null);
- * // => ''
+ * _.toNumber(3.2);
+ * // => 3.2
  *
- * _.toString(-0);
- * // => '-0'
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
  *
- * _.toString([1, 2, 3]);
- * // => '1,2,3'
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
  */
-function toString(value) {
-  return value == null ? '' : baseToString(value);
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol(value)) {
+    return NAN;
+  }
+  if (isObject(value)) {
+    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+    value = isObject(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
 }
 
-/**
- * Gets the value at `path` of `object`. If the resolved value is
- * `undefined`, the `defaultValue` is returned in its place.
- *
- * @static
- * @memberOf _
- * @since 3.7.0
- * @category Object
- * @param {Object} object The object to query.
- * @param {Array|string} path The path of the property to get.
- * @param {*} [defaultValue] The value returned for `undefined` resolved values.
- * @returns {*} Returns the resolved value.
- * @example
- *
- * var object = { 'a': [{ 'b': { 'c': 3 } }] };
- *
- * _.get(object, 'a[0].b.c');
- * // => 3
- *
- * _.get(object, ['a', '0', 'b', 'c']);
- * // => 3
- *
- * _.get(object, 'a.b.c', 'default');
- * // => 'default'
- */
-function get$2(object, path, defaultValue) {
-  var result = object == null ? undefined : baseGet(object, path);
-  return result === undefined ? defaultValue : result;
-}
+var lodash_debounce = debounce;
 
-var lodash_get = get$2;
+var handlebars_runtime = {exports: {}};
 
-class ContainerElement extends HTMLElement {
-  dataSourceUrls = {};
+var base = {};
 
-  connectedCallback() {
-    setTimeout(() => { // wait until stanzas ready
-      const stanzaElements = Array.from(
-        this.querySelectorAll('*')
-      ).filter((el) => el.tagName.startsWith('TOGOSTANZA-') && 'stanza' in el);
+var utils = {};
 
-      connectStanzasWithAttributes(this, stanzaElements);
-      connectStanzasWithHandler(stanzaElements);
-      connectDataSource(this);
-    }, 0);
-  }
-
-  disconnectedCallback() {
-    for (const entry of Object.values(this.dataSourceUrls)) {
-      URL.revokeObjectURL(entry.value);
-    }
-  }
-
-  async dataSourceUrlChanged(oldUrl, newUrl, receiver, targetAttribute) {
-    this.disposeDataSourceUrl(oldUrl);
-
-    const receiverElements = this.querySelectorAll(receiver);
-
-    if (newUrl) {
-      const objectUrl = await this.getOrCreateObjectUrl(newUrl);
-
-      setEach(receiverElements, targetAttribute, objectUrl);
-    } else {
-      removeEach(receiverElements, targetAttribute);
-    }
-  }
-
-  async getOrCreateObjectUrl(url) {
-    const entry = this.dataSourceUrls[url];
-
-    if (entry) {
-      entry.count++;
-      return entry.value;
-    }
-
-    const blob      = await fetch(url).then(res => res.blob());
-    const objectUrl = URL.createObjectURL(blob);
-
-    this.dataSourceUrls[url] = {
-      value: objectUrl,
-      count: 1
-    };
-
-    return objectUrl;
-  }
-
-  disposeDataSourceUrl(url) {
-    const entry = this.dataSourceUrls[url];
-
-    if (!entry) { return; }
-
-    entry.count--;
-
-    if (entry.count === 0) {
-      URL.revokeObjectURL(entry.value);
-
-      delete this.dataSourceUrls[url];
-    }
-  }
-}
-
-ContainerElement.customElementName = 'togostanza--container';
-
-function connectStanzasWithHandler(stanzaElements) {
-  for (const srcEl of stanzaElements) {
-    for (const eventName of outgoingEventNames(srcEl.stanza)) {
-      srcEl.addEventListener(eventName, (event) => {
-        for (const destEl of stanzaElements) {
-          if (incomingEventNames(destEl.stanza).includes(eventName)) {
-            destEl.stanza.handleEvent(event);
-          }
-        }
-      });
-    }
-  }
-}
-
-function connectStanzasWithAttributes(container, stanzaElements) {
-  for (const mapElement of container.querySelectorAll('togostanza--event-map')) {
-    const on              = mapElement.getAttribute('on');
-    const receiver        = mapElement.getAttribute('receiver');
-    const targetAttribute = mapElement.getAttribute('target-attribute');
-    const valuePath       = mapElement.getAttribute('value-path');
-
-    const receiverElements = container.querySelectorAll(receiver);
-
-    for (const srcEl of stanzaElements) {
-      if (!outgoingEventNames(srcEl.stanza).includes(on)) { continue; }
-
-      srcEl.addEventListener(on, (event) => {
-        const value = valuePath ? lodash_get(event.detail, valuePath) : event.detail;
-
-        if (value === true) {
-          setEach(receiverElements, targetAttribute, '');
-        } else if (value === false || value === undefined) {
-          removeEach(receiverElements, targetAttribute);
-        } else if (value.constructor === String) { // a bit weird, but a unified way to determine string literals and objects
-          setEach(receiverElements, targetAttribute, value);
-        } else {
-          setEach(receiverElements, targetAttribute, JSON.stringify(value));
-        }
-      });
-    }
-  }
-}
-
-function connectDataSource(container) {
-  for (const dataSource of container.querySelectorAll('togostanza--data-source')) {
-    dataSource.containerElement = container;
-
-    const url             = dataSource.getAttribute('url');
-    const receiver        = dataSource.getAttribute('receiver');
-    const targetAttribute = dataSource.getAttribute('target-attribute');
-
-    container.dataSourceUrlChanged(null, url, receiver, targetAttribute);
-  }
-}
-
-function setEach(elements, key, value) {
-  for (const el of elements) {
-    el.setAttribute(key, value);
-  }
-}
-
-function removeEach(elements, key) {
-  for (const el of elements) {
-    el.removeAttribute(key);
-  }
-}
-
-function outgoingEventNames(stanza) {
-  return stanza.metadata['stanza:outgoingEvent']?.map(e => e['stanza:key']) || [];
-}
-
-function incomingEventNames(stanza) {
-  return stanza.metadata['stanza:incomingEvent']?.map(e => e['stanza:key']) || [];
-}
-
-class DataSourceElement extends HTMLElement {
-  attributeChangedCallback(key, oldVal, newVal) {
-    if (key !== 'url') { return; }
-
-    const receiver        = this.getAttribute('receiver');
-    const targetAttribute = this.getAttribute('target-attribute');
-
-    this.containerElement?.dataSourceUrlChanged(oldVal, newVal, receiver, targetAttribute);
-  }
-}
-
-DataSourceElement.observedAttributes = ['url'];
-DataSourceElement.customElementName = 'togostanza--data-source';
-
-var utils = createCommonjsModule(function (module, exports) {
-
-exports.__esModule = true;
-exports.extend = extend;
-exports.indexOf = indexOf;
-exports.escapeExpression = escapeExpression;
-exports.isEmpty = isEmpty;
-exports.createFrame = createFrame;
-exports.blockParams = blockParams;
-exports.appendContextPath = appendContextPath;
+utils.__esModule = true;
+utils.extend = extend$1;
+utils.indexOf = indexOf;
+utils.escapeExpression = escapeExpression;
+utils.isEmpty = isEmpty;
+utils.createFrame = createFrame;
+utils.blockParams = blockParams;
+utils.appendContextPath = appendContextPath;
 var escape = {
   '&': '&amp;',
   '<': '&lt;',
@@ -8426,7 +10732,7 @@ function escapeChar(chr) {
   return escape[chr];
 }
 
-function extend(obj /* , ...source */) {
+function extend$1(obj /* , ...source */) {
   for (var i = 1; i < arguments.length; i++) {
     for (var key in arguments[i]) {
       if (Object.prototype.hasOwnProperty.call(arguments[i], key)) {
@@ -8440,7 +10746,7 @@ function extend(obj /* , ...source */) {
 
 var toString = Object.prototype.toString;
 
-exports.toString = toString;
+utils.toString = toString;
 // Sourced from lodash
 // https://github.com/bestiejs/lodash/blob/master/LICENSE.txt
 /* eslint-disable func-style */
@@ -8450,11 +10756,11 @@ var isFunction = function isFunction(value) {
 // fallback for older versions of Chrome and Safari
 /* istanbul ignore next */
 if (isFunction(/x/)) {
-  exports.isFunction = isFunction = function (value) {
+  utils.isFunction = isFunction = function (value) {
     return typeof value === 'function' && toString.call(value) === '[object Function]';
   };
 }
-exports.isFunction = isFunction;
+utils.isFunction = isFunction;
 
 /* eslint-enable func-style */
 
@@ -8463,7 +10769,7 @@ var isArray = Array.isArray || function (value) {
   return value && typeof value === 'object' ? toString.call(value) === '[object Array]' : false;
 };
 
-exports.isArray = isArray;
+utils.isArray = isArray;
 // Older IE versions do not directly support indexOf so we must implement our own, sadly.
 
 function indexOf(array, value) {
@@ -8509,7 +10815,7 @@ function isEmpty(value) {
 }
 
 function createFrame(object) {
-  var frame = extend({}, object);
+  var frame = extend$1({}, object);
   frame._parent = object;
   return frame;
 }
@@ -8523,9 +10829,9 @@ function appendContextPath(contextPath, id) {
   return (contextPath ? contextPath + '.' : '') + id;
 }
 
-});
+var exception = {exports: {}};
 
-var exception = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 var errorProps = ['description', 'fileName', 'lineNumber', 'endLineNumber', 'message', 'name', 'number', 'stack'];
@@ -8589,13 +10895,17 @@ Exception.prototype = new Error();
 exports['default'] = Exception;
 module.exports = exports['default'];
 
-});
+}(exception, exception.exports));
 
-var blockHelperMissing = createCommonjsModule(function (module, exports) {
+var helpers = {};
+
+var blockHelperMissing = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 
-
+var _utils = utils;
 
 exports['default'] = function (instance) {
   instance.registerHelper('blockHelperMissing', function (context, options) {
@@ -8606,7 +10916,7 @@ exports['default'] = function (instance) {
       return fn(this);
     } else if (context === false || context == null) {
       return inverse(this);
-    } else if (utils.isArray(context)) {
+    } else if (_utils.isArray(context)) {
       if (context.length > 0) {
         if (options.ids) {
           options.ids = [options.name];
@@ -8618,8 +10928,8 @@ exports['default'] = function (instance) {
       }
     } else {
       if (options.data && options.ids) {
-        var data = utils.createFrame(options.data);
-        data.contextPath = utils.appendContextPath(options.data.contextPath, options.name);
+        var data = _utils.createFrame(options.data);
+        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.name);
         options = { data: data };
       }
 
@@ -8630,20 +10940,22 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(blockHelperMissing, blockHelperMissing.exports));
 
-var each = createCommonjsModule(function (module, exports) {
+var each = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 // istanbul ignore next
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _utils = utils;
 
+var _exception = exception.exports;
 
-
-
-var _exception2 = _interopRequireDefault(exception);
+var _exception2 = _interopRequireDefault(_exception);
 
 exports['default'] = function (instance) {
   instance.registerHelper('each', function (context, options) {
@@ -8659,15 +10971,15 @@ exports['default'] = function (instance) {
         contextPath = undefined;
 
     if (options.data && options.ids) {
-      contextPath = utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
+      contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
     }
 
-    if (utils.isFunction(context)) {
+    if (_utils.isFunction(context)) {
       context = context.call(this);
     }
 
     if (options.data) {
-      data = utils.createFrame(options.data);
+      data = _utils.createFrame(options.data);
     }
 
     function execIteration(field, index, last) {
@@ -8684,12 +10996,12 @@ exports['default'] = function (instance) {
 
       ret = ret + fn(context[field], {
         data: data,
-        blockParams: utils.blockParams([context[field], field], [contextPath + field, null])
+        blockParams: _utils.blockParams([context[field], field], [contextPath + field, null])
       });
     }
 
     if (context && typeof context === 'object') {
-      if (utils.isArray(context)) {
+      if (_utils.isArray(context)) {
         for (var j = context.length; i < j; i++) {
           if (i in context) {
             execIteration(i, i, i === context.length - 1);
@@ -8736,18 +11048,20 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(each, each.exports));
 
-var helperMissing = createCommonjsModule(function (module, exports) {
+var helperMissing = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 // istanbul ignore next
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _exception = exception.exports;
 
-
-var _exception2 = _interopRequireDefault(exception);
+var _exception2 = _interopRequireDefault(_exception);
 
 exports['default'] = function (instance) {
   instance.registerHelper('helperMissing', function () /* [args, ]options */{
@@ -8763,34 +11077,36 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(helperMissing, helperMissing.exports));
 
-var _if = createCommonjsModule(function (module, exports) {
+var _if = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 // istanbul ignore next
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _utils = utils;
 
+var _exception = exception.exports;
 
-
-
-var _exception2 = _interopRequireDefault(exception);
+var _exception2 = _interopRequireDefault(_exception);
 
 exports['default'] = function (instance) {
   instance.registerHelper('if', function (conditional, options) {
     if (arguments.length != 2) {
       throw new _exception2['default']('#if requires exactly one argument');
     }
-    if (utils.isFunction(conditional)) {
+    if (_utils.isFunction(conditional)) {
       conditional = conditional.call(this);
     }
 
     // Default behavior is to render the positive path if the value is truthy and not empty.
     // The `includeZero` option may be set to treat the condtional as purely not empty based on the
     // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
-    if (!options.hash.includeZero && !conditional || utils.isEmpty(conditional)) {
+    if (!options.hash.includeZero && !conditional || _utils.isEmpty(conditional)) {
       return options.inverse(this);
     } else {
       return options.fn(this);
@@ -8811,9 +11127,11 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(_if, _if.exports));
 
-var log$1 = createCommonjsModule(function (module, exports) {
+var log$1 = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 
@@ -8839,9 +11157,11 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(log$1, log$1.exports));
 
-var lookup = createCommonjsModule(function (module, exports) {
+var lookup = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 
@@ -8857,42 +11177,44 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(lookup, lookup.exports));
 
-var _with = createCommonjsModule(function (module, exports) {
+var _with = {exports: {}};
+
+(function (module, exports) {
 
 exports.__esModule = true;
 // istanbul ignore next
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _utils = utils;
 
+var _exception = exception.exports;
 
-
-
-var _exception2 = _interopRequireDefault(exception);
+var _exception2 = _interopRequireDefault(_exception);
 
 exports['default'] = function (instance) {
   instance.registerHelper('with', function (context, options) {
     if (arguments.length != 2) {
       throw new _exception2['default']('#with requires exactly one argument');
     }
-    if (utils.isFunction(context)) {
+    if (_utils.isFunction(context)) {
       context = context.call(this);
     }
 
     var fn = options.fn;
 
-    if (!utils.isEmpty(context)) {
+    if (!_utils.isEmpty(context)) {
       var data = options.data;
       if (options.data && options.ids) {
-        data = utils.createFrame(options.data);
-        data.contextPath = utils.appendContextPath(options.data.contextPath, options.ids[0]);
+        data = _utils.createFrame(options.data);
+        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]);
       }
 
       return fn(context, {
         data: data,
-        blockParams: utils.blockParams([context], [data && data.contextPath])
+        blockParams: _utils.blockParams([context], [data && data.contextPath])
       });
     } else {
       return options.inverse(this);
@@ -8902,41 +11224,42 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(_with, _with.exports));
 
-var registerDefaultHelpers_1 = registerDefaultHelpers;
-var moveHelperToHooks_1 = moveHelperToHooks;
+helpers.__esModule = true;
+helpers.registerDefaultHelpers = registerDefaultHelpers;
+helpers.moveHelperToHooks = moveHelperToHooks;
 // istanbul ignore next
 
 function _interopRequireDefault$3(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _helpersBlockHelperMissing = blockHelperMissing.exports;
 
+var _helpersBlockHelperMissing2 = _interopRequireDefault$3(_helpersBlockHelperMissing);
 
-var _helpersBlockHelperMissing2 = _interopRequireDefault$3(blockHelperMissing);
+var _helpersEach = each.exports;
 
+var _helpersEach2 = _interopRequireDefault$3(_helpersEach);
 
+var _helpersHelperMissing = helperMissing.exports;
 
-var _helpersEach2 = _interopRequireDefault$3(each);
+var _helpersHelperMissing2 = _interopRequireDefault$3(_helpersHelperMissing);
 
+var _helpersIf = _if.exports;
 
+var _helpersIf2 = _interopRequireDefault$3(_helpersIf);
 
-var _helpersHelperMissing2 = _interopRequireDefault$3(helperMissing);
+var _helpersLog = log$1.exports;
 
+var _helpersLog2 = _interopRequireDefault$3(_helpersLog);
 
+var _helpersLookup = lookup.exports;
 
-var _helpersIf2 = _interopRequireDefault$3(_if);
+var _helpersLookup2 = _interopRequireDefault$3(_helpersLookup);
 
+var _helpersWith = _with.exports;
 
-
-var _helpersLog2 = _interopRequireDefault$3(log$1);
-
-
-
-var _helpersLookup2 = _interopRequireDefault$3(lookup);
-
-
-
-var _helpersWith2 = _interopRequireDefault$3(_with);
+var _helpersWith2 = _interopRequireDefault$3(_helpersWith);
 
 function registerDefaultHelpers(instance) {
   _helpersBlockHelperMissing2['default'](instance);
@@ -8957,17 +11280,15 @@ function moveHelperToHooks(instance, helperName, keepHelper) {
   }
 }
 
+var decorators = {};
 
-var helpers = /*#__PURE__*/Object.defineProperty({
-	registerDefaultHelpers: registerDefaultHelpers_1,
-	moveHelperToHooks: moveHelperToHooks_1
-}, '__esModule', {value: true});
+var inline = {exports: {}};
 
-var inline = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 
-
+var _utils = utils;
 
 exports['default'] = function (instance) {
   instance.registerDecorator('inline', function (fn, props, container, options) {
@@ -8977,7 +11298,7 @@ exports['default'] = function (instance) {
       ret = function (context, options) {
         // Create a new partials stack frame prior to exec.
         var original = container.partials;
-        container.partials = utils.extend({}, original, props.partials);
+        container.partials = _utils.extend({}, original, props.partials);
         var ret = fn(context, options);
         container.partials = original;
         return ret;
@@ -8992,31 +11313,29 @@ exports['default'] = function (instance) {
 
 module.exports = exports['default'];
 
-});
+}(inline, inline.exports));
 
-var registerDefaultDecorators_1 = registerDefaultDecorators;
+decorators.__esModule = true;
+decorators.registerDefaultDecorators = registerDefaultDecorators;
 // istanbul ignore next
 
 function _interopRequireDefault$2(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _decoratorsInline = inline.exports;
 
-
-var _decoratorsInline2 = _interopRequireDefault$2(inline);
+var _decoratorsInline2 = _interopRequireDefault$2(_decoratorsInline);
 
 function registerDefaultDecorators(instance) {
   _decoratorsInline2['default'](instance);
 }
 
+var logger$1 = {exports: {}};
 
-var decorators = /*#__PURE__*/Object.defineProperty({
-	registerDefaultDecorators: registerDefaultDecorators_1
-}, '__esModule', {value: true});
-
-var logger_1 = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 
-
+var _utils = utils;
 
 var logger = {
   methodMap: ['debug', 'info', 'warn', 'error'],
@@ -9025,7 +11344,7 @@ var logger = {
   // Maps a given level value to the `methodMap` indexes above.
   lookupLevel: function lookupLevel(level) {
     if (typeof level === 'string') {
-      var levelMap = utils.indexOf(logger.methodMap, level.toLowerCase());
+      var levelMap = _utils.indexOf(logger.methodMap, level.toLowerCase());
       if (levelMap >= 0) {
         level = levelMap;
       } else {
@@ -9059,11 +11378,16 @@ var logger = {
 exports['default'] = logger;
 module.exports = exports['default'];
 
-});
+}(logger$1, logger$1.exports));
 
-var createNewLookupObject_2 = createNewLookupObject;
+var protoAccess = {};
 
+var createNewLookupObject$1 = {};
 
+createNewLookupObject$1.__esModule = true;
+createNewLookupObject$1.createNewLookupObject = createNewLookupObject;
+
+var _utils$2 = utils;
 
 /**
  * Create a new object with "null"-prototype to avoid truthy results on prototype properties.
@@ -9077,26 +11401,22 @@ function createNewLookupObject() {
     sources[_key] = arguments[_key];
   }
 
-  return utils.extend.apply(undefined, [Object.create(null)].concat(sources));
+  return _utils$2.extend.apply(undefined, [Object.create(null)].concat(sources));
 }
 
-
-var createNewLookupObject_1 = /*#__PURE__*/Object.defineProperty({
-	createNewLookupObject: createNewLookupObject_2
-}, '__esModule', {value: true});
-
-var createProtoAccessControl_1 = createProtoAccessControl;
-var resultIsAllowed_1 = resultIsAllowed;
-var resetLoggedProperties_1 = resetLoggedProperties;
+protoAccess.__esModule = true;
+protoAccess.createProtoAccessControl = createProtoAccessControl;
+protoAccess.resultIsAllowed = resultIsAllowed;
+protoAccess.resetLoggedProperties = resetLoggedProperties;
 // istanbul ignore next
 
 function _interopRequireWildcard$1(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
+var _createNewLookupObject = createNewLookupObject$1;
 
+var _logger$1 = logger$1.exports;
 
-
-
-var logger$1 = _interopRequireWildcard$1(logger_1);
+var logger = _interopRequireWildcard$1(_logger$1);
 
 var loggedProperties = Object.create(null);
 
@@ -9113,11 +11433,11 @@ function createProtoAccessControl(runtimeOptions) {
 
   return {
     properties: {
-      whitelist: createNewLookupObject_1.createNewLookupObject(defaultPropertyWhiteList, runtimeOptions.allowedProtoProperties),
+      whitelist: _createNewLookupObject.createNewLookupObject(defaultPropertyWhiteList, runtimeOptions.allowedProtoProperties),
       defaultValue: runtimeOptions.allowProtoPropertiesByDefault
     },
     methods: {
-      whitelist: createNewLookupObject_1.createNewLookupObject(defaultMethodWhiteList, runtimeOptions.allowedProtoMethods),
+      whitelist: _createNewLookupObject.createNewLookupObject(defaultMethodWhiteList, runtimeOptions.allowedProtoMethods),
       defaultValue: runtimeOptions.allowProtoMethodsByDefault
     }
   };
@@ -9145,7 +11465,7 @@ function checkWhiteList(protoAccessControlForType, propertyName) {
 function logUnexpecedPropertyAccessOnce(propertyName) {
   if (loggedProperties[propertyName] !== true) {
     loggedProperties[propertyName] = true;
-    logger$1.log('error', 'Handlebars: Access has been denied to resolve the property "' + propertyName + '" because it is not an "own property" of its parent.\n' + 'You can add a runtime option to disable the check or this warning:\n' + 'See https://handlebarsjs.com/api-reference/runtime-options.html#options-to-control-prototype-access for details');
+    logger.log('error', 'Handlebars: Access has been denied to resolve the property "' + propertyName + '" because it is not an "own property" of its parent.\n' + 'You can add a runtime option to disable the check or this warning:\n' + 'See https://handlebarsjs.com/api-reference/runtime-options.html#options-to-control-prototype-access for details');
   }
 }
 
@@ -9155,41 +11475,35 @@ function resetLoggedProperties() {
   });
 }
 
-
-var protoAccess = /*#__PURE__*/Object.defineProperty({
-	createProtoAccessControl: createProtoAccessControl_1,
-	resultIsAllowed: resultIsAllowed_1,
-	resetLoggedProperties: resetLoggedProperties_1
-}, '__esModule', {value: true});
-
-var HandlebarsEnvironment_1 = HandlebarsEnvironment;
+base.__esModule = true;
+base.HandlebarsEnvironment = HandlebarsEnvironment;
 // istanbul ignore next
 
 function _interopRequireDefault$1(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
+var _utils$1 = utils;
 
+var _exception$1 = exception.exports;
 
+var _exception2$1 = _interopRequireDefault$1(_exception$1);
 
+var _helpers$1 = helpers;
 
-var _exception2$1 = _interopRequireDefault$1(exception);
+var _decorators = decorators;
 
+var _logger = logger$1.exports;
 
+var _logger2 = _interopRequireDefault$1(_logger);
 
-
-
-
-
-var _logger2 = _interopRequireDefault$1(logger_1);
-
-
+var _internalProtoAccess$1 = protoAccess;
 
 var VERSION = '4.7.7';
-var VERSION_1 = VERSION;
+base.VERSION = VERSION;
 var COMPILER_REVISION = 8;
-var COMPILER_REVISION_1 = COMPILER_REVISION;
+base.COMPILER_REVISION = COMPILER_REVISION;
 var LAST_COMPATIBLE_COMPILER_REVISION = 7;
 
-var LAST_COMPATIBLE_COMPILER_REVISION_1 = LAST_COMPATIBLE_COMPILER_REVISION;
+base.LAST_COMPATIBLE_COMPILER_REVISION = LAST_COMPATIBLE_COMPILER_REVISION;
 var REVISION_CHANGES = {
   1: '<= 1.0.rc.2', // 1.0.rc.2 is actually rev2 but doesn't report it
   2: '== 1.0.0-rc.3',
@@ -9201,16 +11515,16 @@ var REVISION_CHANGES = {
   8: '>= 4.3.0'
 };
 
-var REVISION_CHANGES_1 = REVISION_CHANGES;
+base.REVISION_CHANGES = REVISION_CHANGES;
 var objectType = '[object Object]';
 
-function HandlebarsEnvironment(helpers$1, partials, decorators$1) {
-  this.helpers = helpers$1 || {};
+function HandlebarsEnvironment(helpers, partials, decorators) {
+  this.helpers = helpers || {};
   this.partials = partials || {};
-  this.decorators = decorators$1 || {};
+  this.decorators = decorators || {};
 
-  helpers.registerDefaultHelpers(this);
-  decorators.registerDefaultDecorators(this);
+  _helpers$1.registerDefaultHelpers(this);
+  _decorators.registerDefaultDecorators(this);
 }
 
 HandlebarsEnvironment.prototype = {
@@ -9220,11 +11534,11 @@ HandlebarsEnvironment.prototype = {
   log: _logger2['default'].log,
 
   registerHelper: function registerHelper(name, fn) {
-    if (utils.toString.call(name) === objectType) {
+    if (_utils$1.toString.call(name) === objectType) {
       if (fn) {
         throw new _exception2$1['default']('Arg not supported with multiple helpers');
       }
-      utils.extend(this.helpers, name);
+      _utils$1.extend(this.helpers, name);
     } else {
       this.helpers[name] = fn;
     }
@@ -9234,8 +11548,8 @@ HandlebarsEnvironment.prototype = {
   },
 
   registerPartial: function registerPartial(name, partial) {
-    if (utils.toString.call(name) === objectType) {
-      utils.extend(this.partials, name);
+    if (_utils$1.toString.call(name) === objectType) {
+      _utils$1.extend(this.partials, name);
     } else {
       if (typeof partial === 'undefined') {
         throw new _exception2$1['default']('Attempting to register a partial called "' + name + '" as undefined');
@@ -9248,11 +11562,11 @@ HandlebarsEnvironment.prototype = {
   },
 
   registerDecorator: function registerDecorator(name, fn) {
-    if (utils.toString.call(name) === objectType) {
+    if (_utils$1.toString.call(name) === objectType) {
       if (fn) {
         throw new _exception2$1['default']('Arg not supported with multiple decorators');
       }
-      utils.extend(this.decorators, name);
+      _utils$1.extend(this.decorators, name);
     } else {
       this.decorators[name] = fn;
     }
@@ -9265,29 +11579,19 @@ HandlebarsEnvironment.prototype = {
    * @deprecated should only be used in handlebars test-cases
    */
   resetLoggedPropertyAccesses: function resetLoggedPropertyAccesses() {
-    protoAccess.resetLoggedProperties();
+    _internalProtoAccess$1.resetLoggedProperties();
   }
 };
 
 var log = _logger2['default'].log;
 
-var log_1 = log;
-var createFrame = utils.createFrame;
-var logger = _logger2['default'];
+base.log = log;
+base.createFrame = _utils$1.createFrame;
+base.logger = _logger2['default'];
 
+var safeString = {exports: {}};
 
-var base = /*#__PURE__*/Object.defineProperty({
-	HandlebarsEnvironment: HandlebarsEnvironment_1,
-	VERSION: VERSION_1,
-	COMPILER_REVISION: COMPILER_REVISION_1,
-	LAST_COMPATIBLE_COMPILER_REVISION: LAST_COMPATIBLE_COMPILER_REVISION_1,
-	REVISION_CHANGES: REVISION_CHANGES_1,
-	log: log_1,
-	createFrame: createFrame,
-	logger: logger
-}, '__esModule', {value: true});
-
-var safeString = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 function SafeString(string) {
@@ -9301,9 +11605,14 @@ SafeString.prototype.toString = SafeString.prototype.toHTML = function () {
 exports['default'] = SafeString;
 module.exports = exports['default'];
 
-});
+}(safeString, safeString.exports));
 
-var wrapHelper_2 = wrapHelper;
+var runtime$1 = {};
+
+var wrapHelper$1 = {};
+
+wrapHelper$1.__esModule = true;
+wrapHelper$1.wrapHelper = wrapHelper;
 
 function wrapHelper(helper, transformOptionsFn) {
   if (typeof helper !== 'function') {
@@ -9319,17 +11628,13 @@ function wrapHelper(helper, transformOptionsFn) {
   return wrapper;
 }
 
-
-var wrapHelper_1 = /*#__PURE__*/Object.defineProperty({
-	wrapHelper: wrapHelper_2
-}, '__esModule', {value: true});
-
-var checkRevision_1 = checkRevision;
-var template_1 = template;
-var wrapProgram_1 = wrapProgram;
-var resolvePartial_1 = resolvePartial;
-var invokePartial_1 = invokePartial;
-var noop_1 = noop$1;
+runtime$1.__esModule = true;
+runtime$1.checkRevision = checkRevision;
+runtime$1.template = template;
+runtime$1.wrapProgram = wrapProgram;
+runtime$1.resolvePartial = resolvePartial;
+runtime$1.invokePartial = invokePartial;
+runtime$1.noop = noop$1;
 // istanbul ignore next
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -9338,33 +11643,33 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
+var _utils = utils;
 
+var Utils = _interopRequireWildcard(_utils);
 
-var Utils = _interopRequireWildcard(utils);
+var _exception = exception.exports;
 
+var _exception2 = _interopRequireDefault(_exception);
 
+var _base = base;
 
-var _exception2 = _interopRequireDefault(exception);
+var _helpers = helpers;
 
+var _internalWrapHelper = wrapHelper$1;
 
-
-
-
-
-
-
+var _internalProtoAccess = protoAccess;
 
 function checkRevision(compilerInfo) {
   var compilerRevision = compilerInfo && compilerInfo[0] || 1,
-      currentRevision = base.COMPILER_REVISION;
+      currentRevision = _base.COMPILER_REVISION;
 
-  if (compilerRevision >= base.LAST_COMPATIBLE_COMPILER_REVISION && compilerRevision <= base.COMPILER_REVISION) {
+  if (compilerRevision >= _base.LAST_COMPATIBLE_COMPILER_REVISION && compilerRevision <= _base.COMPILER_REVISION) {
     return;
   }
 
-  if (compilerRevision < base.LAST_COMPATIBLE_COMPILER_REVISION) {
-    var runtimeVersions = base.REVISION_CHANGES[currentRevision],
-        compilerVersions = base.REVISION_CHANGES[compilerRevision];
+  if (compilerRevision < _base.LAST_COMPATIBLE_COMPILER_REVISION) {
+    var runtimeVersions = _base.REVISION_CHANGES[currentRevision],
+        compilerVersions = _base.REVISION_CHANGES[compilerRevision];
     throw new _exception2['default']('Template was precompiled with an older version of Handlebars than the current runtime. ' + 'Please update your precompiler to a newer version (' + runtimeVersions + ') or downgrade your runtime to an older version (' + compilerVersions + ').');
   } else {
     // Use the embedded version info since the runtime doesn't know about this revision yet
@@ -9447,7 +11752,7 @@ function template(templateSpec, env) {
         return result;
       }
 
-      if (protoAccess.resultIsAllowed(result, container.protoAccessControl, propertyName)) {
+      if (_internalProtoAccess.resultIsAllowed(result, container.protoAccessControl, propertyName)) {
         return result;
       }
       return undefined;
@@ -9552,11 +11857,11 @@ function template(templateSpec, env) {
       }
 
       container.hooks = {};
-      container.protoAccessControl = protoAccess.createProtoAccessControl(options);
+      container.protoAccessControl = _internalProtoAccess.createProtoAccessControl(options);
 
       var keepHelperInHelpers = options.allowCallsToHelperMissing || templateWasPrecompiledWithCompilerV7;
-      helpers.moveHelperToHooks(container, 'helperMissing', keepHelperInHelpers);
-      helpers.moveHelperToHooks(container, 'blockHelperMissing', keepHelperInHelpers);
+      _helpers.moveHelperToHooks(container, 'helperMissing', keepHelperInHelpers);
+      _helpers.moveHelperToHooks(container, 'blockHelperMissing', keepHelperInHelpers);
     } else {
       container.protoAccessControl = options.protoAccessControl; // internal option
       container.helpers = options.helpers;
@@ -9629,7 +11934,7 @@ function invokePartial(partial, context, options) {
   var partialBlock = undefined;
   if (options.fn && options.fn !== noop$1) {
     (function () {
-      options.data = base.createFrame(options.data);
+      options.data = _base.createFrame(options.data);
       // Wrapper function to get access to currentPartialBlock from the closure
       var fn = options.fn;
       partialBlock = options.data['partial-block'] = function partialBlockWrapper(context) {
@@ -9637,7 +11942,7 @@ function invokePartial(partial, context, options) {
 
         // Restore the partial-block from the closure for the execution of the block
         // i.e. the part inside the block of the partial call.
-        options.data = base.createFrame(options.data);
+        options.data = _base.createFrame(options.data);
         options.data['partial-block'] = currentPartialBlock;
         return fn(context, options);
       };
@@ -9664,7 +11969,7 @@ function noop$1() {
 
 function initData(context, data) {
   if (!data || !('root' in data)) {
-    data = data ? base.createFrame(data) : {};
+    data = data ? _base.createFrame(data) : {};
     data.root = context;
   }
   return data;
@@ -9688,22 +11993,14 @@ function wrapHelpersToPassLookupProperty(mergedHelpers, container) {
 
 function passLookupPropertyOption(helper, container) {
   var lookupProperty = container.lookupProperty;
-  return wrapHelper_1.wrapHelper(helper, function (options) {
+  return _internalWrapHelper.wrapHelper(helper, function (options) {
     return Utils.extend({ lookupProperty: lookupProperty }, options);
   });
 }
 
+var noConflict = {exports: {}};
 
-var runtime$1 = /*#__PURE__*/Object.defineProperty({
-	checkRevision: checkRevision_1,
-	template: template_1,
-	wrapProgram: wrapProgram_1,
-	resolvePartial: resolvePartial_1,
-	invokePartial: invokePartial_1,
-	noop: noop_1
-}, '__esModule', {value: true});
-
-var noConflict = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 
@@ -9722,9 +12019,9 @@ exports['default'] = function (Handlebars) {
 
 module.exports = exports['default'];
 
-});
+}(noConflict, noConflict.exports));
 
-var handlebars_runtime = createCommonjsModule(function (module, exports) {
+(function (module, exports) {
 
 exports.__esModule = true;
 // istanbul ignore next
@@ -9735,32 +12032,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
+var _handlebarsBase = base;
 
-
-var base$1 = _interopRequireWildcard(base);
+var base$1 = _interopRequireWildcard(_handlebarsBase);
 
 // Each of these augment the Handlebars object. No need to setup here.
 // (This is done to easily share code between commonjs and browse envs)
 
+var _handlebarsSafeString = safeString.exports;
 
+var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-var _handlebarsSafeString2 = _interopRequireDefault(safeString);
+var _handlebarsException = exception.exports;
 
+var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
+var _handlebarsUtils = utils;
 
-var _handlebarsException2 = _interopRequireDefault(exception);
+var Utils = _interopRequireWildcard(_handlebarsUtils);
 
+var _handlebarsRuntime = runtime$1;
 
+var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-var Utils = _interopRequireWildcard(utils);
+var _handlebarsNoConflict = noConflict.exports;
 
-
-
-var runtime = _interopRequireWildcard(runtime$1);
-
-
-
-var _handlebarsNoConflict2 = _interopRequireDefault(noConflict);
+var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
 // For compatibility and usage outside of module systems, make the Handlebars object a namespace
 function create() {
@@ -9790,1942 +12087,23 @@ inst['default'] = inst;
 exports['default'] = inst;
 module.exports = exports['default'];
 
-});
+}(handlebars_runtime, handlebars_runtime.exports));
 
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
-var runtime = handlebars_runtime['default'];
-
-/**
- * Lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright JS Foundation and other contributors <https://js.foundation/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-var lodash_isequal = createCommonjsModule(function (module, exports) {
-/** Used as the size to enable large array optimizations. */
-var LARGE_ARRAY_SIZE = 200;
-
-/** Used to stand-in for `undefined` hash values. */
-var HASH_UNDEFINED = '__lodash_hash_undefined__';
-
-/** Used to compose bitmasks for value comparisons. */
-var COMPARE_PARTIAL_FLAG = 1,
-    COMPARE_UNORDERED_FLAG = 2;
-
-/** Used as references for various `Number` constants. */
-var MAX_SAFE_INTEGER = 9007199254740991;
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    arrayTag = '[object Array]',
-    asyncTag = '[object AsyncFunction]',
-    boolTag = '[object Boolean]',
-    dateTag = '[object Date]',
-    errorTag = '[object Error]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    mapTag = '[object Map]',
-    numberTag = '[object Number]',
-    nullTag = '[object Null]',
-    objectTag = '[object Object]',
-    promiseTag = '[object Promise]',
-    proxyTag = '[object Proxy]',
-    regexpTag = '[object RegExp]',
-    setTag = '[object Set]',
-    stringTag = '[object String]',
-    symbolTag = '[object Symbol]',
-    undefinedTag = '[object Undefined]',
-    weakMapTag = '[object WeakMap]';
-
-var arrayBufferTag = '[object ArrayBuffer]',
-    dataViewTag = '[object DataView]',
-    float32Tag = '[object Float32Array]',
-    float64Tag = '[object Float64Array]',
-    int8Tag = '[object Int8Array]',
-    int16Tag = '[object Int16Array]',
-    int32Tag = '[object Int32Array]',
-    uint8Tag = '[object Uint8Array]',
-    uint8ClampedTag = '[object Uint8ClampedArray]',
-    uint16Tag = '[object Uint16Array]',
-    uint32Tag = '[object Uint32Array]';
-
-/**
- * Used to match `RegExp`
- * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
- */
-var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-
-/** Used to detect host constructors (Safari). */
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-
-/** Used to identify `toStringTag` values of typed arrays. */
-var typedArrayTags = {};
-typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
-typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
-typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
-typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
-typedArrayTags[uint32Tag] = true;
-typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
-typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
-typedArrayTags[dataViewTag] = typedArrayTags[dateTag] =
-typedArrayTags[errorTag] = typedArrayTags[funcTag] =
-typedArrayTags[mapTag] = typedArrayTags[numberTag] =
-typedArrayTags[objectTag] = typedArrayTags[regexpTag] =
-typedArrayTags[setTag] = typedArrayTags[stringTag] =
-typedArrayTags[weakMapTag] = false;
-
-/** Detect free variable `global` from Node.js. */
-var freeGlobal = typeof commonjsGlobal == 'object' && commonjsGlobal && commonjsGlobal.Object === Object && commonjsGlobal;
-
-/** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root = freeGlobal || freeSelf || Function('return this')();
-
-/** Detect free variable `exports`. */
-var freeExports = exports && !exports.nodeType && exports;
-
-/** Detect free variable `module`. */
-var freeModule = freeExports && 'object' == 'object' && module && !module.nodeType && module;
-
-/** Detect the popular CommonJS extension `module.exports`. */
-var moduleExports = freeModule && freeModule.exports === freeExports;
-
-/** Detect free variable `process` from Node.js. */
-var freeProcess = moduleExports && freeGlobal.process;
-
-/** Used to access faster Node.js helpers. */
-var nodeUtil = (function() {
-  try {
-    return freeProcess && freeProcess.binding && freeProcess.binding('util');
-  } catch (e) {}
-}());
-
-/* Node.js helper references. */
-var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
-
-/**
- * A specialized version of `_.filter` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {Array} Returns the new filtered array.
- */
-function arrayFilter(array, predicate) {
-  var index = -1,
-      length = array == null ? 0 : array.length,
-      resIndex = 0,
-      result = [];
-
-  while (++index < length) {
-    var value = array[index];
-    if (predicate(value, index, array)) {
-      result[resIndex++] = value;
-    }
-  }
-  return result;
-}
-
-/**
- * Appends the elements of `values` to `array`.
- *
- * @private
- * @param {Array} array The array to modify.
- * @param {Array} values The values to append.
- * @returns {Array} Returns `array`.
- */
-function arrayPush(array, values) {
-  var index = -1,
-      length = values.length,
-      offset = array.length;
-
-  while (++index < length) {
-    array[offset + index] = values[index];
-  }
-  return array;
-}
-
-/**
- * A specialized version of `_.some` for arrays without support for iteratee
- * shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} predicate The function invoked per iteration.
- * @returns {boolean} Returns `true` if any element passes the predicate check,
- *  else `false`.
- */
-function arraySome(array, predicate) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  while (++index < length) {
-    if (predicate(array[index], index, array)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-/**
- * The base implementation of `_.times` without support for iteratee shorthands
- * or max array length checks.
- *
- * @private
- * @param {number} n The number of times to invoke `iteratee`.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the array of results.
- */
-function baseTimes(n, iteratee) {
-  var index = -1,
-      result = Array(n);
-
-  while (++index < n) {
-    result[index] = iteratee(index);
-  }
-  return result;
-}
-
-/**
- * The base implementation of `_.unary` without support for storing metadata.
- *
- * @private
- * @param {Function} func The function to cap arguments for.
- * @returns {Function} Returns the new capped function.
- */
-function baseUnary(func) {
-  return function(value) {
-    return func(value);
-  };
-}
-
-/**
- * Checks if a `cache` value for `key` exists.
- *
- * @private
- * @param {Object} cache The cache to query.
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function cacheHas(cache, key) {
-  return cache.has(key);
-}
-
-/**
- * Gets the value at `key` of `object`.
- *
- * @private
- * @param {Object} [object] The object to query.
- * @param {string} key The key of the property to get.
- * @returns {*} Returns the property value.
- */
-function getValue(object, key) {
-  return object == null ? undefined : object[key];
-}
-
-/**
- * Converts `map` to its key-value pairs.
- *
- * @private
- * @param {Object} map The map to convert.
- * @returns {Array} Returns the key-value pairs.
- */
-function mapToArray(map) {
-  var index = -1,
-      result = Array(map.size);
-
-  map.forEach(function(value, key) {
-    result[++index] = [key, value];
-  });
-  return result;
-}
-
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg(func, transform) {
-  return function(arg) {
-    return func(transform(arg));
-  };
-}
-
-/**
- * Converts `set` to an array of its values.
- *
- * @private
- * @param {Object} set The set to convert.
- * @returns {Array} Returns the values.
- */
-function setToArray(set) {
-  var index = -1,
-      result = Array(set.size);
-
-  set.forEach(function(value) {
-    result[++index] = value;
-  });
-  return result;
-}
-
-/** Used for built-in method references. */
-var arrayProto = Array.prototype,
-    funcProto = Function.prototype,
-    objectProto = Object.prototype;
-
-/** Used to detect overreaching core-js shims. */
-var coreJsData = root['__core-js_shared__'];
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Used to detect methods masquerading as native. */
-var maskSrcKey = (function() {
-  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
-  return uid ? ('Symbol(src)_1.' + uid) : '';
-}());
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto.toString;
-
-/** Used to detect if a method is native. */
-var reIsNative = RegExp('^' +
-  funcToString.call(hasOwnProperty).replace(reRegExpChar, '\\$&')
-  .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
-);
-
-/** Built-in value references. */
-var Buffer = moduleExports ? root.Buffer : undefined,
-    Symbol = root.Symbol,
-    Uint8Array = root.Uint8Array,
-    propertyIsEnumerable = objectProto.propertyIsEnumerable,
-    splice = arrayProto.splice,
-    symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeGetSymbols = Object.getOwnPropertySymbols,
-    nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined,
-    nativeKeys = overArg(Object.keys, Object);
-
-/* Built-in method references that are verified to be native. */
-var DataView = getNative(root, 'DataView'),
-    Map = getNative(root, 'Map'),
-    Promise = getNative(root, 'Promise'),
-    Set = getNative(root, 'Set'),
-    WeakMap = getNative(root, 'WeakMap'),
-    nativeCreate = getNative(Object, 'create');
-
-/** Used to detect maps, sets, and weakmaps. */
-var dataViewCtorString = toSource(DataView),
-    mapCtorString = toSource(Map),
-    promiseCtorString = toSource(Promise),
-    setCtorString = toSource(Set),
-    weakMapCtorString = toSource(WeakMap);
-
-/** Used to convert symbols to primitives and strings. */
-var symbolProto = Symbol ? Symbol.prototype : undefined,
-    symbolValueOf = symbolProto ? symbolProto.valueOf : undefined;
-
-/**
- * Creates a hash object.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function Hash(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
-
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-
-/**
- * Removes all key-value entries from the hash.
- *
- * @private
- * @name clear
- * @memberOf Hash
- */
-function hashClear() {
-  this.__data__ = nativeCreate ? nativeCreate(null) : {};
-  this.size = 0;
-}
-
-/**
- * Removes `key` and its value from the hash.
- *
- * @private
- * @name delete
- * @memberOf Hash
- * @param {Object} hash The hash to modify.
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function hashDelete(key) {
-  var result = this.has(key) && delete this.__data__[key];
-  this.size -= result ? 1 : 0;
-  return result;
-}
-
-/**
- * Gets the hash value for `key`.
- *
- * @private
- * @name get
- * @memberOf Hash
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function hashGet(key) {
-  var data = this.__data__;
-  if (nativeCreate) {
-    var result = data[key];
-    return result === HASH_UNDEFINED ? undefined : result;
-  }
-  return hasOwnProperty.call(data, key) ? data[key] : undefined;
-}
-
-/**
- * Checks if a hash value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf Hash
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function hashHas(key) {
-  var data = this.__data__;
-  return nativeCreate ? (data[key] !== undefined) : hasOwnProperty.call(data, key);
-}
-
-/**
- * Sets the hash `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf Hash
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the hash instance.
- */
-function hashSet(key, value) {
-  var data = this.__data__;
-  this.size += this.has(key) ? 0 : 1;
-  data[key] = (nativeCreate && value === undefined) ? HASH_UNDEFINED : value;
-  return this;
-}
-
-// Add methods to `Hash`.
-Hash.prototype.clear = hashClear;
-Hash.prototype['delete'] = hashDelete;
-Hash.prototype.get = hashGet;
-Hash.prototype.has = hashHas;
-Hash.prototype.set = hashSet;
-
-/**
- * Creates an list cache object.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function ListCache(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
-
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-
-/**
- * Removes all key-value entries from the list cache.
- *
- * @private
- * @name clear
- * @memberOf ListCache
- */
-function listCacheClear() {
-  this.__data__ = [];
-  this.size = 0;
-}
-
-/**
- * Removes `key` and its value from the list cache.
- *
- * @private
- * @name delete
- * @memberOf ListCache
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function listCacheDelete(key) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  if (index < 0) {
-    return false;
-  }
-  var lastIndex = data.length - 1;
-  if (index == lastIndex) {
-    data.pop();
-  } else {
-    splice.call(data, index, 1);
-  }
-  --this.size;
-  return true;
-}
-
-/**
- * Gets the list cache value for `key`.
- *
- * @private
- * @name get
- * @memberOf ListCache
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function listCacheGet(key) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  return index < 0 ? undefined : data[index][1];
-}
-
-/**
- * Checks if a list cache value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf ListCache
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function listCacheHas(key) {
-  return assocIndexOf(this.__data__, key) > -1;
-}
-
-/**
- * Sets the list cache `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf ListCache
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the list cache instance.
- */
-function listCacheSet(key, value) {
-  var data = this.__data__,
-      index = assocIndexOf(data, key);
-
-  if (index < 0) {
-    ++this.size;
-    data.push([key, value]);
-  } else {
-    data[index][1] = value;
-  }
-  return this;
-}
-
-// Add methods to `ListCache`.
-ListCache.prototype.clear = listCacheClear;
-ListCache.prototype['delete'] = listCacheDelete;
-ListCache.prototype.get = listCacheGet;
-ListCache.prototype.has = listCacheHas;
-ListCache.prototype.set = listCacheSet;
-
-/**
- * Creates a map cache object to store key-value pairs.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function MapCache(entries) {
-  var index = -1,
-      length = entries == null ? 0 : entries.length;
-
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-
-/**
- * Removes all key-value entries from the map.
- *
- * @private
- * @name clear
- * @memberOf MapCache
- */
-function mapCacheClear() {
-  this.size = 0;
-  this.__data__ = {
-    'hash': new Hash,
-    'map': new (Map || ListCache),
-    'string': new Hash
-  };
-}
-
-/**
- * Removes `key` and its value from the map.
- *
- * @private
- * @name delete
- * @memberOf MapCache
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function mapCacheDelete(key) {
-  var result = getMapData(this, key)['delete'](key);
-  this.size -= result ? 1 : 0;
-  return result;
-}
-
-/**
- * Gets the map value for `key`.
- *
- * @private
- * @name get
- * @memberOf MapCache
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function mapCacheGet(key) {
-  return getMapData(this, key).get(key);
-}
-
-/**
- * Checks if a map value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf MapCache
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function mapCacheHas(key) {
-  return getMapData(this, key).has(key);
-}
-
-/**
- * Sets the map `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf MapCache
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the map cache instance.
- */
-function mapCacheSet(key, value) {
-  var data = getMapData(this, key),
-      size = data.size;
-
-  data.set(key, value);
-  this.size += data.size == size ? 0 : 1;
-  return this;
-}
-
-// Add methods to `MapCache`.
-MapCache.prototype.clear = mapCacheClear;
-MapCache.prototype['delete'] = mapCacheDelete;
-MapCache.prototype.get = mapCacheGet;
-MapCache.prototype.has = mapCacheHas;
-MapCache.prototype.set = mapCacheSet;
-
-/**
- *
- * Creates an array cache object to store unique values.
- *
- * @private
- * @constructor
- * @param {Array} [values] The values to cache.
- */
-function SetCache(values) {
-  var index = -1,
-      length = values == null ? 0 : values.length;
-
-  this.__data__ = new MapCache;
-  while (++index < length) {
-    this.add(values[index]);
-  }
-}
-
-/**
- * Adds `value` to the array cache.
- *
- * @private
- * @name add
- * @memberOf SetCache
- * @alias push
- * @param {*} value The value to cache.
- * @returns {Object} Returns the cache instance.
- */
-function setCacheAdd(value) {
-  this.__data__.set(value, HASH_UNDEFINED);
-  return this;
-}
-
-/**
- * Checks if `value` is in the array cache.
- *
- * @private
- * @name has
- * @memberOf SetCache
- * @param {*} value The value to search for.
- * @returns {number} Returns `true` if `value` is found, else `false`.
- */
-function setCacheHas(value) {
-  return this.__data__.has(value);
-}
-
-// Add methods to `SetCache`.
-SetCache.prototype.add = SetCache.prototype.push = setCacheAdd;
-SetCache.prototype.has = setCacheHas;
-
-/**
- * Creates a stack cache object to store key-value pairs.
- *
- * @private
- * @constructor
- * @param {Array} [entries] The key-value pairs to cache.
- */
-function Stack(entries) {
-  var data = this.__data__ = new ListCache(entries);
-  this.size = data.size;
-}
-
-/**
- * Removes all key-value entries from the stack.
- *
- * @private
- * @name clear
- * @memberOf Stack
- */
-function stackClear() {
-  this.__data__ = new ListCache;
-  this.size = 0;
-}
-
-/**
- * Removes `key` and its value from the stack.
- *
- * @private
- * @name delete
- * @memberOf Stack
- * @param {string} key The key of the value to remove.
- * @returns {boolean} Returns `true` if the entry was removed, else `false`.
- */
-function stackDelete(key) {
-  var data = this.__data__,
-      result = data['delete'](key);
-
-  this.size = data.size;
-  return result;
-}
-
-/**
- * Gets the stack value for `key`.
- *
- * @private
- * @name get
- * @memberOf Stack
- * @param {string} key The key of the value to get.
- * @returns {*} Returns the entry value.
- */
-function stackGet(key) {
-  return this.__data__.get(key);
-}
-
-/**
- * Checks if a stack value for `key` exists.
- *
- * @private
- * @name has
- * @memberOf Stack
- * @param {string} key The key of the entry to check.
- * @returns {boolean} Returns `true` if an entry for `key` exists, else `false`.
- */
-function stackHas(key) {
-  return this.__data__.has(key);
-}
-
-/**
- * Sets the stack `key` to `value`.
- *
- * @private
- * @name set
- * @memberOf Stack
- * @param {string} key The key of the value to set.
- * @param {*} value The value to set.
- * @returns {Object} Returns the stack cache instance.
- */
-function stackSet(key, value) {
-  var data = this.__data__;
-  if (data instanceof ListCache) {
-    var pairs = data.__data__;
-    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {
-      pairs.push([key, value]);
-      this.size = ++data.size;
-      return this;
-    }
-    data = this.__data__ = new MapCache(pairs);
-  }
-  data.set(key, value);
-  this.size = data.size;
-  return this;
-}
-
-// Add methods to `Stack`.
-Stack.prototype.clear = stackClear;
-Stack.prototype['delete'] = stackDelete;
-Stack.prototype.get = stackGet;
-Stack.prototype.has = stackHas;
-Stack.prototype.set = stackSet;
-
-/**
- * Creates an array of the enumerable property names of the array-like `value`.
- *
- * @private
- * @param {*} value The value to query.
- * @param {boolean} inherited Specify returning inherited property names.
- * @returns {Array} Returns the array of property names.
- */
-function arrayLikeKeys(value, inherited) {
-  var isArr = isArray(value),
-      isArg = !isArr && isArguments(value),
-      isBuff = !isArr && !isArg && isBuffer(value),
-      isType = !isArr && !isArg && !isBuff && isTypedArray(value),
-      skipIndexes = isArr || isArg || isBuff || isType,
-      result = skipIndexes ? baseTimes(value.length, String) : [],
-      length = result.length;
-
-  for (var key in value) {
-    if ((inherited || hasOwnProperty.call(value, key)) &&
-        !(skipIndexes && (
-           // Safari 9 has enumerable `arguments.length` in strict mode.
-           key == 'length' ||
-           // Node.js 0.10 has enumerable non-index properties on buffers.
-           (isBuff && (key == 'offset' || key == 'parent')) ||
-           // PhantomJS 2 has enumerable non-index properties on typed arrays.
-           (isType && (key == 'buffer' || key == 'byteLength' || key == 'byteOffset')) ||
-           // Skip index properties.
-           isIndex(key, length)
-        ))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * Gets the index at which the `key` is found in `array` of key-value pairs.
- *
- * @private
- * @param {Array} array The array to inspect.
- * @param {*} key The key to search for.
- * @returns {number} Returns the index of the matched value, else `-1`.
- */
-function assocIndexOf(array, key) {
-  var length = array.length;
-  while (length--) {
-    if (eq(array[length][0], key)) {
-      return length;
-    }
-  }
-  return -1;
-}
-
-/**
- * The base implementation of `getAllKeys` and `getAllKeysIn` which uses
- * `keysFunc` and `symbolsFunc` to get the enumerable property names and
- * symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Function} keysFunc The function to get the keys of `object`.
- * @param {Function} symbolsFunc The function to get the symbols of `object`.
- * @returns {Array} Returns the array of property names and symbols.
- */
-function baseGetAllKeys(object, keysFunc, symbolsFunc) {
-  var result = keysFunc(object);
-  return isArray(object) ? result : arrayPush(result, symbolsFunc(object));
-}
-
-/**
- * The base implementation of `getTag` without fallbacks for buggy environments.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
- */
-function baseGetTag(value) {
-  if (value == null) {
-    return value === undefined ? undefinedTag : nullTag;
-  }
-  return (symToStringTag && symToStringTag in Object(value))
-    ? getRawTag(value)
-    : objectToString(value);
-}
-
-/**
- * The base implementation of `_.isArguments`.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an `arguments` object,
- */
-function baseIsArguments(value) {
-  return isObjectLike(value) && baseGetTag(value) == argsTag;
-}
-
-/**
- * The base implementation of `_.isEqual` which supports partial comparisons
- * and tracks traversed objects.
- *
- * @private
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @param {boolean} bitmask The bitmask flags.
- *  1 - Unordered comparison
- *  2 - Partial comparison
- * @param {Function} [customizer] The function to customize comparisons.
- * @param {Object} [stack] Tracks traversed `value` and `other` objects.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- */
-function baseIsEqual(value, other, bitmask, customizer, stack) {
-  if (value === other) {
-    return true;
-  }
-  if (value == null || other == null || (!isObjectLike(value) && !isObjectLike(other))) {
-    return value !== value && other !== other;
-  }
-  return baseIsEqualDeep(value, other, bitmask, customizer, baseIsEqual, stack);
-}
-
-/**
- * A specialized version of `baseIsEqual` for arrays and objects which performs
- * deep comparisons and tracks traversed objects enabling objects with circular
- * references to be compared.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} [stack] Tracks traversed `object` and `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function baseIsEqualDeep(object, other, bitmask, customizer, equalFunc, stack) {
-  var objIsArr = isArray(object),
-      othIsArr = isArray(other),
-      objTag = objIsArr ? arrayTag : getTag(object),
-      othTag = othIsArr ? arrayTag : getTag(other);
-
-  objTag = objTag == argsTag ? objectTag : objTag;
-  othTag = othTag == argsTag ? objectTag : othTag;
-
-  var objIsObj = objTag == objectTag,
-      othIsObj = othTag == objectTag,
-      isSameTag = objTag == othTag;
-
-  if (isSameTag && isBuffer(object)) {
-    if (!isBuffer(other)) {
-      return false;
-    }
-    objIsArr = true;
-    objIsObj = false;
-  }
-  if (isSameTag && !objIsObj) {
-    stack || (stack = new Stack);
-    return (objIsArr || isTypedArray(object))
-      ? equalArrays(object, other, bitmask, customizer, equalFunc, stack)
-      : equalByTag(object, other, objTag, bitmask, customizer, equalFunc, stack);
-  }
-  if (!(bitmask & COMPARE_PARTIAL_FLAG)) {
-    var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-        othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
-
-    if (objIsWrapped || othIsWrapped) {
-      var objUnwrapped = objIsWrapped ? object.value() : object,
-          othUnwrapped = othIsWrapped ? other.value() : other;
-
-      stack || (stack = new Stack);
-      return equalFunc(objUnwrapped, othUnwrapped, bitmask, customizer, stack);
-    }
-  }
-  if (!isSameTag) {
-    return false;
-  }
-  stack || (stack = new Stack);
-  return equalObjects(object, other, bitmask, customizer, equalFunc, stack);
-}
-
-/**
- * The base implementation of `_.isNative` without bad shim checks.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a native function,
- *  else `false`.
- */
-function baseIsNative(value) {
-  if (!isObject(value) || isMasked(value)) {
-    return false;
-  }
-  var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
-  return pattern.test(toSource(value));
-}
-
-/**
- * The base implementation of `_.isTypedArray` without Node.js optimizations.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
- */
-function baseIsTypedArray(value) {
-  return isObjectLike(value) &&
-    isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
-}
-
-/**
- * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function baseKeys(object) {
-  if (!isPrototype(object)) {
-    return nativeKeys(object);
-  }
-  var result = [];
-  for (var key in Object(object)) {
-    if (hasOwnProperty.call(object, key) && key != 'constructor') {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for arrays with support for
- * partial deep comparisons.
- *
- * @private
- * @param {Array} array The array to compare.
- * @param {Array} other The other array to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `array` and `other` objects.
- * @returns {boolean} Returns `true` if the arrays are equivalent, else `false`.
- */
-function equalArrays(array, other, bitmask, customizer, equalFunc, stack) {
-  var isPartial = bitmask & COMPARE_PARTIAL_FLAG,
-      arrLength = array.length,
-      othLength = other.length;
-
-  if (arrLength != othLength && !(isPartial && othLength > arrLength)) {
-    return false;
-  }
-  // Assume cyclic values are equal.
-  var stacked = stack.get(array);
-  if (stacked && stack.get(other)) {
-    return stacked == other;
-  }
-  var index = -1,
-      result = true,
-      seen = (bitmask & COMPARE_UNORDERED_FLAG) ? new SetCache : undefined;
-
-  stack.set(array, other);
-  stack.set(other, array);
-
-  // Ignore non-index properties.
-  while (++index < arrLength) {
-    var arrValue = array[index],
-        othValue = other[index];
-
-    if (customizer) {
-      var compared = isPartial
-        ? customizer(othValue, arrValue, index, other, array, stack)
-        : customizer(arrValue, othValue, index, array, other, stack);
-    }
-    if (compared !== undefined) {
-      if (compared) {
-        continue;
-      }
-      result = false;
-      break;
-    }
-    // Recursively compare arrays (susceptible to call stack limits).
-    if (seen) {
-      if (!arraySome(other, function(othValue, othIndex) {
-            if (!cacheHas(seen, othIndex) &&
-                (arrValue === othValue || equalFunc(arrValue, othValue, bitmask, customizer, stack))) {
-              return seen.push(othIndex);
-            }
-          })) {
-        result = false;
-        break;
-      }
-    } else if (!(
-          arrValue === othValue ||
-            equalFunc(arrValue, othValue, bitmask, customizer, stack)
-        )) {
-      result = false;
-      break;
-    }
-  }
-  stack['delete'](array);
-  stack['delete'](other);
-  return result;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for comparing objects of
- * the same `toStringTag`.
- *
- * **Note:** This function only supports comparing values with tags of
- * `Boolean`, `Date`, `Error`, `Number`, `RegExp`, or `String`.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {string} tag The `toStringTag` of the objects to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `object` and `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function equalByTag(object, other, tag, bitmask, customizer, equalFunc, stack) {
-  switch (tag) {
-    case dataViewTag:
-      if ((object.byteLength != other.byteLength) ||
-          (object.byteOffset != other.byteOffset)) {
-        return false;
-      }
-      object = object.buffer;
-      other = other.buffer;
-
-    case arrayBufferTag:
-      if ((object.byteLength != other.byteLength) ||
-          !equalFunc(new Uint8Array(object), new Uint8Array(other))) {
-        return false;
-      }
-      return true;
-
-    case boolTag:
-    case dateTag:
-    case numberTag:
-      // Coerce booleans to `1` or `0` and dates to milliseconds.
-      // Invalid dates are coerced to `NaN`.
-      return eq(+object, +other);
-
-    case errorTag:
-      return object.name == other.name && object.message == other.message;
-
-    case regexpTag:
-    case stringTag:
-      // Coerce regexes to strings and treat strings, primitives and objects,
-      // as equal. See http://www.ecma-international.org/ecma-262/7.0/#sec-regexp.prototype.tostring
-      // for more details.
-      return object == (other + '');
-
-    case mapTag:
-      var convert = mapToArray;
-
-    case setTag:
-      var isPartial = bitmask & COMPARE_PARTIAL_FLAG;
-      convert || (convert = setToArray);
-
-      if (object.size != other.size && !isPartial) {
-        return false;
-      }
-      // Assume cyclic values are equal.
-      var stacked = stack.get(object);
-      if (stacked) {
-        return stacked == other;
-      }
-      bitmask |= COMPARE_UNORDERED_FLAG;
-
-      // Recursively compare objects (susceptible to call stack limits).
-      stack.set(object, other);
-      var result = equalArrays(convert(object), convert(other), bitmask, customizer, equalFunc, stack);
-      stack['delete'](object);
-      return result;
-
-    case symbolTag:
-      if (symbolValueOf) {
-        return symbolValueOf.call(object) == symbolValueOf.call(other);
-      }
-  }
-  return false;
-}
-
-/**
- * A specialized version of `baseIsEqualDeep` for objects with support for
- * partial deep comparisons.
- *
- * @private
- * @param {Object} object The object to compare.
- * @param {Object} other The other object to compare.
- * @param {number} bitmask The bitmask flags. See `baseIsEqual` for more details.
- * @param {Function} customizer The function to customize comparisons.
- * @param {Function} equalFunc The function to determine equivalents of values.
- * @param {Object} stack Tracks traversed `object` and `other` objects.
- * @returns {boolean} Returns `true` if the objects are equivalent, else `false`.
- */
-function equalObjects(object, other, bitmask, customizer, equalFunc, stack) {
-  var isPartial = bitmask & COMPARE_PARTIAL_FLAG,
-      objProps = getAllKeys(object),
-      objLength = objProps.length,
-      othProps = getAllKeys(other),
-      othLength = othProps.length;
-
-  if (objLength != othLength && !isPartial) {
-    return false;
-  }
-  var index = objLength;
-  while (index--) {
-    var key = objProps[index];
-    if (!(isPartial ? key in other : hasOwnProperty.call(other, key))) {
-      return false;
-    }
-  }
-  // Assume cyclic values are equal.
-  var stacked = stack.get(object);
-  if (stacked && stack.get(other)) {
-    return stacked == other;
-  }
-  var result = true;
-  stack.set(object, other);
-  stack.set(other, object);
-
-  var skipCtor = isPartial;
-  while (++index < objLength) {
-    key = objProps[index];
-    var objValue = object[key],
-        othValue = other[key];
-
-    if (customizer) {
-      var compared = isPartial
-        ? customizer(othValue, objValue, key, other, object, stack)
-        : customizer(objValue, othValue, key, object, other, stack);
-    }
-    // Recursively compare objects (susceptible to call stack limits).
-    if (!(compared === undefined
-          ? (objValue === othValue || equalFunc(objValue, othValue, bitmask, customizer, stack))
-          : compared
-        )) {
-      result = false;
-      break;
-    }
-    skipCtor || (skipCtor = key == 'constructor');
-  }
-  if (result && !skipCtor) {
-    var objCtor = object.constructor,
-        othCtor = other.constructor;
-
-    // Non `Object` object instances with different constructors are not equal.
-    if (objCtor != othCtor &&
-        ('constructor' in object && 'constructor' in other) &&
-        !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
-          typeof othCtor == 'function' && othCtor instanceof othCtor)) {
-      result = false;
-    }
-  }
-  stack['delete'](object);
-  stack['delete'](other);
-  return result;
-}
-
-/**
- * Creates an array of own enumerable property names and symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names and symbols.
- */
-function getAllKeys(object) {
-  return baseGetAllKeys(object, keys, getSymbols);
-}
-
-/**
- * Gets the data for `map`.
- *
- * @private
- * @param {Object} map The map to query.
- * @param {string} key The reference key.
- * @returns {*} Returns the map data.
- */
-function getMapData(map, key) {
-  var data = map.__data__;
-  return isKeyable(key)
-    ? data[typeof key == 'string' ? 'string' : 'hash']
-    : data.map;
-}
-
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
-function getNative(object, key) {
-  var value = getValue(object, key);
-  return baseIsNative(value) ? value : undefined;
-}
-
-/**
- * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the raw `toStringTag`.
- */
-function getRawTag(value) {
-  var isOwn = hasOwnProperty.call(value, symToStringTag),
-      tag = value[symToStringTag];
-
-  try {
-    value[symToStringTag] = undefined;
-    var unmasked = true;
-  } catch (e) {}
-
-  var result = nativeObjectToString.call(value);
-  if (unmasked) {
-    if (isOwn) {
-      value[symToStringTag] = tag;
-    } else {
-      delete value[symToStringTag];
-    }
-  }
-  return result;
-}
-
-/**
- * Creates an array of the own enumerable symbols of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of symbols.
- */
-var getSymbols = !nativeGetSymbols ? stubArray : function(object) {
-  if (object == null) {
-    return [];
-  }
-  object = Object(object);
-  return arrayFilter(nativeGetSymbols(object), function(symbol) {
-    return propertyIsEnumerable.call(object, symbol);
-  });
-};
-
-/**
- * Gets the `toStringTag` of `value`.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
- */
-var getTag = baseGetTag;
-
-// Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
-if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
-    (Map && getTag(new Map) != mapTag) ||
-    (Promise && getTag(Promise.resolve()) != promiseTag) ||
-    (Set && getTag(new Set) != setTag) ||
-    (WeakMap && getTag(new WeakMap) != weakMapTag)) {
-  getTag = function(value) {
-    var result = baseGetTag(value),
-        Ctor = result == objectTag ? value.constructor : undefined,
-        ctorString = Ctor ? toSource(Ctor) : '';
-
-    if (ctorString) {
-      switch (ctorString) {
-        case dataViewCtorString: return dataViewTag;
-        case mapCtorString: return mapTag;
-        case promiseCtorString: return promiseTag;
-        case setCtorString: return setTag;
-        case weakMapCtorString: return weakMapTag;
-      }
-    }
-    return result;
-  };
-}
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
-}
-
-/**
- * Checks if `value` is suitable for use as unique object key.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is suitable, else `false`.
- */
-function isKeyable(value) {
-  var type = typeof value;
-  return (type == 'string' || type == 'number' || type == 'symbol' || type == 'boolean')
-    ? (value !== '__proto__')
-    : (value === null);
-}
-
-/**
- * Checks if `func` has its source masked.
- *
- * @private
- * @param {Function} func The function to check.
- * @returns {boolean} Returns `true` if `func` is masked, else `false`.
- */
-function isMasked(func) {
-  return !!maskSrcKey && (maskSrcKey in func);
-}
-
-/**
- * Checks if `value` is likely a prototype object.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
- */
-function isPrototype(value) {
-  var Ctor = value && value.constructor,
-      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
-
-  return value === proto;
-}
-
-/**
- * Converts `value` to a string using `Object.prototype.toString`.
- *
- * @private
- * @param {*} value The value to convert.
- * @returns {string} Returns the converted string.
- */
-function objectToString(value) {
-  return nativeObjectToString.call(value);
-}
-
-/**
- * Converts `func` to its source code.
- *
- * @private
- * @param {Function} func The function to convert.
- * @returns {string} Returns the source code.
- */
-function toSource(func) {
-  if (func != null) {
-    try {
-      return funcToString.call(func);
-    } catch (e) {}
-    try {
-      return (func + '');
-    } catch (e) {}
-  }
-  return '';
-}
-
-/**
- * Performs a
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * comparison between two values to determine if they are equivalent.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- * @example
- *
- * var object = { 'a': 1 };
- * var other = { 'a': 1 };
- *
- * _.eq(object, object);
- * // => true
- *
- * _.eq(object, other);
- * // => false
- *
- * _.eq('a', 'a');
- * // => true
- *
- * _.eq('a', Object('a'));
- * // => false
- *
- * _.eq(NaN, NaN);
- * // => true
- */
-function eq(value, other) {
-  return value === other || (value !== value && other !== other);
-}
-
-/**
- * Checks if `value` is likely an `arguments` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an `arguments` object,
- *  else `false`.
- * @example
- *
- * _.isArguments(function() { return arguments; }());
- * // => true
- *
- * _.isArguments([1, 2, 3]);
- * // => false
- */
-var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsArguments : function(value) {
-  return isObjectLike(value) && hasOwnProperty.call(value, 'callee') &&
-    !propertyIsEnumerable.call(value, 'callee');
-};
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
-/**
- * Checks if `value` is array-like. A value is considered array-like if it's
- * not a function and has a `value.length` that's an integer greater than or
- * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- * @example
- *
- * _.isArrayLike([1, 2, 3]);
- * // => true
- *
- * _.isArrayLike(document.body.children);
- * // => true
- *
- * _.isArrayLike('abc');
- * // => true
- *
- * _.isArrayLike(_.noop);
- * // => false
- */
-function isArrayLike(value) {
-  return value != null && isLength(value.length) && !isFunction(value);
-}
-
-/**
- * Checks if `value` is a buffer.
- *
- * @static
- * @memberOf _
- * @since 4.3.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
- * @example
- *
- * _.isBuffer(new Buffer(2));
- * // => true
- *
- * _.isBuffer(new Uint8Array(2));
- * // => false
- */
-var isBuffer = nativeIsBuffer || stubFalse;
-
-/**
- * Performs a deep comparison between two values to determine if they are
- * equivalent.
- *
- * **Note:** This method supports comparing arrays, array buffers, booleans,
- * date objects, error objects, maps, numbers, `Object` objects, regexes,
- * sets, strings, symbols, and typed arrays. `Object` objects are compared
- * by their own, not inherited, enumerable properties. Functions and DOM
- * nodes are compared by strict equality, i.e. `===`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to compare.
- * @param {*} other The other value to compare.
- * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
- * @example
- *
- * var object = { 'a': 1 };
- * var other = { 'a': 1 };
- *
- * _.isEqual(object, other);
- * // => true
- *
- * object === other;
- * // => false
- */
-function isEqual(value, other) {
-  return baseIsEqual(value, other);
-}
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a function, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  if (!isObject(value)) {
-    return false;
-  }
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in Safari 9 which returns 'object' for typed arrays and other constructors.
-  var tag = baseGetTag(value);
-  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This method is loosely based on
- * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- * @example
- *
- * _.isLength(3);
- * // => true
- *
- * _.isLength(Number.MIN_VALUE);
- * // => false
- *
- * _.isLength(Infinity);
- * // => false
- *
- * _.isLength('3');
- * // => false
- */
-function isLength(value) {
-  return typeof value == 'number' &&
-    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return value != null && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return value != null && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a typed array.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
- * @example
- *
- * _.isTypedArray(new Uint8Array);
- * // => true
- *
- * _.isTypedArray([]);
- * // => false
- */
-var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-function keys(object) {
-  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
-}
-
-/**
- * This method returns a new empty array.
- *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {Array} Returns the new empty array.
- * @example
- *
- * var arrays = _.times(2, _.stubArray);
- *
- * console.log(arrays);
- * // => [[], []]
- *
- * console.log(arrays[0] === arrays[1]);
- * // => false
- */
-function stubArray() {
-  return [];
-}
-
-/**
- * This method returns `false`.
- *
- * @static
- * @memberOf _
- * @since 4.13.0
- * @category Util
- * @returns {boolean} Returns `false`.
- * @example
- *
- * _.times(2, _.stubFalse);
- * // => [false, false]
- */
-function stubFalse() {
-  return false;
-}
-
-module.exports = isEqual;
-});
-
-function grouping(objs, ...keys) {
-  const normalizedKeys = keys.map((key) => {
-    if (key instanceof Array) {
-      return {key, alias: key.join('_')};
-    } else if (key instanceof Object) {
-      return key;
-    } else {
-      return {key, alias: key};
-    }
-  });
-
-  return _grouping(objs, normalizedKeys);
-}
-
-function _grouping(objs, keys, acc = {}) {
-  const [currentKey, ...remainKeys] = keys;
-
-  return groupBy(objs, obj => pluckKeyOrKeys(obj, currentKey.key)).map(([currentValue, remainValues]) => {
-    if (remainKeys.length === 0) {
-      return currentValue;
-    } else {
-      const nextKey = remainKeys[0];
-
-      return {
-        [currentKey.alias]: currentValue,
-        [nextKey.alias]:    _grouping(remainValues, remainKeys)
-      };
-    }
-  });
-}
-
-function groupBy(objs, keyFn) {
-  const ret = [];
-
-  objs.forEach((obj) => {
-    const key   = keyFn(obj);
-    const entry = ret.find(([existKey]) => lodash_isequal(existKey, key));
-
-    if (entry) {
-      entry[1].push(obj);
-    } else {
-      ret.push([key, [obj]]);
-    }
-  });
-
-  return ret;
-}
-
-function pluckKeyOrKeys(obj, key) {
-  return key instanceof Array ? key.map((k) => obj[k]) : obj[key];
-}
-
-function unwrapValueFromBinding(queryResult) {
-  const bindings = queryResult.results.bindings;
-
-  return bindings.map((binding) => {
-    const ret = {};
-
-    Object.keys(binding).forEach((key) => {
-      ret[key] = binding[key].value;
-    });
-
-    return ret;
-  });
-}
+var runtime = handlebars_runtime.exports['default'];
 
 class Stanza {
-  constructor(host, metadata, templates, url, handleEvent) {
-    this.host        = host;
-    this.root        = host.shadowRoot;
-    this.metadata    = metadata;
-    this.url         = url;
-    this.handleEvent = handleEvent;
+  constructor(element, metadata, templates, url) {
+    this.element = element;
+    this.metadata = metadata;
 
     const handlebarsRuntime = runtime.create();
-
-    this.templates = Object.fromEntries(templates.map(([name, spec]) => {
-      return [name, handlebarsRuntime.template(spec)];
-    }));
+    this.templates = Object.fromEntries(
+      templates.map(([name, spec]) => {
+        return [name, handlebarsRuntime.template(spec)];
+      })
+    );
 
     const bbox = document.createElement('div');
     bbox.style.position = 'relative';
@@ -11734,49 +12112,101 @@ class Stanza {
     main.style.overflow = 'auto';
     bbox.appendChild(main);
 
-    this.menu = document.createElement('togostanza--menu');
-    this.menu.setAttribute('href', url.replace(/\.js$/, '.html'));
-    this.setMenuPlacement(host.getAttribute('togostanza-menu-placement'));
+    this.menuElement = document.createElement('togostanza--menu');
+    this.menuElement.setAttribute('href', url.replace(/\.js$/, '.html'));
+    this.menuElement.menuDefinition = this.menu.bind(this);
 
-    bbox.appendChild(this.menu);
+    bbox.appendChild(this.menuElement);
 
-    this.root.appendChild(bbox);
+    element.shadowRoot.appendChild(bbox);
 
-    // TODO migrate
-    this.grouping               = grouping;
-    this.unwrapValueFromBinding = unwrapValueFromBinding;
+    this.url = url;
+
+    this.renderDebounced = lodash_debounce(() => {
+      this.render();
+    }, 50);
   }
 
-  setMenuPlacement(placement) {
-    if (placement) {
-      this.menu.setAttribute('placement', placement);
-    } else {
-      this.menu.removeAttribute('placement');
-    }
+  get root() {
+    return this.element.shadowRoot;
   }
 
-  select(selector) {
-    return this.root.querySelector(selector);
+  menu() {
+    return [];
   }
 
-  selectAll(selector) {
-    return this.root.querySelectorAll(selector);
-  }
-
-  render({template: templateName, parameters, selector}) {
+  renderTemplate({ template: templateName, parameters, selector }) {
     const template = this.templates[templateName];
 
     if (!template) {
-      throw new Error(`template "${templateName}" is missing, available templates: ${Object.keys(this.templates).join(', ')}`);
+      throw new Error(
+        `template "${templateName}" is missing, available templates: ${Object.keys(
+          this.templates
+        ).join(', ')}`
+      );
     }
 
     const html = template(parameters);
-
-    this.select(selector || 'main').innerHTML = html;
+    this.root.querySelector(selector || 'main').innerHTML = html;
   }
 
-  async query({template, parameters, endpoint, method}) {
-    const sparql  = this.templates[template](parameters);
+  get params() {
+    const attributes = this.element.attributes;
+
+    return Object.fromEntries(
+      this.metadata['stanza:parameter'].map((param) => {
+        const key = param['stanza:key'];
+        const type = param['stanza:type'];
+
+        if (type === 'boolean') {
+          return [key, attributes.hasOwnProperty(key)];
+        }
+
+        const valueStr = attributes[key]?.value;
+
+        if (valueStr === null || valueStr === undefined) {
+          return [key, valueStr];
+        }
+
+        let value;
+
+        switch (type) {
+          case 'number':
+            value = Number(valueStr);
+            break;
+          case 'date':
+          case 'datetime':
+            value = new Date(valueStr);
+            break;
+          case 'json':
+            value = JSON.parse(valueStr);
+            break;
+          default:
+            value = valueStr;
+        }
+
+        return [key, value];
+      })
+    );
+  }
+
+  importWebFontCSS(cssUrl) {
+    const el = document.createElement('link');
+
+    el.rel = 'stylesheet';
+    el.type = 'text/css';
+    el.href = new URL(cssUrl, this.url).href;
+
+    document.head.appendChild(el);
+    this.root.appendChild(el.cloneNode());
+  }
+
+  handleAttributeChange() {
+    this.renderDebounced();
+  }
+
+  async query({ template, parameters, endpoint, method }) {
+    const sparql = this.templates[template](parameters);
     const payload = new URLSearchParams();
 
     payload.set('query', sparql);
@@ -11786,139 +12216,10 @@ class Stanza {
       method: method || 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept':       'application/sparql-results+json'
+        Accept: 'application/sparql-results+json',
       },
-      body: payload
+      body: payload,
     }).then((res) => res.json());
-  }
-
-  importWebFontCSS(cssUrl) {
-    const el = document.createElement('link');
-
-    el.rel  = 'stylesheet';
-    el.type = 'text/css';
-    el.href = new URL(cssUrl, this.url).href;
-
-    document.head.appendChild(el);
-    this.root.appendChild(el.cloneNode());
-  }
-}
-
-async function defineStanzaElement({stanzaModule, metadata, templates, url}) {
-  const id        = metadata['@id'];
-  const paramKeys = metadata['stanza:parameter'].map(param => param['stanza:key']);
-
-  class StanzaElement extends HTMLElement {
-    constructor() {
-      super(...arguments);
-
-      this.renderDebounced = lodash_debounce(() => {
-        this.render();
-      }, 50);
-
-      ensureBuiltinElementsDefined();
-
-      this.attachShadow({mode: 'open'});
-
-      const handleEvent = (event) => {
-        stanzaModule.handleEvent?.(this.stanza, this.params, event);
-      };
-
-      this.stanza = new Stanza(this, metadata, templates, url, handleEvent);
-    }
-
-    connectedCallback() {
-      const hostStyle = document.createElement('style');
-      hostStyle.append(cssVariableDefaults(metadata['stanza:style']) || '');
-      this.shadowRoot.append(hostStyle);
-
-      const shadowStyleLink = document.createElement('link');
-      shadowStyleLink.rel = 'stylesheet';
-      shadowStyleLink.href = url.replace(/\.js$/, '.css');
-      this.shadowRoot.append(shadowStyleLink);
-
-      this.renderDebounced();
-      this.renderDebounced.flush();
-    }
-
-    attributeChangedCallback(name, oldValue, newValue) {
-      if (name === 'togostanza-menu-placement') {
-        this.stanza.setMenuPlacement(newValue);
-        return;
-      }
-
-      if (stanzaModule.handleAttributeChange) {
-        stanzaModule.handleAttributeChange(this.stanza, this.params, name, oldValue, newValue);
-      } else {
-        this.renderDebounced();
-      }
-    }
-
-    get params() {
-      return Object.fromEntries(
-        metadata['stanza:parameter'].map((param) => {
-          const key  = param['stanza:key'];
-          const type = param['stanza:type'];
-
-          if (type === 'boolean') {
-            return [key, this.attributes.hasOwnProperty(key)];
-          }
-
-          const valueStr = this.attributes[key]?.value;
-
-          if (valueStr === null || valueStr === undefined) {
-            return [key, valueStr];
-          }
-
-          let value;
-
-          switch (type) {
-            case 'number':
-              value = Number(valueStr);
-              break;
-            case 'date':
-            case 'datetime':
-              value = new Date(valueStr);
-              break;
-            case 'json':
-              value = JSON.parse(valueStr);
-              break;
-            default:
-              value = valueStr;
-          }
-
-          return [key, value];
-        })
-      );
-    }
-
-    render() {
-      stanzaModule.default(this.stanza, this.params);
-    }
-  }
-
-  StanzaElement.observedAttributes = [...paramKeys, 'togostanza-menu-placement'];
-
-  customElements.define(`togostanza-${id}`, StanzaElement);
-}
-
-function cssVariableDefaults(defs) {
-  if (!defs) { return null; }
-
-  return defaultOutdent`
-    :host {
-    ${defs.map(def => `  ${def['stanza:key']}: ${def['stanza:default']};`).join('\n')}
-    }
-  `;
-}
-
-function ensureBuiltinElementsDefined() {
-  for (const el of [MenuElement, ContainerElement, DataSourceElement]) {
-    const name = el.customElementName;
-
-    if (!customElements.get(name)) {
-      customElements.define(name, el);
-    }
   }
 }
 
@@ -15012,10 +15313,6 @@ function downloadPngMenuItem(stanza, filename) {
 }
 
 function appendCustomCss(stanza, CustomCssUrl) {
-  const stanzaId = stanza.metadata["@id"];
-  const main = stanza.root.querySelector("main");
-  main.dataset.stanzaId = stanzaId;
-
   const link = document.createElement("link");
   stanza.root.appendChild(link);
   link.setAttribute("rel", "stylesheet");
@@ -15183,18 +15480,18 @@ const CHROMOSOME_NT_LENGTH = {
   },
 };
 const CHROMOSOME_POSIITONS = {};
-Object.keys(CHROMOSOME_NT_LENGTH).forEach(refKey => {
+Object.keys(CHROMOSOME_NT_LENGTH).forEach((refKey) => {
   let pos = 0;
-  CHROMOSOME_POSIITONS[refKey] = Object.fromEntries( Object.keys(CHROMOSOME_NT_LENGTH[refKey]).map(chrKey => {
-    const map = [chrKey, pos];
-    pos += CHROMOSOME_NT_LENGTH[refKey][chrKey];
-    return map;
-  }) );
+  CHROMOSOME_POSIITONS[refKey] = Object.fromEntries(
+    Object.keys(CHROMOSOME_NT_LENGTH[refKey]).map((chrKey) => {
+      const map = [chrKey, pos];
+      pos += CHROMOSOME_NT_LENGTH[refKey][chrKey];
+      return map;
+    })
+  );
 });
 
-
-class ManhattanPlot extends Stanza$1 {
-
+class ManhattanPlot extends Stanza {
   menu() {
     return [
       downloadSvgMenuItem(this, "manhattan_plot"),
@@ -15203,7 +15500,6 @@ class ManhattanPlot extends Stanza$1 {
   }
 
   async render() {
-
     if (this.params.lowThresh === "") {
       this.params.lowThresh = 4;
     }
@@ -15224,9 +15520,11 @@ class ManhattanPlot extends Stanza$1 {
       this.params["data-url"],
       this.root.querySelector("#chart")
     );
-    
+
     // stage data and stage names
-    this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
+    this._stageData = Object.fromEntries(
+      dataset.stages.map((stage) => [stage.label, stage])
+    );
     const fixedStageNamesOrder = [
       "discovery",
       "replication",
@@ -15235,9 +15533,9 @@ class ManhattanPlot extends Stanza$1 {
       "not provided",
     ];
     this._stageNames = fixedStageNamesOrder.filter((stageName) => {
-      return dataset.stages.find(stage => stage.label === stageName);
+      return dataset.stages.find((stage) => stage.label === stageName);
     });
-    
+
     // add stage information to each plot
     const chromosomeKey = this.params.chromosomeKey;
     const positionKey = this.params.positionKey;
@@ -15247,7 +15545,9 @@ class ManhattanPlot extends Stanza$1 {
         // convert chromosome data from 'chrnum' to 'num'
         variant[chromosomeKey] = variant[chromosomeKey].replace("chr", "");
         // set position
-        variant.pos = CHROMOSOME_POSIITONS.hg38[variant[chromosomeKey]] + parseInt(variant[positionKey]);
+        variant.pos =
+          CHROMOSOME_POSIITONS.hg38[variant[chromosomeKey]] +
+          parseInt(variant[positionKey]);
       }
     }
 
@@ -15281,7 +15581,7 @@ class ManhattanPlot extends Stanza$1 {
       }
     });
     return variants;
-  };
+  }
 
   makeConsole() {
     const stageList = this.root.querySelector("#stageList");
@@ -15337,17 +15637,16 @@ class ManhattanPlot extends Stanza$1 {
     const areaWidth = width - marginLeft;
     const areaHeight = height - marginBottom;
     const drawAreaHeight = areaHeight - paddingTop;
-  
+
     const chartElement = stanza.root.querySelector("#chart");
     const controlElement = stanza.root.querySelector("#control");
     let overThreshArray;
-  
-  
+
     const lowThresh = parseFloat(params.lowThresh);
     let highThresh = parseFloat(params.highThresh);
-  
+
     const pValueKey = params.pValueKey;
-  
+
     const chromosomeSumLength = {};
     Object.keys(CHROMOSOME_NT_LENGTH).forEach((ref) => {
       chromosomeSumLength[ref] = Object.keys(CHROMOSOME_NT_LENGTH[ref]).reduce(
@@ -15355,7 +15654,7 @@ class ManhattanPlot extends Stanza$1 {
         0
       );
     });
-  
+
     const chromosomeArray = Object.values(CHROMOSOME_NT_LENGTH.hg38);
     const chromosomeStartPosition = {};
     let startPos = 0;
@@ -15368,7 +15667,7 @@ class ManhattanPlot extends Stanza$1 {
         chromosomeStartPosition[chr] = startPos;
       }
     }
-  
+
     const canvasDiv = select(chartElement)
       .append("div")
       .style("width", areaWidth + "px")
@@ -15394,17 +15693,17 @@ class ManhattanPlot extends Stanza$1 {
     const tooltip = select(chartElement)
       .append("div")
       .attr("class", "tooltip");
-  
+
     let horizonalRange = []; // [begin position, end position]
     let verticalRange = []; // [begin position, end position]
     let maxLogP = 0;
     let maxLogPInt;
     let total;
-  
+
     const getRangeLength = function (targetRange) {
       return targetRange[1] - targetRange[0];
     };
-  
+
     // axis line
     axisGroup
       .append("path")
@@ -15423,11 +15722,11 @@ class ManhattanPlot extends Stanza$1 {
       .attr("y", marginLeft - 32)
       .attr("transform", "rotate(-90)")
       .attr("text-anchor", "middle");
-  
+
     // select range by drag
     let horizonalDragBegin = false;
     let verticalDragBegin = false;
-  
+
     svg
       .on("mousedown", function (e) {
         if (pointer(e)[1] <= areaHeight) {
@@ -15535,7 +15834,7 @@ class ManhattanPlot extends Stanza$1 {
           verticalDragBegin = false;
         }
       });
-  
+
     // slider
     const ctrlSvg = select(controlElement)
       .append("svg")
@@ -15596,7 +15895,8 @@ class ManhattanPlot extends Stanza$1 {
               canvas
                 .style(
                   "left",
-                  ((horizonalRange[0] + move) / getRangeLength(horizonalRange)) *
+                  ((horizonalRange[0] + move) /
+                    getRangeLength(horizonalRange)) *
                     areaWidth +
                     "px"
                 )
@@ -15635,9 +15935,9 @@ class ManhattanPlot extends Stanza$1 {
             }
           })
       );
-  
+
     const sliderLabelGroup = ctrlSvg.append("g").attr("id", "sliderLabel");
-  
+
     sliderLabelGroup
       .selectAll(".slider-label")
       .data(CHROMOSOMES)
@@ -15660,7 +15960,7 @@ class ManhattanPlot extends Stanza$1 {
       .attr("y", 18)
       .attr("font-size", "12")
       .attr("fill", "#2F4D76");
-  
+
     sliderLabelGroup
       .selectAll(".slider-ine")
       .data(CHROMOSOMES)
@@ -15679,7 +15979,7 @@ class ManhattanPlot extends Stanza$1 {
           (pos / chromosomeSumLength.hg38) * areaWidth + marginLeft;
         return "M " + sliderLinePos + ", " + 2 + " V " + 24 + " Z";
       });
-  
+
     // button
     const ctrlBtn = select(controlElement)
       .append("div")
@@ -15744,19 +16044,19 @@ class ManhattanPlot extends Stanza$1 {
       .attr("id", "threshold")
       .attr("type", "text")
       .attr("value", "8");
-  
+
     const threshold = stanza.root.querySelector("#threshold");
     threshold.addEventListener("input", () => {
       highThresh = parseFloat(threshold.value);
       reRender(this._variants);
       pagination(stanza.root, params, overThreshArray);
     });
-  
+
     reRender(this._variants);
-  
+
     //listen stage checkbox event
     const stageBtn = stanza.root.querySelectorAll(".stage-btn");
-  
+
     for (let i = 0; i < stageBtn.length; i++) {
       stageBtn[i].addEventListener("change", (e) => {
         const stageName = e.path[0].getAttribute("data-stage");
@@ -15766,7 +16066,7 @@ class ManhattanPlot extends Stanza$1 {
         pagination(stanza.root, params, overThreshArray);
       });
     }
-  
+
     function reRender(variants) {
       if (horizonalRange[0] === undefined) {
         horizonalRange = [
@@ -15777,25 +16077,25 @@ class ManhattanPlot extends Stanza$1 {
         ];
         total = horizonalRange[1];
       }
-  
+
       overThreshArray = [];
       const pValueArray = variants.map(
         (variant) => Math.log10(parseFloat(variant["p-value"])) * -1
       );
-  
+
       maxLogP = Math.max(...pValueArray);
       if (maxLogPInt === undefined) {
         maxLogPInt = Math.floor(maxLogP);
       }
-  
+
       if (verticalRange[0] === undefined) {
         verticalRange = [lowThresh, maxLogPInt];
       }
-      
+
       xLabelGroup.html("");
       yLabelGroup.html("");
       plotGroup.html("");
-  
+
       plotGroup
         .selectAll(".plot")
         .data(variants)
@@ -15859,7 +16159,7 @@ class ManhattanPlot extends Stanza$1 {
         })
         .on("mouseout", () => tooltip.style("display", "none"));
       renderCanvas(variants);
-  
+
       // x axis label
       xLabelGroup
         .selectAll(".x-label")
@@ -15869,7 +16169,8 @@ class ManhattanPlot extends Stanza$1 {
         .attr("class", "axis-label x-label")
         .text((d) => d)
         .attr("x", (d) => {
-          let pos = CHROMOSOME_POSIITONS.hg38[d] + CHROMOSOME_NT_LENGTH.hg38[d] / 2;
+          let pos =
+            CHROMOSOME_POSIITONS.hg38[d] + CHROMOSOME_NT_LENGTH.hg38[d] / 2;
           return (
             ((pos - horizonalRange[0]) / getRangeLength(horizonalRange)) *
               areaWidth +
@@ -15878,7 +16179,7 @@ class ManhattanPlot extends Stanza$1 {
         })
         .attr("font-size", "12")
         .attr("y", areaHeight + 20);
-  
+
       // chart background
       xLabelGroup
         .selectAll(".x-background")
@@ -15922,14 +16223,14 @@ class ManhattanPlot extends Stanza$1 {
             return "#FFFFFF";
           }
         });
-  
+
       // y axis label
       yLabelGroup
         .append("rect")
         .attr("fill", "#FFFFFF")
         .attr("width", marginLeft - 1)
         .attr("height", areaHeight);
-  
+
       const overThreshLine = stanza.root.querySelectorAll(".overthresh-line");
       for (
         let i = Math.floor(verticalRange[0]) + 1;
@@ -15942,7 +16243,9 @@ class ManhattanPlot extends Stanza$1 {
             drawAreaHeight;
         //Calucurate display of scale
         const tickNum = 20; //Tick number to display (set by manual)
-        const tickInterval = Math.floor(getRangeLength(verticalRange) / tickNum);
+        const tickInterval = Math.floor(
+          getRangeLength(verticalRange) / tickNum
+        );
         if (getRangeLength(verticalRange) < tickNum) {
           yLabelGroup
             .append("text")
@@ -15987,7 +16290,7 @@ class ManhattanPlot extends Stanza$1 {
       for (let i = 0; i < overThreshLine.length; i++) {
         overThreshLine[i].remove();
       }
-  
+
       // y zero (lowThresh)
       yLabelGroup
         .append("text")
@@ -16001,28 +16304,34 @@ class ManhattanPlot extends Stanza$1 {
         .attr("class", "axis-line")
         .attr(
           "d",
-          "M " + (marginLeft - 8) + ", " + areaHeight + " H " + marginLeft + " Z"
+          "M " +
+            (marginLeft - 8) +
+            ", " +
+            areaHeight +
+            " H " +
+            marginLeft +
+            " Z"
         );
-  
+
       // slider
       ctrlSvg
         .select("rect#slider")
         .attr("x", marginLeft + (horizonalRange[0] / total) * areaWidth)
         .attr("width", (getRangeLength(horizonalRange) / total) * areaWidth)
         .attr("transform", "translate(0, 0)");
-  
+
       const totalOverThreshVariants = stanza.root.querySelector(
         "#totalOverThreshVariants"
       );
       totalOverThreshVariants.innerText = overThreshArray.length;
       setRange(horizonalRange);
-  
+
       //slider shadow (Show only when chart is zoomed)
       const sliderShadow = stanza.root.querySelectorAll(".slider-shadow");
       for (let i = 0; i < sliderShadow.length; i++) {
         sliderShadow[i].remove();
       }
-  
+
       if (
         horizonalRange[0] !== 0 &&
         horizonalRange[1] !== chromosomeSumLength.hg38
@@ -16050,7 +16359,7 @@ class ManhattanPlot extends Stanza$1 {
           );
       }
     }
-  
+
     function renderCanvas(variants) {
       const horizonalRangeLength = getRangeLength(horizonalRange);
       if (canvas.node().getContext) {
@@ -16058,7 +16367,7 @@ class ManhattanPlot extends Stanza$1 {
         canvas.attr("height", (total / horizonalRangeLength) * areaHeight);
         const ctx = canvas.node().getContext("2d");
         ctx.clearRect(0, 0, areaWidth, areaHeight);
-  
+
         for (const d of variants) {
           const stage = d["stage"].replace(/\s/, "-").toLowerCase();
           ctx.beginPath();
@@ -16084,12 +16393,15 @@ class ManhattanPlot extends Stanza$1 {
       }
       canvas.style("display", "none");
     }
-  
+
     function setRange(horizonalRange) {
       let start = 0;
       let text = "";
       for (const ch of CHROMOSOMES) {
-        if (start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[0] && !text) {
+        if (
+          start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[0] &&
+          !text
+        ) {
           text += " chr" + ch + ":" + Math.floor(horizonalRange[0]);
         }
         if (start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[1]) {
@@ -16100,15 +16412,14 @@ class ManhattanPlot extends Stanza$1 {
       }
       ctrlBtn.select("#range_text").html(text);
     }
-  
+
     pagination(stanza.root, params, overThreshArray);
   }
-  
 }
 
 var stanzaModule = /*#__PURE__*/Object.freeze({
-	__proto__: null,
-	'default': ManhattanPlot
+    __proto__: null,
+    'default': ManhattanPlot
 });
 
 var metadata = {
