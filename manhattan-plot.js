@@ -16429,12 +16429,9 @@ var metadata = {
 	"@id": "manhattan-plot",
 	"stanza:label": "Manhattan plot",
 	"stanza:definition": "Manhattan plot MetaStanza (for GWAS)",
-	"stanza:type": "Stanza",
-	"stanza:display": "Graph",
 	"stanza:provider": "Togostanza",
 	"stanza:license": "MIT",
-	"stanza:author": "c-nakashima",
-	"stanza:address": "nakashima@penqe.com",
+	"stanza:author": "DBCLS",
 	"stanza:contributor": [
 ],
 	"stanza:created": "2021-01-13",
