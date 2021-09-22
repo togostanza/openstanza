@@ -5,7 +5,8 @@
   "repository": "https://github.com/togostanza/openstanza",
   "dependencies": {
     "d3": "^6.7.0",
-    "togostanza": "github:togostanza/togostanza"
+    "togostanza": "github:togostanza/togostanza",
+    "togostanza-utils": "github:togostanza/togostanza-utils"
   },
   "engines": {
     "node": ">=14"
