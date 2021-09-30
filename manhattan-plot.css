@@ -257,16 +257,16 @@ div#dl_list ul li.hover {
 .chart-section table tbody tr td input:checked + label:before {
   content: "+ ";
 }
-.chart-section table tbody tr td input:checked + label[data-stage=discovery] {
+.chart-section table tbody tr td input:checked + label[data-stage=Discovery] {
   background-color: var(--togostanza-discovery-color);
 }
-.chart-section table tbody tr td input:checked + label[data-stage=replication] {
+.chart-section table tbody tr td input:checked + label[data-stage=Replication] {
   background-color: var(--togostanza-replication-color);
 }
-.chart-section table tbody tr td input:checked + label[data-stage=combined] {
+.chart-section table tbody tr td input:checked + label[data-stage=Combined] {
   background-color: var(--togostanza-combined-color);
 }
-.chart-section table tbody tr td input:checked + label[data-stage="meta analysis"] {
+.chart-section table tbody tr td input:checked + label[data-stage=Meta-analysis] {
   background-color: var(--togostanza-meta-analysis-color);
 }
 .chart-section table tbody tr td input:checked + label[data-stage="not provided"] {

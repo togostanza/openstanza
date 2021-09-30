@@ -15492,10 +15492,10 @@ Object.keys(CHROMOSOME_NT_LENGTH).forEach((refKey) => {
 });
 
 const FIXED_STAGE_NAME_ORDER = [
-  "discovery",
-  "replication",
-  "combined",
-  "meta analysis",
+  "Discovery",
+  "Replication",
+  "Combined",
+  "Meta-analysis",
   "not provided",
 ];
 
@@ -15531,9 +15531,9 @@ class ManhattanPlot extends Stanza {
     );
 
     // stage data and stage names
-    this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.condition1, stage]) );
+    this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
     this._stageNames = FIXED_STAGE_NAME_ORDER.filter((stageName) => {
-      return dataset.stages.find(stage => stage.condition1 === stageName);
+      return dataset.stages.find(stage => stage.label === stageName);
     });
 
     // add stage information to each plot
@@ -15541,7 +15541,7 @@ class ManhattanPlot extends Stanza {
     const positionKey = this.params.positionKey;
     for (const stage of dataset.stages) {
       for (const variant of stage.variants) {
-        variant.stage = stage.condition1;
+        variant.stage = stage.label;
         // convert chromosome data from 'chrnum' to 'num'
         variant[chromosomeKey] = variant[chromosomeKey].replace("chr", "");
         // set position
@@ -16115,7 +16115,7 @@ class ManhattanPlot extends Stanza {
         })
         .append("circle")
         .attr("fill", function (d) {
-          const stage = d["stage"].replace(/\s/, "-");
+          const stage = d["stage"].replace(/\s/, "-").toLowerCase();
           return `var(--togostanza-${stage}-color)`;
         })
         .attr("cx", function (d) {
@@ -16438,7 +16438,7 @@ var metadata = {
 	"stanza:parameter": [
 	{
 		"stanza:key": "data-url",
-		"stanza:example": "http://localhost:8080/manhattan-plot/assets/manhattan-plot.json",
+		"stanza:example": "./manhattan-plot/assets/manhattan-plot.json",
 		"stanza:description": "Data source URL (json)",
 		"stanza:required": true
 	},
