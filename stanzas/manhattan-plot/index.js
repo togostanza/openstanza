@@ -707,7 +707,7 @@ export default class ManhattanPlot extends Stanza {
         })
         .append("circle")
         .attr("fill", function (d) {
-          const stage = d["stage"].replace(/\s/, "-");
+          const stage = d["stage"].replace(/\s/, "-").toLowerCase();
           return `var(--togostanza-${stage}-color)`;
         })
         .attr("cx", function (d) {

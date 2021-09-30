@@ -8301,7 +8301,7 @@
     {
       "condition1":"discovery",
       "condition2":"hepatitis B",
-      "label":"Discovery",
+      "label":"Meta-analysis",
       "variants":[
         {
           "ref":"A",

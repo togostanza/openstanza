@@ -281,16 +281,16 @@ div#dl_list {
               &:before {
                 content: "+ ";
               }
-              &[data-stage="discovery"] {
+              &[data-stage="Discovery"] {
                 background-color: $COLOR_DISCOVERY;
               }
-              &[data-stage="replication"] {
+              &[data-stage="Replication"] {
                 background-color: $COLOR_REPLICATION;
               }
-              &[data-stage="combined"] {
+              &[data-stage="Combined"] {
                 background-color: $COLOR_COMBINED;
               }
-              &[data-stage="meta analysis"] {
+              &[data-stage="Meta-analysis"] {
                 background-color: $COLOR_META_ANARYSIS;
               }
               &[data-stage="not provided"] {
