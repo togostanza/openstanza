@@ -8301,12 +8301,12 @@
     {
       "condition1":"discovery",
       "condition2":"hepatitis B",
-      "label":"discovery",
+      "label":"Meta-analysis",
       "variants":[
         {
           "ref":"A",
           "stop":12705100,
-          "p-value":4.67E-7,
+          "p-value":4.67E-17,
           "start":12705100,
           "alt":"C",
           "rsId":"rs7511708",
