@@ -79,24 +79,28 @@ path {
 }
 
 text {
+  &.x-label, &.y-label, &.slider-label {
+    user-select: none;
+    font-size: 12px;
+  }
   &.x-label {
     text-anchor: middle;
-    user-select: none;
   }
 
   &.y-label {
     text-anchor: end;
-    user-select: none;
   }
 
   &.slider-label {
     text-anchor: middle;
-    user-select: none;
   }
 
   &.axis-title {
     user-select: none;
     color: #000000;
+    font-size: 14px;
+    text-anchor: middle;
+    transform: rotate(-90deg)
   }
 }
 
