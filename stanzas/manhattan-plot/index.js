@@ -7,7 +7,7 @@ import {
   downloadPngMenuItem,
   appendCustomCss,
   getFormatedJson,
-} from "@/lib/metastanza_utils.js";
+} from "togostanza-utils";
 
 const CHROMOSOMES = [
   "1",
@@ -65,13 +65,15 @@ const CHROMOSOME_NT_LENGTH = {
   },
 };
 const CHROMOSOME_POSIITONS = {};
-Object.keys(CHROMOSOME_NT_LENGTH).forEach(refKey => {
+Object.keys(CHROMOSOME_NT_LENGTH).forEach((refKey) => {
   let pos = 0;
-  CHROMOSOME_POSIITONS[refKey] = Object.fromEntries( Object.keys(CHROMOSOME_NT_LENGTH[refKey]).map(chrKey => {
-    const map = [chrKey, pos];
-    pos += CHROMOSOME_NT_LENGTH[refKey][chrKey];
-    return map;
-  }) );
+  CHROMOSOME_POSIITONS[refKey] = Object.fromEntries(
+    Object.keys(CHROMOSOME_NT_LENGTH[refKey]).map((chrKey) => {
+      const map = [chrKey, pos];
+      pos += CHROMOSOME_NT_LENGTH[refKey][chrKey];
+      return map;
+    })
+  );
 });
 
 const FIXED_STAGE_NAME_ORDER = [
@@ -84,7 +86,6 @@ const FIXED_STAGE_NAME_ORDER = [
 
 
 export default class ManhattanPlot extends Stanza {
-
   menu() {
     return [
       downloadSvgMenuItem(this, "manhattan_plot"),
@@ -93,7 +94,6 @@ export default class ManhattanPlot extends Stanza {
   }
 
   async render() {
-
     if (this.params.lowThresh === "") {
       this.params.lowThresh = 4;
     }
@@ -114,13 +114,13 @@ export default class ManhattanPlot extends Stanza {
       this.params["data-url"],
       this.root.querySelector("#chart")
     );
-    
+
     // stage data and stage names
     this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
     this._stageNames = FIXED_STAGE_NAME_ORDER.filter((stageName) => {
       return dataset.stages.find(stage => stage.label === stageName);
     });
-    
+
     // add stage information to each plot
     const chromosomeKey = this.params.chromosomeKey;
     const positionKey = this.params.positionKey;
@@ -130,7 +130,9 @@ export default class ManhattanPlot extends Stanza {
         // convert chromosome data from 'chrnum' to 'num'
         variant[chromosomeKey] = variant[chromosomeKey].replace("chr", "");
         // set position
-        variant.pos = CHROMOSOME_POSIITONS.hg38[variant[chromosomeKey]] + parseInt(variant[positionKey]);
+        variant.pos =
+          CHROMOSOME_POSIITONS.hg38[variant[chromosomeKey]] +
+          parseInt(variant[positionKey]);
       }
     }
 
@@ -164,7 +166,7 @@ export default class ManhattanPlot extends Stanza {
       }
     });
     return variants;
-  };
+  }
 
   makeConsole() {
     const stageList = this.root.querySelector("#stageList");
@@ -220,17 +222,16 @@ export default class ManhattanPlot extends Stanza {
     const areaWidth = width - marginLeft;
     const areaHeight = height - marginBottom;
     const drawAreaHeight = areaHeight - paddingTop;
-  
+
     const chartElement = stanza.root.querySelector("#chart");
     const controlElement = stanza.root.querySelector("#control");
     let overThreshArray;
-  
-  
+
     const lowThresh = parseFloat(params.lowThresh);
     let highThresh = parseFloat(params.highThresh);
-  
+
     const pValueKey = params.pValueKey;
-  
+
     const chromosomeSumLength = {};
     Object.keys(CHROMOSOME_NT_LENGTH).forEach((ref) => {
       chromosomeSumLength[ref] = Object.keys(CHROMOSOME_NT_LENGTH[ref]).reduce(
@@ -238,7 +239,7 @@ export default class ManhattanPlot extends Stanza {
         0
       );
     });
-  
+
     const chromosomeArray = Object.values(CHROMOSOME_NT_LENGTH.hg38);
     const chromosomeStartPosition = {};
     let startPos = 0;
@@ -251,7 +252,7 @@ export default class ManhattanPlot extends Stanza {
         chromosomeStartPosition[chr] = startPos;
       }
     }
-  
+
     const canvasDiv = d3
       .select(chartElement)
       .append("div")
@@ -280,17 +281,17 @@ export default class ManhattanPlot extends Stanza {
       .select(chartElement)
       .append("div")
       .attr("class", "tooltip");
-  
+
     let horizonalRange = []; // [begin position, end position]
     let verticalRange = []; // [begin position, end position]
     let maxLogP = 0;
     let maxLogPInt;
     let total;
-  
+
     const getRangeLength = function (targetRange) {
       return targetRange[1] - targetRange[0];
     };
-  
+
     // axis line
     axisGroup
       .append("path")
@@ -310,7 +311,7 @@ export default class ManhattanPlot extends Stanza {
     // select range by drag
     let horizonalDragBegin = false;
     let verticalDragBegin = false;
-  
+
     svg
       .on("mousedown", function (e) {
         if (d3.pointer(e)[1] <= areaHeight) {
@@ -418,7 +419,7 @@ export default class ManhattanPlot extends Stanza {
           verticalDragBegin = false;
         }
       });
-  
+
     // slider
     const ctrlSvg = d3
       .select(controlElement)
@@ -481,7 +482,8 @@ export default class ManhattanPlot extends Stanza {
               canvas
                 .style(
                   "left",
-                  ((horizonalRange[0] + move) / getRangeLength(horizonalRange)) *
+                  ((horizonalRange[0] + move) /
+                    getRangeLength(horizonalRange)) *
                     areaWidth +
                     "px"
                 )
@@ -520,9 +522,9 @@ export default class ManhattanPlot extends Stanza {
             }
           })
       );
-  
+
     const sliderLabelGroup = ctrlSvg.append("g").attr("id", "sliderLabel");
-  
+
     sliderLabelGroup
       .selectAll(".slider-label")
       .data(CHROMOSOMES)
@@ -544,7 +546,7 @@ export default class ManhattanPlot extends Stanza {
       })
       .attr("y", 18)
       .attr("fill", "#2F4D76");
-  
+
     sliderLabelGroup
       .selectAll(".slider-ine")
       .data(CHROMOSOMES)
@@ -563,7 +565,7 @@ export default class ManhattanPlot extends Stanza {
           (pos / chromosomeSumLength.hg38) * areaWidth + marginLeft;
         return "M " + sliderLinePos + ", " + 2 + " V " + 24 + " Z";
       });
-  
+
     // button
     const ctrlBtn = d3
       .select(controlElement)
@@ -632,19 +634,19 @@ export default class ManhattanPlot extends Stanza {
       .attr("id", "threshold")
       .attr("type", "text")
       .attr("value", "8");
-  
+
     const threshold = stanza.root.querySelector("#threshold");
     threshold.addEventListener("input", () => {
       highThresh = parseFloat(threshold.value);
       reRender(this._variants);
       pagination(stanza.root, params, overThreshArray);
     });
-  
+
     reRender(this._variants);
-  
+
     //listen stage checkbox event
     const stageBtn = stanza.root.querySelectorAll(".stage-btn");
-  
+
     for (let i = 0; i < stageBtn.length; i++) {
       stageBtn[i].addEventListener("change", (e) => {
         const stageName = e.path[0].getAttribute("data-stage");
@@ -654,7 +656,7 @@ export default class ManhattanPlot extends Stanza {
         pagination(stanza.root, params, overThreshArray);
       });
     }
-  
+
     function reRender(variants) {
       if (horizonalRange[0] === undefined) {
         horizonalRange = [
@@ -665,25 +667,25 @@ export default class ManhattanPlot extends Stanza {
         ];
         total = horizonalRange[1];
       }
-  
+
       overThreshArray = [];
       const pValueArray = variants.map(
         (variant) => Math.log10(parseFloat(variant["p-value"])) * -1
       );
-  
+
       maxLogP = Math.max(...pValueArray);
       if (maxLogPInt === undefined) {
         maxLogPInt = Math.floor(maxLogP);
       }
-  
+
       if (verticalRange[0] === undefined) {
         verticalRange = [lowThresh, maxLogPInt];
       }
-      
+
       xLabelGroup.html("");
       yLabelGroup.html("");
       plotGroup.html("");
-  
+
       plotGroup
         .selectAll(".plot")
         .data(variants)
@@ -747,7 +749,7 @@ export default class ManhattanPlot extends Stanza {
         })
         .on("mouseout", () => tooltip.style("display", "none"));
       renderCanvas(variants);
-  
+
       // x axis label
       xLabelGroup
         .selectAll(".x-label")
@@ -757,7 +759,8 @@ export default class ManhattanPlot extends Stanza {
         .attr("class", "axis-label x-label")
         .text((d) => d)
         .attr("x", (d) => {
-          let pos = CHROMOSOME_POSIITONS.hg38[d] + CHROMOSOME_NT_LENGTH.hg38[d] / 2;
+          let pos =
+            CHROMOSOME_POSIITONS.hg38[d] + CHROMOSOME_NT_LENGTH.hg38[d] / 2;
           return (
             ((pos - horizonalRange[0]) / getRangeLength(horizonalRange)) *
               areaWidth +
@@ -765,7 +768,7 @@ export default class ManhattanPlot extends Stanza {
           );
         })
         .attr("y", areaHeight + 20);
-  
+
       // chart background
       xLabelGroup
         .selectAll(".x-background")
@@ -809,14 +812,14 @@ export default class ManhattanPlot extends Stanza {
             return "#FFFFFF";
           }
         });
-  
+
       // y axis label
       yLabelGroup
         .append("rect")
         .attr("fill", "#FFFFFF")
         .attr("width", marginLeft - 1)
         .attr("height", areaHeight);
-  
+
       const overThreshLine = stanza.root.querySelectorAll(".overthresh-line");
       for (
         let i = Math.floor(verticalRange[0]) + 1;
@@ -829,7 +832,9 @@ export default class ManhattanPlot extends Stanza {
             drawAreaHeight;
         //Calucurate display of scale
         const tickNum = 20; //Tick number to display (set by manual)
-        const tickInterval = Math.floor(getRangeLength(verticalRange) / tickNum);
+        const tickInterval = Math.floor(
+          getRangeLength(verticalRange) / tickNum
+        );
         if (getRangeLength(verticalRange) < tickNum) {
           yLabelGroup
             .append("text")
@@ -873,7 +878,7 @@ export default class ManhattanPlot extends Stanza {
       for (let i = 0; i < overThreshLine.length; i++) {
         overThreshLine[i].remove();
       }
-  
+
       // y zero (lowThresh)
       yLabelGroup
         .append("text")
@@ -887,28 +892,34 @@ export default class ManhattanPlot extends Stanza {
         .attr("class", "axis-line")
         .attr(
           "d",
-          "M " + (marginLeft - 8) + ", " + areaHeight + " H " + marginLeft + " Z"
+          "M " +
+            (marginLeft - 8) +
+            ", " +
+            areaHeight +
+            " H " +
+            marginLeft +
+            " Z"
         );
-  
+
       // slider
       ctrlSvg
         .select("rect#slider")
         .attr("x", marginLeft + (horizonalRange[0] / total) * areaWidth)
         .attr("width", (getRangeLength(horizonalRange) / total) * areaWidth)
         .attr("transform", "translate(0, 0)");
-  
+
       const totalOverThreshVariants = stanza.root.querySelector(
         "#totalOverThreshVariants"
       );
       totalOverThreshVariants.innerText = overThreshArray.length;
       setRange(horizonalRange);
-  
+
       //slider shadow (Show only when chart is zoomed)
       const sliderShadow = stanza.root.querySelectorAll(".slider-shadow");
       for (let i = 0; i < sliderShadow.length; i++) {
         sliderShadow[i].remove();
       }
-  
+
       if (
         horizonalRange[0] !== 0 &&
         horizonalRange[1] !== chromosomeSumLength.hg38
@@ -936,7 +947,7 @@ export default class ManhattanPlot extends Stanza {
           );
       }
     }
-  
+
     function renderCanvas(variants) {
       const horizonalRangeLength = getRangeLength(horizonalRange);
       if (canvas.node().getContext) {
@@ -944,7 +955,7 @@ export default class ManhattanPlot extends Stanza {
         canvas.attr("height", (total / horizonalRangeLength) * areaHeight);
         const ctx = canvas.node().getContext("2d");
         ctx.clearRect(0, 0, areaWidth, areaHeight);
-  
+
         for (const d of variants) {
           const stage = d["stage"].replace(/\s/, "-").toLowerCase();
           ctx.beginPath();
@@ -970,12 +981,15 @@ export default class ManhattanPlot extends Stanza {
       }
       canvas.style("display", "none");
     }
-  
+
     function setRange(horizonalRange) {
       let start = 0;
       let text = "";
       for (const ch of CHROMOSOMES) {
-        if (start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[0] && !text) {
+        if (
+          start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[0] &&
+          !text
+        ) {
           text += " chr" + ch + ":" + Math.floor(horizonalRange[0]);
         }
         if (start + CHROMOSOME_NT_LENGTH.hg38[ch] >= horizonalRange[1]) {
@@ -986,9 +1000,7 @@ export default class ManhattanPlot extends Stanza {
       }
       ctrlBtn.select("#range_text").html(text);
     }
-  
+
     pagination(stanza.root, params, overThreshArray);
   }
-  
 }
-
