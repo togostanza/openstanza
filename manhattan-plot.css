@@ -60,21 +60,25 @@ path.background-fill {
   stroke: red;
 }
 
+text.x-label, text.y-label, text.slider-label {
+  user-select: none;
+  font-size: 12px;
+}
 text.x-label {
   text-anchor: middle;
-  user-select: none;
 }
 text.y-label {
   text-anchor: end;
-  user-select: none;
 }
 text.slider-label {
   text-anchor: middle;
-  user-select: none;
 }
 text.axis-title {
   user-select: none;
   color: #000000;
+  font-size: 14px;
+  text-anchor: middle;
+  transform: rotate(-90deg);
 }
 
 circle.discovery {
@@ -113,7 +117,7 @@ svg#dl_button .hover {
   box-sizing: border-box;
   position: absolute;
   padding: 12px;
-  width: 170px;
+  width: 210px;
   height: 120px;
   background: #f6f6f6;
   border: 1.5px solid #99acb2;
