@@ -305,12 +305,9 @@ export default class ManhattanPlot extends Stanza {
       .append("text")
       .text("-log₁₀(p-value)")
       .attr("class", "axis-title")
-      .attr("font-size", "14")
       .attr("x", -areaHeight / 2)
-      .attr("y", marginLeft - 32)
-      .attr("transform", "rotate(-90)")
-      .attr("text-anchor", "middle");
-
+      .attr("y", marginLeft - 32);
+  
     // select range by drag
     let horizonalDragBegin = false;
     let verticalDragBegin = false;
@@ -548,7 +545,6 @@ export default class ManhattanPlot extends Stanza {
         return (pos / chromosomeSumLength.hg38) * areaWidth + marginLeft;
       })
       .attr("y", 18)
-      .attr("font-size", "12")
       .attr("fill", "#2F4D76");
 
     sliderLabelGroup
@@ -771,7 +767,6 @@ export default class ManhattanPlot extends Stanza {
             marginLeft
           );
         })
-        .attr("font-size", "12")
         .attr("y", areaHeight + 20);
 
       // chart background
@@ -845,7 +840,6 @@ export default class ManhattanPlot extends Stanza {
             .append("text")
             .text(i)
             .attr("class", "axis-label y-label")
-            .attr("font-size", "12")
             .attr("x", marginLeft - 12)
             .attr("y", y)
             .attr("text-anchor", "end");
