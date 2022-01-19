@@ -6,8 +6,9 @@ import {
   downloadSvgMenuItem,
   downloadPngMenuItem,
   appendCustomCss,
-  getFormatedJson,
 } from "togostanza-utils";
+
+import loadData from "togostanza-utils/load-data";
 
 const CHROMOSOMES = [
   "1",
@@ -84,7 +85,6 @@ const FIXED_STAGE_NAME_ORDER = [
   "not provided",
 ];
 
-
 export default class ManhattanPlot extends Stanza {
   menu() {
     return [
@@ -110,15 +110,18 @@ export default class ManhattanPlot extends Stanza {
       this.params.pValueKey = "p-value";
     }
 
-    const dataset = await getFormatedJson(
+    const dataset = await loadData(
       this.params["data-url"],
-      this.root.querySelector("#chart")
+      "json",
+      this.root.querySelector("main")
     );
 
     // stage data and stage names
-    this._stageData = Object.fromEntries( dataset.stages.map(stage => [stage.label, stage]) );
+    this._stageData = Object.fromEntries(
+      dataset.stages.map((stage) => [stage.label, stage])
+    );
     this._stageNames = FIXED_STAGE_NAME_ORDER.filter((stageName) => {
-      return dataset.stages.find(stage => stage.label === stageName);
+      return dataset.stages.find((stage) => stage.label === stageName);
     });
 
     // add stage information to each plot
@@ -307,7 +310,7 @@ export default class ManhattanPlot extends Stanza {
       .attr("class", "axis-title")
       .attr("x", -areaHeight / 2)
       .attr("y", marginLeft - 32);
-  
+
     // select range by drag
     let horizonalDragBegin = false;
     let verticalDragBegin = false;
