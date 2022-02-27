@@ -1,87 +1,293 @@
 <style>
   @import url('https://nanbyodata.jp/static/sass/main.css');
   @import url('https://nanbyodata.jp/static/sass/disease.css');
+
+  .data_table > :nth-child(1) {
+    border: solid 2px #C1C6D3;
+    border-radius: 5px;
+  }
+  .data_name > h2, h3, p{
+    margin: 0;
+  }
+  .data_info > div > p {
+    border: 1px solid;
+    border-radius: 5px;
+  }
+  .data_table > :nth-child(1) > div  {
+    padding: 10px;
+  }
+  .data_table > :nth-child(2) {
+    padding-top: 10px;
+  }
+
+  .data_table > :nth-child(1) > hr {
+    border-top: 1px dotted #C1C6D3;
+    margin: 0;
+  }
+  .link-wrapper {
+    border-bottom: none;
+  }
+  .data_info {
+    display: flex;
+  }
+  .data_info > div {
+    display: inline;
+    border: 1px solid;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+
+  .data-list {
+    display: flex;
+  }
+
+  .data-list > div {
+    border: 1px solid;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+
+  .data-list > div > div {
+    border: 1px solid;
+    border-radius: 5px;
+  }
+
+  details summary {
+    border-bottom: none;
+  }
+
+  .tab-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  margin:20px 0;
+  }
+  .tab-wrap:after {
+    content: '';
+    width: 100%;
+    height: 1px;
+    background: DeepSkyBlue;
+    display: block;
+    order: -1;
+  }
+  .tab-label {
+    text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+    white-space: nowrap;
+    text-align: center;
+    padding: 10px .5em;
+    order: -1;
+    position: relative;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+  }
+  .tab-label:not(:last-of-type) {
+    margin-right: 5px;
+  }
+  .tab-content {
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+  }
+  /* アクティブなタブ */
+  .tab-switch:checked+.tab-label {
+    border: DeepSkyBlue 1px solid;
+    border-bottom: none;
+  }
+  .tab-switch:checked+.tab-label+.tab-content {
+    height: auto;
+    overflow: auto;
+    padding: 15px;
+    opacity: 1;
+    transition: .5s opacity;
+  }
+  /* ラジオボタン非表示 */
+  .tab-switch {
+    display: none;
+  }
 </style>
 <div id="data-wrapper">
   <div class="data_table">
-    <div class="data_number">
-      <h3>NANDO ID:<span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
-      <h3>告示番号:<span>{{result.notification_number}}</span></h3>
+    <div>
+      <div class="data_name">
+        <h3>NANDO ID:<span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
+        <h2>
+          <ruby>{{result.label_ja}}<rt>にほんごるび</h2></rt></ruby>
+        </h2>
+        <h3>{{result.label_en}}</h2>
+
+        {{!-- <div class="data_number">
+        <h3>NANDO ID:<span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
+        <h3>告示番号:<span>{{result.notification_number}}</span></h3>
+        </div>
+        <div class="data_title">
+          <h2>{{result.label_ja}}</h2>
+          <h3>{{result.label_en}}</h3>
+        </div> --}}
+      </div>
+      <hr>
+      <div class="data_info">
+        <div>告示番号:<span>41</span></div>
+        <div>臨床調査個人表・医療意見書</div>
+        <div>小児慢性特定疾病情報センター</div>
+        
+        {{!-- <div class="data-list">
+          <div class="link-wrapper">
+            {{#if result.mhlw.url}}
+            <div class="data-link">
+              <span><a href="{{result.mhlw.url}}" target="_blank">概要、診断基準等</a></span>
+            </div>
+            {{/if}}
+            {{#if result.source}}
+            <div class="data-link">
+              <span><a href="{{result.source}}" target="_blank">臨床調査個人票・医療意見書</a></span>
+            </div>
+            {{/if}}
+            {{#if result.nanbyou.url}}
+            <div class="data-link">
+              <span><a href="{{result.nanbyou.url}}" target="_blank">難病情報センター</a></span>
+            </div>
+            {{/if}}
+            {{#if result.shouman.url}}
+            <div class="data-link">
+              <span><a href="{{result.shouman.url}}" target="_blank">小児慢性特定疾病情報センター</a></span>
+            </div>
+            {{/if}}
+          </div>
+          {{#if result.alt_label_ja_string}}
+          <div class="list-wrapper">
+            <h4>別疾患名(日):</h4>
+            <div class="list-contents">
+              <p>{{result.alt_label_ja_string}}</p>
+            </div>
+          </div>
+          {{/if}}
+          {{#if result.alt_label_en_string}}
+          <div class="list-wrapper">
+            <h4>別疾患名(英):</h4>
+            <div class="list-contents">
+              <p>{{result.alt_label_en_string}}</p>
+            </div>
+          </div>
+          {{/if}}
+        </div> --}}
+      </div>
     </div>
-    <div class="data_title">
-      <h2>{{result.label_ja}}</h2>
-      <h3>{{result.label_en}}</h3>
-    </div>
-    <div class="data-list">
-      <div class="link-wrapper">
-        {{#if result.mhlw.url}}
-        <div class="data-link">
-          <span><a href="{{result.mhlw.url}}" target="_blank">概要、診断基準等</a></span>
-        </div>
-        {{/if}}
-        {{#if result.source}}
-        <div class="data-link">
-          <span><a href="{{result.source}}" target="_blank">臨床調査個人票・医療意見書</a></span>
-        </div>
-        {{/if}}
-        {{#if result.nanbyou.url}}
-        <div class="data-link">
-          <span><a href="{{result.nanbyou.url}}" target="_blank">難病情報センター</a></span>
-        </div>
-        {{/if}}
-        {{#if result.shouman.url}}
-        <div class="data-link">
-          <span><a href="{{result.shouman.url}}" target="_blank">小児慢性特定疾病情報センター</a></span>
-        </div>
-        {{/if}}
+    <div class="data_info">
+      <div>別疾患名（日）
+        <p>
+          <span>Ewing 肉腫</span>
+        </p>
       </div>
-      {{#if result.alt_label_ja_string}}
-      <div class="list-wrapper">
-        <h4>別疾患名(日):</h4>
-        <div class="list-contents">
-          <p>{{result.alt_label_ja_string}}</p>
-        </div>
+      <div>遺伝形式
+        <p>
+          <span>体細胞変異</span>
+        </p>
       </div>
-      {{/if}}
-      {{#if result.alt_label_en_string}}
-      <div class="list-wrapper">
-        <h4>別疾患名(英):</h4>
-        <div class="list-contents">
-          <p>{{result.alt_label_en_string}}</p>
-        </div>
+      <div>疾患原因遺伝子
+        <p>
+          <span>ERG</span>
+          <span>ETV1</span>
+          <span>ETV4</span>
+          <span>EWSR1</span>
+          <span>FLI1</span> 
+        </p>
       </div>
-      {{/if}}
+      
+      {{!-- <div class="data-list">
+        {{#if result.alt_label_ja_string}}
+        <div class="list-wrapper">
+          <h4>別疾患名(日):</h4>
+          <div class="list-contents">
+            <p>{{result.alt_label_ja_string}}</p>
+          </div>
+        </div>
+        {{/if}}
+        {{#if result.alt_label_en_string}}
+        <div class="list-wrapper">
+          <h4>別疾患名(英):</h4>
+          <div class="list-contents">
+            <p>{{result.alt_label_en_string}}</p>
+          </div>
+        </div>
+        {{/if}}
 
-      {{#if result.inheritance_uris}}
-      <div class="list-wrapper">
-        <h4>遺伝形式:</h4>
-        <div class="list-contents">
-          <p>
-            {{#each result.inheritance_uris}}
-            <a href="{{uri}}" target="_blank">{{id}}</a>
-            {{/each}}
-          </p>
+        {{#if result.inheritance_uris}}
+        <div class="list-wrapper">
+          <h4>遺伝形式:</h4>
+          <div class="list-contents">
+            <p>
+              {{#each result.inheritance_uris}}
+              <a href="{{uri}}" target="_blank">{{id}}</a>
+              {{/each}}
+            </p>
+          </div>
         </div>
-      </div>
-      {{/if}}
+        {{/if}}
 
-      {{#if result.gene_uris}}
-      <div class="list-wrapper">
-        <h4>疾患原因遺伝子:</h4>
-        <div class="list-contents">
-          <p>
-            {{#each result.gene_uris}}
-            <a href="{{uri}}" target="_blank">{{id}}</a>
-            {{/each}}
-          </p>
+        {{#if result.gene_uris}}
+        <div class="list-wrapper">
+          <h4>疾患原因遺伝子:</h4>
+          <div class="list-contents">
+            <p>
+              {{#each result.gene_uris}}
+              <a href="{{uri}}" target="_blank">{{id}}</a>
+              {{/each}}
+            </p>
+          </div>
         </div>
-      </div>
-      {{/if}}
+        {{/if}}
 
+      </div> --}}
     </div>
   </div>
 
-  {{#if result.db_xrefs.omim}}
+  <details open>
+    <summary>リンク一覧</summary>
+    <div class="data-list" id="#dev-edit-html">
+      <div class="">
+        <h3>OMIM</h3>
+        <div class="">
+          <p>
+            {{#each result.db_xrefs.omim}}
+            <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
+            {{/each}}
+          </p>
+        </div>
+      </div>
+      <div class="">
+        <h3>Orphanet</h3>
+        <div class="">
+          <p>
+            {{#each result.db_xrefs.orphanet}}
+            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}" target="_blank">ORPHA:{{id}}</a>
+            {{/each}}
+          </p>
+        </div>
+      </div>
+      <div class="">
+        <h3>Monarch Initiative</h3>
+        <div class="">
+          <p>
+            {{#each result.mondos}}
+            <a href="https://monarchinitiative.org/disease/{{id}}" target="_blank">{{id}}</a>
+            {{/each}}
+          </p>
+        </div>
+      </div>
+      <div class="">
+        <h3>KEGG Disease</h3>
+        <div class="">
+          <p>
+            ???
+            {{!-- {{#each result.db_xrefs.omim}}
+            <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
+            {{/each}} --}}
+          </p>
+        </div>
+      </div>
+  </details>
+
+  {{!-- {{#if result.db_xrefs.omim}}
   <details open>
     <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
     <div class="data-list" id="#dev-edit-html">
@@ -210,9 +416,9 @@
         {{/if}}
       {{/if}}
     {{/if}}
-  {{/if}}
+  {{/if}} --}}
 
-
+{{!-- 
   {{#if result.description}}
   <details open>
     <summary>概要</summary>
@@ -220,8 +426,30 @@
       {{result.description}}
     </div>
   </details>
-  {{/if}}
+  {{/if}} --}}
 
+  <details open>
+    <summary>疾患定義</summary>
+    <div class="tab-wrap">
+      <input id="TAB-01" type="radio" name="TAB" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01">厚労省</label>
+      <div class="tab-content">
+          コンテンツ 1
+      </div>
+      <input id="TAB-02" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="TAB-02">Monarch Initiative</label>
+      <div class="tab-content">
+          コンテンツ 2
+      </div>
+      <input id="TAB-03" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="TAB-03">MedGen</label>
+      <div class="tab-content">
+        <div class="text">
+        {{result.medgen_definition}}
+        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" target="_blank"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  {{!-- 
   {{#if result.medgen_definition}}
   <details open>
     <summary>疾患定義（From MedGen）</summary>
@@ -242,7 +470,7 @@
       {{/each}}
     </div>
   </details>
-  {{/if}}
+  {{/if}} --}}
 
   {{#if result.phenotype_flg}}
   <details open>
@@ -600,9 +828,40 @@
   </details>
   {{/if}}
 
+  <details open>
+    <summary>疾患階層情報</summary>
+    <div>
+      <ul>
+        <li>Peripheral neuroepithelioma</li>
+        <li>Askin tumor</li>
+        <li>Ewing sarcoma</li>
+      </ul>
+    </div>
+    <div>
+      <p>遺伝学的検査データベース</p>
+      <p>指定難病情報センター</p>
+      <p>小児慢性特定疾病情報センター</p>
+      <p>MGeND</p>
+    </div>
+  </details>
+
   {{#if result.cell}}
   <details open>
-    <summary>難病特異的細胞情報（From Riken BRC）</summary>
+    <summary>難病特異的バイオリソース From Riken BRC</summary>
+    <div class="tab-wrap">
+      <input id="cell" type="radio" name="TAB" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
+      <div class="tab-content">
+          コンテンツ 1
+      </div>
+      <input id="mus" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="mus">マウス</label>
+      <div class="tab-content">
+          コンテンツ 2
+      </div>
+      <input id="dna" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="dna">遺伝子</label>
+      <div class="tab-content">
+        コンテンツ 3
+      </div>
+    </div>
     <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
     <togostanza-pagination-table
       data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}"
@@ -614,10 +873,9 @@
   </details>
   {{/if}}
 
-  <!--
-  {{#if result.genetesting}}
+  {{!-- {{#if result.genetesting}} --}}
   <details open>
-    <summary>遺伝学的検査情報（From 国立成育医療研究センター）</summary>
+    <summary>遺伝学的検査表示</summary>
     <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
 
     <togostanza-pagination-table
@@ -632,7 +890,6 @@
       columns="[{&quot;id&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Test name&quot;},{&quot;id&quot;:&quot;hp&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;hp&quot;},{&quot;id&quot;:&quot;gene&quot;,&quot;label&quot;:&quot;Gene&quot;},{&quot;id&quot;:&quot;contact&quot;,&quot;label&quot;:&quot;Contact&quot;,&quot;link&quot;:&quot;contact&quot;}]"
     ></togostanza-pagination-table>
   </details>
-  {{/if}}
-  -->
+  {{!-- {{/if}} --}}
 
 </div>
