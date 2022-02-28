@@ -68,6 +68,7 @@
   }
   .data_info2 > div {
     display: inline;
+    font-weight: bold;
     background-color: rgba(20,119,134,0.2);
     border-radius: 3px;
     margin-right: 2px;
@@ -84,6 +85,7 @@
     font-size: 12px;
     color: rgb(20,119,134);
     background-color: #fff;
+    font-weight: normal;
   }
 
   .data_info2 > div:nth-child(n + 2) > div > span{
@@ -99,19 +101,36 @@
     text-decoration: none;
   }
 
-  .data-list {
+  details .data-list {
     display: flex;
+    margin-top: 5px;
   }
 
   .data-list > div {
-    border: 1px solid;
-    border-radius: 5px;
-    margin-right: 10px;
+    background-color: rgba(20,119,134,0.2);
+    border-radius: 3px;
+    margin-right: 2px;
+    font-size: 10px;
+    padding: 2px 4px 6px;
+  }
+
+  .data-list > div > h3 {
+    font-size: 10px;
+    font-weight: normal;
   }
 
   .data-list > div > div {
-    border: 1px solid;
-    border-radius: 5px;
+    border: rgb(20,119,134) 1px solid;
+    border-radius: 3px;
+    padding: 4px 20px;
+    background-color: rgb(20,119,134);
+  }
+
+  .data-list > div > div > p > a{
+    font-size: 12px;
+    font-weight: normal;
+    color: #fff;
+    text-decoration: none;
   }
 
   details summary {
@@ -150,7 +169,6 @@
     overflow: hidden;
     opacity: 0;
   }
-  /* アクティブなタブ */
   .tab-switch:checked+.tab-label {
     border: DeepSkyBlue 1px solid;
     border-bottom: none;
@@ -162,9 +180,28 @@
     opacity: 1;
     transition: .5s opacity;
   }
-  /* ラジオボタン非表示 */
   .tab-switch {
     display: none;
+  }
+  details {
+    z-index: 0;
+    position: relative;
+  }
+
+  #data-wrapper details summary {
+    color: #fff;
+  }
+  #data-wrapper details summary:before {
+    width: 100%;
+    height: 28px;
+    z-index: -1;
+    position: absolute;
+  }
+  #data-wrapper details[open] summary:after {
+    left: 7px;
+  }
+  #data-wrapper details summary:after {
+    left: 7px;
   }
 </style>
 <div id="data-wrapper">
@@ -338,49 +375,58 @@
   </div>
 
   <details open>
+    
     <summary>リンク一覧</summary>
     <div class="data-list" id="#dev-edit-html">
-      <div class="">
+      {{#if result.db_xrefs.omim}}
+      <div>
         <h3>OMIM</h3>
-        <div class="">
+        <div>
           <p>
             {{#each result.db_xrefs.omim}}
-            <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
+            <a href="https://omim.org/entry/{{id}}">{{id}}</a>
             {{/each}}
           </p>
         </div>
       </div>
-      <div class="">
+      {{/if}}
+      {{#if result.db_xrefs.orphanet}}
+      <div>
         <h3>Orphanet</h3>
-        <div class="">
+        <div>
           <p>
             {{#each result.db_xrefs.orphanet}}
-            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}" target="_blank">ORPHA:{{id}}</a>
+            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}">ORPHA:{{id}}</a>
             {{/each}}
           </p>
         </div>
       </div>
-      <div class="">
+      {{/if}}
+      {{#if result.mondos}}
+      <div>
         <h3>Monarch Initiative</h3>
-        <div class="">
+        <div>
           <p>
             {{#each result.mondos}}
-            <a href="https://monarchinitiative.org/disease/{{id}}" target="_blank">{{id}}</a>
+            <a href="https://monarchinitiative.org/disease/{{id}}">{{id}}</a>
             {{/each}}
           </p>
         </div>
       </div>
-      <div class="">
+      {{/if}}
+      {{!-- {{#if ???}} --}}
+      <div>
         <h3>KEGG Disease</h3>
-        <div class="">
+        <div>
           <p>
-            ???
+            <a>???</a>
             {{!-- {{#each result.db_xrefs.omim}}
             <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
             {{/each}} --}}
           </p>
         </div>
       </div>
+      {{!-- {{/if}} --}}
   </details>
 
   {{!-- {{#if result.db_xrefs.omim}}
@@ -527,15 +573,15 @@
   <details open>
     <summary>疾患定義</summary>
     <div class="tab-wrap">
-      <input id="TAB-01" type="radio" name="TAB" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01">厚労省</label>
+      <input id="TAB-01" type="radio" name="TAB1" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01">厚労省</label>
       <div class="tab-content">
           コンテンツ 1
       </div>
-      <input id="TAB-02" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="TAB-02">Monarch Initiative</label>
+      <input id="TAB-02" type="radio" name="TAB1" class="tab-switch" /><label class="tab-label" for="TAB-02">Monarch Initiative</label>
       <div class="tab-content">
           コンテンツ 2
       </div>
-      <input id="TAB-03" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="TAB-03">MedGen</label>
+      <input id="TAB-03" type="radio" name="TAB1" class="tab-switch" /><label class="tab-label" for="TAB-03">MedGen</label>
       <div class="tab-content">
         <div class="text">
         {{result.medgen_definition}}
@@ -945,15 +991,15 @@
   <details open>
     <summary>難病特異的バイオリソース From Riken BRC</summary>
     <div class="tab-wrap">
-      <input id="cell" type="radio" name="TAB" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
+      <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
       <div class="tab-content">
           コンテンツ 1
       </div>
-      <input id="mus" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="mus">マウス</label>
+      <input id="mus" type="radio" name="TAB2" class="tab-switch" /><label class="tab-label" for="mus">マウス</label>
       <div class="tab-content">
           コンテンツ 2
       </div>
-      <input id="dna" type="radio" name="TAB" class="tab-switch" /><label class="tab-label" for="dna">遺伝子</label>
+      <input id="dna" type="radio" name="TAB2" class="tab-switch" /><label class="tab-label" for="dna">遺伝子</label>
       <div class="tab-content">
         コンテンツ 3
       </div>
