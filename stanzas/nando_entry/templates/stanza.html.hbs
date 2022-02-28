@@ -9,10 +9,26 @@
   .data_name > h2, h3, p{
     margin: 0;
   }
-  .data_info > div > p {
-    border: 1px solid;
-    border-radius: 5px;
+  .data_name > h3 {
+    font-size: 12px;
+    font-weight: normal;
   }
+  .data_name > h2 > ruby {
+    font-size: 24px;
+  }
+  .data_name > h2 > ruby > rt {
+    font-size: 8px;
+    font-weight: normal;
+  }
+  .data_name > h2 > h3 {
+    font-size: 14px;
+    font-weight: normal;
+  }
+  .data_info1 > div > p {
+    border: 1px solid;
+    border-radius: 3px;
+  }
+
   .data_table > :nth-child(1) > div  {
     padding: 10px;
   }
@@ -20,21 +36,67 @@
     padding-top: 10px;
   }
 
-  .data_table > :nth-child(1) > hr {
-    border-top: 1px dotted #C1C6D3;
+  .data_name {
+    border-bottom: 1px dotted #C1C6D3;
     margin: 0;
   }
   .link-wrapper {
     border-bottom: none;
   }
-  .data_info {
+  .data_info1, .data_info2 {
     display: flex;
   }
-  .data_info > div {
+  .data_info1 > div {
     display: inline;
-    border: 1px solid;
-    border-radius: 5px;
+    border: #147786 1px solid;
+    background-color: #fff;
+    border-radius: 3px;
     margin-right: 10px;
+    color: #147786;
+    font-size: 12px;
+    padding: 4px 10px;
+  }
+
+  .data_info1 > div:nth-child(n + 2) {
+    border: #147786 1px solid;
+    background-color: #147786;
+    color: #fff;
+  }
+  .data_info1 > div:nth-child(n + 2) > a {
+    color: #fff;
+    text-decoration: none;
+  }
+  .data_info2 > div {
+    display: inline;
+    background-color: rgba(20,119,134,0.2);
+    border-radius: 3px;
+    margin-right: 2px;
+    font-size: 10px;
+    padding: 2px 4px 6px;
+  }
+  .data_info2 > div > div {
+    margin-top: 6px;
+  }
+  .data_info2 > div > div > span{
+    border: rgb(20,119,134) 1px solid;
+    border-radius: 3px;
+    padding: 4px 20px;
+    font-size: 12px;
+    color: rgb(20,119,134);
+    background-color: #fff;
+  }
+
+  .data_info2 > div:nth-child(n + 2) > div > span{
+    border: rgb(20,119,134) 1px solid;
+    border-radius: 3px;
+    padding: 4px 20px;
+    font-size: 12px;
+    background-color: rgb(20,119,134);
+  }
+
+  .data_info2 > div:nth-child(n + 2) > div > span> a{
+    color: #fff;
+    text-decoration: none;
   }
 
   .data-list {
@@ -109,7 +171,7 @@
   <div class="data_table">
     <div>
       <div class="data_name">
-        <h3>NANDO ID:<span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
+        <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
         <h2>
           <ruby>{{result.label_ja}}<rt>にほんごるび</h2></rt></ruby>
         </h2>
@@ -124,11 +186,28 @@
           <h3>{{result.label_en}}</h3>
         </div> --}}
       </div>
-      <hr>
-      <div class="data_info">
-        <div>告示番号:<span>41</span></div>
-        <div>臨床調査個人表・医療意見書</div>
-        <div>小児慢性特定疾病情報センター</div>
+      <div class="data_info1">
+        <div>告示番号: <span>{{result.notification_number}}</span></div>
+        {{#if result.mhlw.url}}
+        <div>
+          <a href="{{result.mhlw.url}}">概要、診断基準等</a>
+        </div>
+        {{/if}}
+        {{#if result.source}}
+        <div>
+          <a href="{{result.source}}">臨床調査個人票・医療意見書</a>
+        </div>
+        {{/if}}
+        {{#if result.nanbyou.url}}
+        <div>
+          <a href="{{result.nanbyou.url}}">難病情報センター</a>
+        </div>
+        {{/if}}
+        {{#if result.shouman.url}}
+        <div>
+          <a href="{{result.shouman.url}}">小児慢性特定疾病情報センター</a>
+        </div>
+        {{/if}}
         
         {{!-- <div class="data-list">
           <div class="link-wrapper">
@@ -172,26 +251,43 @@
         </div> --}}
       </div>
     </div>
-    <div class="data_info">
+    <div class="data_info2">
+      {{#if result.alt_label_ja}}
       <div>別疾患名（日）
-        <p>
-          <span>Ewing 肉腫</span>
-        </p>
+        <div>
+          {{#each result.alt_label_ja}}
+          <span>{{this}}</span>
+          {{/each}}
+        </div>
       </div>
+      {{/if}}
+      {{!-- {{#if result.alt_label_en}}
+      <div>別疾患名（英）
+        <div>
+          {{#each result.alt_label_en}}
+          <span>{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+      {{/if}} --}}
+      {{#if result.inheritance_uris}}
       <div>遺伝形式
-        <p>
-          <span>体細胞変異</span>
-        </p>
+        <div>
+          {{#each result.inheritance_uris}}
+            <span><a href="{{uri}}">{{id}}</a></span>
+          {{/each}}
+        </div>
       </div>
+      {{/if}}
+      {{#if result.gene_uris}}
       <div>疾患原因遺伝子
-        <p>
-          <span>ERG</span>
-          <span>ETV1</span>
-          <span>ETV4</span>
-          <span>EWSR1</span>
-          <span>FLI1</span> 
-        </p>
+        <div>
+          {{#each result.gene_uris}}
+            <span><a href="{{uri}}">{{id}}</a></span>
+          {{/each}}
+        </div>
       </div>
+      {{/if}}
       
       {{!-- <div class="data-list">
         {{#if result.alt_label_ja_string}}
