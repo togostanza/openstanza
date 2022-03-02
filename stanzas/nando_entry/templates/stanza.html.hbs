@@ -49,23 +49,19 @@
   .data_info1 > div {
     display: inline;
     border: #147786 1px solid;
-    background-color: #fff;
     border-radius: 3px;
     margin-right: 10px;
-    color: #147786;
     font-size: 12px;
     padding: 4px 10px;
-  }
-
-  .data_info1 > div:nth-child(n + 2) {
-    border: #147786 1px solid;
     background-color: #147786;
     color: #fff;
   }
-  .data_info1 > div:nth-child(n + 2) > a {
+
+  .data_info1 > div > a {
     color: #fff;
     text-decoration: none;
   }
+  
   .data_info2 > div {
     display: inline;
     font-weight: bold;
@@ -78,17 +74,8 @@
   .data_info2 > div > div {
     margin-top: 6px;
   }
-  .data_info2 > div > div > span{
-    border: rgb(20,119,134) 1px solid;
-    border-radius: 3px;
-    padding: 4px 20px;
-    font-size: 12px;
-    color: rgb(20,119,134);
-    background-color: #fff;
-    font-weight: normal;
-  }
 
-  .data_info2 > div:nth-child(n + 2) > div > span{
+  .data_info2 > div > div > span{
     border: rgb(20,119,134) 1px solid;
     border-radius: 3px;
     padding: 4px 20px;
@@ -96,7 +83,7 @@
     background-color: rgb(20,119,134);
   }
 
-  .data_info2 > div:nth-child(n + 2) > div > span> a{
+  .data_info2 > div > div > span> a{
     color: #fff;
     text-decoration: none;
   }
@@ -201,7 +188,7 @@
     left: 7px;
   }
   #data-wrapper details summary:after {
-    left: 7px;
+    left: 9px;
   }
 </style>
 <div id="data-wrapper">
@@ -224,7 +211,8 @@
         </div> --}}
       </div>
       <div class="data_info1">
-        <div>告示番号: <span>{{result.notification_number}}</span></div>
+        <div style="background-color: #fff;
+    color: #147786;">告示番号: <span>{{result.notification_number}}</span></div>
         {{#if result.mhlw.url}}
         <div>
           <a href="{{result.mhlw.url}}">概要、診断基準等</a>
@@ -293,7 +281,7 @@
       <div>別疾患名（日）
         <div>
           {{#each result.alt_label_ja}}
-          <span>{{this}}</span>
+          <span style="background-color: #fff; color: rgb(20,119,134);">{{this}}</span>
           {{/each}}
         </div>
       </div>
@@ -414,19 +402,16 @@
         </div>
       </div>
       {{/if}}
-      {{!-- {{#if ???}} --}}
+      {{#if result.kegg.url}}
       <div>
         <h3>KEGG Disease</h3>
         <div>
           <p>
-            <a>???</a>
-            {{!-- {{#each result.db_xrefs.omim}}
-            <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
-            {{/each}} --}}
+            <a href="{{result.kegg.url}}">{{result.kegg.id}}</a>
           </p>
         </div>
       </div>
-      {{!-- {{/if}} --}}
+      {{/if}}
   </details>
 
   {{!-- {{#if result.db_xrefs.omim}}
@@ -573,21 +558,30 @@
   <details open>
     <summary>疾患定義</summary>
     <div class="tab-wrap">
+      {{#if result.description}}
       <input id="TAB-01" type="radio" name="TAB1" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01">厚労省</label>
       <div class="tab-content">
-          コンテンツ 1
+        {{result.description}}
       </div>
-      <input id="TAB-02" type="radio" name="TAB1" class="tab-switch" /><label class="tab-label" for="TAB-02">Monarch Initiative</label>
+      {{/if}}
+      {{#if result.mondo_decs}}
+      <input id="TAB-02" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}checked="checked"{{/unless}}/><label class="tab-label" for="TAB-02">Monarch Initiative</label>
       <div class="tab-content">
-          コンテンツ 2
+        {{#each result.mondo_decs}}
+        {{id}}
+        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        {{/each}}
       </div>
-      <input id="TAB-03" type="radio" name="TAB1" class="tab-switch" /><label class="tab-label" for="TAB-03">MedGen</label>
+      {{/if}}
+      {{#if result.medgen_definition}}
+      <input id="TAB-03" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="TAB-03">MedGen</label>
       <div class="tab-content">
         <div class="text">
         {{result.medgen_definition}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" target="_blank"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
         </div>
       </div>
+      {{/if}}
     </div>
   </details>
 
@@ -616,7 +610,7 @@
 
   {{#if result.phenotype_flg}}
   <details open>
-    <summary>臨床的特徴（From HPO）</summary>
+    <summary>臨床的特徴 From HPO</summary>
     <!-- HP_0025354 -->
     <ul>
       {{#if result.phenotype_HP_0025354_label}}
@@ -987,33 +981,34 @@
     </div>
   </details>
 
-  {{#if result.cell}}
   <details open>
     <summary>難病特異的バイオリソース From Riken BRC</summary>
     <div class="tab-wrap">
+      {{#if result.cell}}
       <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
       <div class="tab-content">
-          コンテンツ 1
+        ここにテーブルが入る
+        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
+        <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
+        page-size-option="10,20,50,100"
+        page-slider="false"
+        columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
-      <input id="mus" type="radio" name="TAB2" class="tab-switch" /><label class="tab-label" for="mus">マウス</label>
+      {{/if}}
+      {{!-- {#if result.mus}} --}}
+      <input id="mus" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}checked="checked"{{/unless}} /><label class="tab-label" for="mus">マウス</label>
       <div class="tab-content">
           コンテンツ 2
       </div>
-      <input id="dna" type="radio" name="TAB2" class="tab-switch" /><label class="tab-label" for="dna">遺伝子</label>
+      {{!-- {{/if}} --}}
+      {{!-- {#if result.dna}} --}}
+      <input id="dna" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}{{#unless result.mus}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="dna">遺伝子</label>
       <div class="tab-content">
         コンテンツ 3
       </div>
+      {{!-- {{/if}} --}}
     </div>
-    <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
-    <togostanza-pagination-table
-      data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}"
-      data-type="json"
-      page-size-option="10,20,50,100"
-      page-slider="false"
-      columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"
-      ></togostanza-pagination-table>
   </details>
-  {{/if}}
 
   {{!-- {{#if result.genetesting}} --}}
   <details open>
