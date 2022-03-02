@@ -127,29 +127,28 @@
   .tab-wrap {
   display: flex;
   flex-wrap: wrap;
-  margin:20px 0;
+  margin: 12px 0;
   }
   .tab-wrap:after {
     content: '';
     width: 100%;
-    height: 1px;
-    background: DeepSkyBlue;
+    height: 2px;
+    background: #13295A;;
     display: block;
     order: -1;
   }
   .tab-label {
-    text-shadow: 0 -1px 0 rgba(0,0,0,.2);
     white-space: nowrap;
     text-align: center;
-    padding: 10px .5em;
+    padding: 6px 16px;
     order: -1;
     position: relative;
     cursor: pointer;
     border-radius: 5px 5px 0 0;
+    color: #13295A;
+    font-weight: bold;
   }
-  .tab-label:not(:last-of-type) {
-    margin-right: 5px;
-  }
+
   .tab-content {
     width: 100%;
     height: 0;
@@ -157,13 +156,14 @@
     opacity: 0;
   }
   .tab-switch:checked+.tab-label {
-    border: DeepSkyBlue 1px solid;
-    border-bottom: none;
+    border: #13295A 2px solid;
+    border-bottom: #fff 2px solid;
+    margin-bottom: -2px;
   }
   .tab-switch:checked+.tab-label+.tab-content {
     height: auto;
     overflow: auto;
-    padding: 15px;
+    padding: 10px 5px;
     opacity: 1;
     transition: .5s opacity;
   }
@@ -189,6 +189,89 @@
   }
   #data-wrapper details summary:after {
     left: 9px;
+  }
+
+  .phenotype_view {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    height: 550px;
+  }
+
+  .phenotype_view > div > ul {
+    padding: 0 5px;
+    list-style: none;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  .phenotype_view > div > ul > li {
+    font-weight: normal;
+    padding-top: 4px;
+  }
+  .checkbox{
+  display: none;
+  }
+  /*アコーディオンの大きさと位置調整*/
+  .hierarchy_view {
+    margin-left: 20px;
+  }
+  .hierarchy_view label{
+    position: relative;
+    display: block;
+    cursor: pointer;
+  }
+  
+  /*ラベル内の矢印の設定*/
+  .hierarchy_view label::before{
+    content:'';
+    display: block;
+    border-left:5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #000;
+    position: absolute;
+    top: 50%;
+    left: -15px;
+    transform: translate(0,-50%) rotate(-90deg);
+  }
+
+  .hierarchy_view ul {
+    padding: 0 5px;
+  }
+  
+  /*表示される要素の基本設定*/
+  .hierarchy_view li{
+    height: 0;
+    transition:.4s;
+    overflow: hidden;
+    list-style-type: disc;
+    list-style-position: inside;
+    position: relative;
+  }
+  .hierarchy_view li::marker {
+    margin: 0;
+  }
+  .hierarchy_view li > span {
+    text-align: right;
+  }
+  .hierarchy_view li > span:before {
+    border-top: 1px dotted;
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 100%;
+  }
+  .hierarchy_view li:after {
+    content: "■★△◯";
+  }
+  
+  /*ラベル内の矢印のアニメーション設定*/
+  .checkbox:checked ~ ul label::before{
+    transform: translate(0,-50%);  
+  }
+  
+  /*表示される要素のアニメーション設定*/
+  .checkbox:checked ~ ul li{
+    height: auto;
   }
 </style>
 <div id="data-wrapper">
@@ -576,10 +659,8 @@
       {{#if result.medgen_definition}}
       <input id="TAB-03" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="TAB-03">MedGen</label>
       <div class="tab-content">
-        <div class="text">
         {{result.medgen_definition}}
         <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
-        </div>
       </div>
       {{/if}}
     </div>
@@ -607,6 +688,92 @@
     </div>
   </details>
   {{/if}} --}}
+
+  <details open>
+    <summary>臨床的特徴 TEST</summary>
+    <div class="phenotype_view">
+      <div>
+        <ul>血液および血液痙性組織の異常
+          <li><a href="#">凝固の異常</a></li>
+          <li><a href="#">貧血</a></li>
+          <li><a href="#">整脈血栓症</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>頭部と頸部の異常
+          <li><a href="#">上向きの鼻孔</a></li>
+          <li><a href="#">歯の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>四肢の異常
+          <li><a href="#">Made肺変形</a></li>
+          <li><a href="#">上肢の異常</a></li>
+          <li><a href="#">上腕骨の異常</a></li>
+          <li><a href="#">外反膝</a></li>
+          <li><a href="#">大腿骨の異常</a></li>
+          <li><a href="#">小肢症</a></li>
+          <li><a href="#">尺骨低形成</a></li>
+          <li><a href="#">橈足湾曲</a></li>
+          <li><a href="#">肘脱臼</a></li>
+          <li><a href="#">脛骨の異常</a></li>
+          <li><a href="#">骨幹端の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>心血管系
+          <li><a href="#">リンパ管腫</a></li>
+          <li><a href="#">動脈瘤</a></li>
+          <li><a href="#">心外膜の異常</a></li>
+          <li><a href="#">血管腫</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>内分泌系異常
+          <li><a href="#">思春期早発</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>免疫系の異常
+          <li><a href="#">リンパ管腫</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>外皮の異常
+          <li><a href="#">皮下結節</a></li>
+          <li><a href="#">皮膚潰瘍</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>神経系の異常
+          <li><a href="#">片麻痺/片側不全麻痺</a></li>
+          <li><a href="#">錐体路運動機能の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>全身症状
+          <li><a href="#">骨痛</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>成長異常
+          <li><a href="#">低身長</a></li>
+          <li><a href="#">成長障害（成長不全）</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>新生物
+          <li><a href="#">リンパ管腫</a></li>
+          <li><a href="#">外骨症</a></li>
+          <li><a href="#">多発性外骨症</a></li>
+          <li><a href="#">肉腫</a></li>
+          <li><a href="#">血管腫</a></li>
+          <li><a href="#">軟骨肉腫</a></li>
+          <li><a href="#">骨盤外骨症</a></li>
+        </ul>
+      </div>
+    </div>
+  </details>
 
   {{#if result.phenotype_flg}}
   <details open>
@@ -966,11 +1133,12 @@
 
   <details open>
     <summary>疾患階層情報</summary>
-    <div>
+    <div class="hierarchy_view">
+    <input type="checkbox" id="hierarchy_view1" class="checkbox">
       <ul>
-        <li>Peripheral neuroepithelioma</li>
-        <li>Askin tumor</li>
-        <li>Ewing sarcoma</li>
+        <label for="hierarchy_view1">Peripheral neuroepithelioma</label>
+        <li>Askin tumor<span></span></li>
+        <li>Ewing sarcoma<span></span></li>
       </ul>
     </div>
     <div>
