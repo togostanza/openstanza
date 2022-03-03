@@ -2,67 +2,73 @@
   @import url('https://nanbyodata.jp/static/sass/main.css');
   @import url('https://nanbyodata.jp/static/sass/disease.css');
 
-  .data_table > :nth-child(1) {
+  .data-table > :nth-child(1) {
     border: solid 2px #C1C6D3;
     border-radius: 5px;
   }
-  .data_name > h2, h3, p{
+  .data-name > h2, h3, p{
     margin: 0;
   }
-  .data_name > h3 {
+  .data-name > h3 {
     font-size: 12px;
     font-weight: normal;
   }
-  .data_name > h2 > ruby {
+  .data-name > h2 > ruby {
     font-size: 24px;
   }
-  .data_name > h2 > ruby > rt {
+  .data-name > h2 > ruby > rt {
     font-size: 8px;
     font-weight: normal;
   }
-  .data_name > h2 > h3 {
+  .data-name > h2 > h3 {
     font-size: 14px;
     font-weight: normal;
   }
-  .data_info1 > div > p {
+  .data-info1 > div > p {
     border: 1px solid;
     border-radius: 3px;
   }
 
-  .data_table > :nth-child(1) > div  {
+  .data-table > :nth-child(1) > div  {
     padding: 10px;
   }
-  .data_table > :nth-child(2) {
+  .data-table > :nth-child(2) {
     padding-top: 10px;
   }
 
-  .data_name {
-    border-bottom: 1px dotted #C1C6D3;
+  .data-name {
+    border-bottom: 1px dashed #C1C6D3;
     margin: 0;
   }
   .link-wrapper {
     border-bottom: none;
   }
-  .data_info1, .data_info2 {
+  .data-info1, .data-info2 {
     display: flex;
   }
-  .data_info1 > div {
+  .data-info1 > div {
     display: inline;
     border: #147786 1px solid;
     border-radius: 3px;
     margin-right: 10px;
     font-size: 12px;
-    padding: 4px 10px;
     background-color: #147786;
     color: #fff;
+    font-weight: bold;
   }
 
-  .data_info1 > div > a {
+  .data-info1 > div:nth-child(1) {
+    padding: 4px 10px;
+  }
+
+  .data-info1 > div > a {
     color: #fff;
     text-decoration: none;
+    display: block;
+    padding: 4px 10px;
   }
   
-  .data_info2 > div {
+  .data-info2 > div {
     display: inline;
     font-weight: bold;
     background-color: rgba(20,119,134,0.2);
@@ -71,21 +77,23 @@
     font-size: 10px;
     padding: 2px 4px 6px;
   }
-  .data_info2 > div > div {
-    margin-top: 6px;
-  }
 
-  .data_info2 > div > div > span{
+  .data-info2 > div > div > span{
     border: rgb(20,119,134) 1px solid;
     border-radius: 3px;
-    padding: 4px 20px;
     font-size: 12px;
     background-color: rgb(20,119,134);
+    display: inline-flex;
   }
 
-  .data_info2 > div > div > span> a{
+  .data-info2 > div:nth-child(1) > div > span {
+    padding: 4px 20px;
+  }
+
+  .data-info2 > div > div > span> a{
     color: #fff;
     text-decoration: none;
+    padding: 4px 20px;
   }
 
   details .data-list {
@@ -109,7 +117,6 @@
   .data-list > div > div {
     border: rgb(20,119,134) 1px solid;
     border-radius: 3px;
-    padding: 4px 20px;
     background-color: rgb(20,119,134);
   }
 
@@ -118,6 +125,8 @@
     font-weight: normal;
     color: #fff;
     text-decoration: none;
+    padding: 4px 20px;
+    display: block;
   }
 
   details summary {
@@ -191,20 +200,20 @@
     left: 9px;
   }
 
-  .phenotype_view {
+  .phenotype-view {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
-    height: 550px;
+    max-height: 550px;
   }
 
-  .phenotype_view > div > ul {
+  .phenotype-view > div > ul {
     padding: 0 5px;
     list-style: none;
     font-size: 14px;
     font-weight: bold;
   }
-  .phenotype_view > div > ul > li {
+  .phenotype-view > div > ul > li {
     font-weight: normal;
     padding-top: 4px;
   }
@@ -212,17 +221,18 @@
   display: none;
   }
   /*アコーディオンの大きさと位置調整*/
-  .hierarchy_view {
+  .hierarchy-view {
     margin-left: 20px;
   }
-  .hierarchy_view label{
+  .hierarchy-view label{
     position: relative;
-    display: block;
+    display: flex;
     cursor: pointer;
+    justify-content: space-between;
   }
   
   /*ラベル内の矢印の設定*/
-  .hierarchy_view label::before{
+  .hierarchy-view label::before{
     content:'';
     display: block;
     border-left:5px solid transparent;
@@ -234,50 +244,89 @@
     transform: translate(0,-50%) rotate(-90deg);
   }
 
-  .hierarchy_view ul {
+  .hierarchy-view ul {
     padding: 0 5px;
-  }
-  
-  /*表示される要素の基本設定*/
-  .hierarchy_view li{
-    height: 0;
-    transition:.4s;
-    overflow: hidden;
-    list-style-type: disc;
+    font-weight: bold;
+    font-size: 12px;
     list-style-position: inside;
-    position: relative;
   }
-  .hierarchy_view li::marker {
-    margin: 0;
+
+  .hierarchy-view li{
+    height: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
   }
-  .hierarchy_view li > span {
-    text-align: right;
-  }
-  .hierarchy_view li > span:before {
-    border-top: 1px dotted;
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 100%;
-  }
-  .hierarchy_view li:after {
-    content: "■★△◯";
-  }
-  
-  /*ラベル内の矢印のアニメーション設定*/
+
   .checkbox:checked ~ ul label::before{
     transform: translate(0,-50%);  
   }
-  
-  /*表示される要素のアニメーション設定*/
+
   .checkbox:checked ~ ul li{
     height: auto;
+    padding-top: 5px;
+  }
+  .genre-view {
+    text-align: right;
+    padding: 10px 0;
+  }
+  .genre-view > p {
+    display: inline;
+    background-color: rgba(19, 41, 90, 0.1);
+    padding: 15px 20px;
+    border-radius: 5px;
+
+  }
+  .genre-view > p > span {
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .icon::before {
+    color: #fff;
+    padding: 2.8px 5px;
+    margin-right: 3px;
+    font-weight: normal;
+    font-size: 9.6px;
+  }
+  .-genetic-disease-testing::before {
+    content: "G";
+    background-color: #5D639D;
+  }
+  .-designed-rare-disease::before {
+    content: "D";
+    background-color: #005FB6;
+  }
+  .-chronic-pediatric::before {
+    content: "C";
+    background-color: #E35480;
+  }
+  .-mgend::before {
+    content: "M";
+    background-color: #254571;
+  }
+  .centerline {
+    display: flex;
+    align-items: center;
+  }
+  .centerline::after {
+    border-top: #7F7F7F 1px dashed;
+    content: "";
+    width: 517px;
+    margin-left: 4px;
+    margin-right: 4px;
+  }
+  .hierarchy-view div {
+    display: flex;
+    
   }
 </style>
 <div id="data-wrapper">
-  <div class="data_table">
+  <div class="data-table">
     <div>
-      <div class="data_name">
+      <div class="data-name">
         <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
         <h2>
           <ruby>{{result.label_ja}}<rt>にほんごるび</h2></rt></ruby>
@@ -293,7 +342,7 @@
           <h3>{{result.label_en}}</h3>
         </div> --}}
       </div>
-      <div class="data_info1">
+      <div class="data-info1">
         <div style="background-color: #fff;
     color: #147786;">告示番号: <span>{{result.notification_number}}</span></div>
         {{#if result.mhlw.url}}
@@ -359,7 +408,7 @@
         </div> --}}
       </div>
     </div>
-    <div class="data_info2">
+    <div class="data-info2">
       {{#if result.alt_label_ja}}
       <div>別疾患名（日）
         <div>
@@ -445,8 +494,7 @@
     </div>
   </div>
 
-  <details open>
-    
+  <details open>  
     <summary>リンク一覧</summary>
     <div class="data-list" id="#dev-edit-html">
       {{#if result.db_xrefs.omim}}
@@ -689,9 +737,10 @@
   </details>
   {{/if}} --}}
 
+
   <details open>
     <summary>臨床的特徴 TEST</summary>
-    <div class="phenotype_view">
+    <div class="phenotype-view">
       <div>
         <ul>血液および血液痙性組織の異常
           <li><a href="#">凝固の異常</a></li>
@@ -776,6 +825,264 @@
   </details>
 
   {{#if result.phenotype_flg}}
+  <details open>
+    <summary>臨床的特徴 From HPO</summary>
+    <div class="phenotype-view">
+      <!-- HP_0025354 -->
+      {{#if result.phenotype_HP_0025354_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0025354_label}}
+          {{#each result.phenotype_HP_0025354}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001871 -->
+      {{#if result.phenotype_HP_0001871_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001871_label}}
+          {{#each result.phenotype_HP_0001871}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0003549 -->
+      {{#if result.phenotype_HP_0003549_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0003549_label}}
+          {{#each result.phenotype_HP_0003549}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000152 -->
+      {{#if result.phenotype_HP_0000152_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000152_label}}
+          {{#each result.phenotype_HP_0000152}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0040064 -->
+      {{#if result.phenotype_HP_0040064_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0040064_label}}
+          {{#each result.phenotype_HP_0040064}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001939 -->
+      {{#if result.phenotype_HP_0001939_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001939_label}}
+          {{#each result.phenotype_HP_0001939}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001197 -->
+      {{#if result.phenotype_HP_0001197_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001197_label}}
+          {{#each result.phenotype_HP_0001197}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000769 -->
+      {{#if result.phenotype_HP_0000769_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000769_label}}
+          {{#each result.phenotype_HP_0000769}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001626 -->
+      {{#if result.phenotype_HP_0001626_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001626_label}}
+          {{#each result.phenotype_HP_0001626}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0025031 -->
+      {{#if result.phenotype_HP_0025031_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0025031_label}}
+          {{#each result.phenotype_HP_0025031}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000598 -->
+      {{#if result.phenotype_HP_0000598_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000598_label}}
+          {{#each result.phenotype_HP_0000598}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000818 -->
+      {{#if result.phenotype_HP_0000818_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000818_label}}
+          {{#each result.phenotype_HP_0000818}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000478 -->
+      {{#if result.phenotype_HP_0000478_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000478_label}}
+          {{#each result.phenotype_HP_0000478}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000119 -->
+      {{#if result.phenotype_HP_0000119_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000119_label}}
+          {{#each result.phenotype_HP_0000119}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0002715 -->
+      {{#if result.phenotype_HP_0002715_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0002715_label}}
+          {{#each result.phenotype_HP_0002715}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001574 -->
+      {{#if result.phenotype_HP_0001574_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001574_label}}
+          {{#each result.phenotype_HP_0001574}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0003011 -->
+      {{#if result.phenotype_HP_0003011_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0003011_label}}
+          {{#each result.phenotype_HP_0003011}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000707 -->
+      {{#if result.phenotype_HP_0000707_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000707_label}}
+          {{#each result.phenotype_HP_0000707}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0002086 -->
+      {{#if result.phenotype_HP_0002086_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0002086_label}}
+          {{#each result.phenotype_HP_0002086}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0000924 -->
+      {{#if result.phenotype_HP_0000924_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0000924_label}}
+          {{#each result.phenotype_HP_0000924}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0045027 -->
+      {{#if result.phenotype_HP_0045027_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0045027_label}}
+          {{#each result.phenotype_HP_0045027}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001608 -->
+      {{#if result.phenotype_HP_0001608_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001608_label}}
+          {{#each result.phenotype_HP_0001608}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0025142 -->
+      {{#if result.phenotype_HP_0025142_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0025142_label}}
+          {{#each result.phenotype_HP_0025142}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0001507 -->
+      {{#if result.phenotype_HP_0001507_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0001507_label}}
+          {{#each result.phenotype_HP_0001507}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+      <!-- HP_0002664 -->
+      {{#if result.phenotype_HP_0002664_label}}
+      <div>
+        <ul>{{result.phenotype_HP_0002664_label}}
+          {{#each result.phenotype_HP_0002664}}
+            <li><a href="{{uri}}"><font color="#0431B4">{{id}}</font></a></li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+    </div>
+  </details>
+  {{/if}}
+
+  {{!-- {{#if result.phenotype_flg}}
   <details open>
     <summary>臨床的特徴 From HPO</summary>
     <!-- HP_0025354 -->
@@ -1129,23 +1436,49 @@
       {{/if}}
     </ul>
   </details>
-  {{/if}}
+  {{/if}} --}}
 
   <details open>
     <summary>疾患階層情報</summary>
-    <div class="hierarchy_view">
-    <input type="checkbox" id="hierarchy_view1" class="checkbox">
+    <div class="hierarchy-view">
+    <input type="checkbox" id="hierarchy-view1" class="checkbox">
       <ul>
-        <label for="hierarchy_view1">Peripheral neuroepithelioma</label>
-        <li>Askin tumor<span></span></li>
-        <li>Ewing sarcoma<span></span></li>
+        <label for="hierarchy-view1">Peripheral neuroepithelioma
+          <span class="centerline"></span>
+          <div>
+            <span class="icon -genetic-disease-testing"></span>
+            <span class="icon -designed-rare-disease"></span>
+            <span class="icon -chronic-pediatric"></span>
+            <span class="icon -mgend"></span>
+          </div>
+        </label>
+        <li>
+          <span class="centerline">・Askin tumor</span>
+          <div>
+            <span class="icon -genetic-disease-testing"></span>
+            <span class="icon -designed-rare-disease"></span>
+            <span class="icon -chronic-pediatric"></span>
+            <span class="icon -mgend"></span>
+          </div>
+        </li>
+        <li>
+          <span class="centerline">・Ewing sarcoma</span>
+          <div>
+            <span class="icon -genetic-disease-testing"></span>
+            <span class="icon -designed-rare-disease"></span>
+            <span class="icon -chronic-pediatric"></span>
+            <span class="icon -mgend"></span>
+          </div>      
+        </li>
       </ul>
     </div>
-    <div>
-      <p>遺伝学的検査データベース</p>
-      <p>指定難病情報センター</p>
-      <p>小児慢性特定疾病情報センター</p>
-      <p>MGeND</p>
+    <div class="genre-view">
+      <p>
+        <span class="icon -genetic-disease-testing">遺伝学的検査データベース</span>
+        <span class="icon -designed-rare-disease">指定難病情報センター</span>
+        <span class="icon -chronic-pediatric">小児慢性特定疾病情報センター</span>
+        <span class="icon -mgend">MGeND</span>
+      </p>
     </div>
   </details>
 
@@ -1155,7 +1488,7 @@
       {{#if result.cell}}
       <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
       <div class="tab-content">
-        ここにテーブルが入る
+        細胞テーブル
         <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
         <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
         page-size-option="10,20,50,100"
@@ -1166,13 +1499,23 @@
       {{!-- {#if result.mus}} --}}
       <input id="mus" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}checked="checked"{{/unless}} /><label class="tab-label" for="mus">マウス</label>
       <div class="tab-content">
-          コンテンツ 2
+        マウステーブル
+        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
+        <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
+        page-size-option="10,20,50,100"
+        page-slider="false"
+        columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
       {{!-- {{/if}} --}}
       {{!-- {#if result.dna}} --}}
       <input id="dna" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}{{#unless result.mus}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="dna">遺伝子</label>
       <div class="tab-content">
-        コンテンツ 3
+        遺伝子テーブル
+        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
+        <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
+        page-size-option="10,20,50,100"
+        page-slider="false"
+        columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
       {{!-- {{/if}} --}}
     </div>
@@ -1197,4 +1540,7 @@
   </details>
   {{!-- {{/if}} --}}
 
+  <details open>
+    <summary>遺伝子多型 From MGeND</summary>
+  </details>
 </div>
