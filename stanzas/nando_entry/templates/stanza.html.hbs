@@ -9,6 +9,9 @@
   .data-name > h2, h3, p{
     margin: 0;
   }
+  .data-name > h2 {
+    padding-top: 13px;
+  }
   .data-name > h3 {
     font-size: 12px;
     font-weight: normal;
@@ -329,7 +332,7 @@
       <div class="data-name">
         <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
         <h2>
-          <ruby>{{result.label_ja}}<rt>にほんごるび</h2></rt></ruby>
+          <ruby>{{result.label_ja}}<rt>せきずいせいきんいしゅくしょうにがた</h2></rt></ruby>
         </h2>
         <h3>{{result.label_en}}</h2>
 
@@ -690,13 +693,13 @@
     <summary>疾患定義</summary>
     <div class="tab-wrap">
       {{#if result.description}}
-      <input id="TAB-01" type="radio" name="TAB1" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01">厚労省</label>
+      <input id="TAB-01" type="radio" name="TAB1" class="tab-switch" checked="checked" /><label class="tab-label" for="TAB-01"><small>From</small> 厚労省</label>
       <div class="tab-content">
         {{result.description}}
       </div>
       {{/if}}
       {{#if result.mondo_decs}}
-      <input id="TAB-02" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}checked="checked"{{/unless}}/><label class="tab-label" for="TAB-02">Monarch Initiative</label>
+      <input id="TAB-02" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}checked="checked"{{/unless}}/><label class="tab-label" for="TAB-02"><small>From</small> Monarch Initiative</label>
       <div class="tab-content">
         {{#each result.mondo_decs}}
         {{id}}
@@ -705,7 +708,7 @@
       </div>
       {{/if}}
       {{#if result.medgen_definition}}
-      <input id="TAB-03" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="TAB-03">MedGen</label>
+      <input id="TAB-03" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="TAB-03"><small>From</small> MedGen</label>
       <div class="tab-content">
         {{result.medgen_definition}}
         <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
@@ -737,96 +740,9 @@
   </details>
   {{/if}} --}}
 
-
-  <details open>
-    <summary>臨床的特徴 TEST</summary>
-    <div class="phenotype-view">
-      <div>
-        <ul>血液および血液痙性組織の異常
-          <li><a href="#">凝固の異常</a></li>
-          <li><a href="#">貧血</a></li>
-          <li><a href="#">整脈血栓症</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>頭部と頸部の異常
-          <li><a href="#">上向きの鼻孔</a></li>
-          <li><a href="#">歯の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>四肢の異常
-          <li><a href="#">Made肺変形</a></li>
-          <li><a href="#">上肢の異常</a></li>
-          <li><a href="#">上腕骨の異常</a></li>
-          <li><a href="#">外反膝</a></li>
-          <li><a href="#">大腿骨の異常</a></li>
-          <li><a href="#">小肢症</a></li>
-          <li><a href="#">尺骨低形成</a></li>
-          <li><a href="#">橈足湾曲</a></li>
-          <li><a href="#">肘脱臼</a></li>
-          <li><a href="#">脛骨の異常</a></li>
-          <li><a href="#">骨幹端の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>心血管系
-          <li><a href="#">リンパ管腫</a></li>
-          <li><a href="#">動脈瘤</a></li>
-          <li><a href="#">心外膜の異常</a></li>
-          <li><a href="#">血管腫</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>内分泌系異常
-          <li><a href="#">思春期早発</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>免疫系の異常
-          <li><a href="#">リンパ管腫</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>外皮の異常
-          <li><a href="#">皮下結節</a></li>
-          <li><a href="#">皮膚潰瘍</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>神経系の異常
-          <li><a href="#">片麻痺/片側不全麻痺</a></li>
-          <li><a href="#">錐体路運動機能の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>全身症状
-          <li><a href="#">骨痛</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>成長異常
-          <li><a href="#">低身長</a></li>
-          <li><a href="#">成長障害（成長不全）</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>新生物
-          <li><a href="#">リンパ管腫</a></li>
-          <li><a href="#">外骨症</a></li>
-          <li><a href="#">多発性外骨症</a></li>
-          <li><a href="#">肉腫</a></li>
-          <li><a href="#">血管腫</a></li>
-          <li><a href="#">軟骨肉腫</a></li>
-          <li><a href="#">骨盤外骨症</a></li>
-        </ul>
-      </div>
-    </div>
-  </details>
-
   {{#if result.phenotype_flg}}
   <details open>
-    <summary>臨床的特徴 From HPO</summary>
+    <summary>臨床的特徴 <small> From HPO</small></summary>
     <div class="phenotype-view">
       <!-- HP_0025354 -->
       {{#if result.phenotype_HP_0025354_label}}
@@ -1438,6 +1354,92 @@
   </details>
   {{/if}} --}}
 
+  {{!-- <details open>
+    <summary>臨床的特徴 TEST</summary>
+    <div class="phenotype-view">
+      <div>
+        <ul>血液および血液痙性組織の異常
+          <li><a href="#">凝固の異常</a></li>
+          <li><a href="#">貧血</a></li>
+          <li><a href="#">整脈血栓症</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>頭部と頸部の異常
+          <li><a href="#">上向きの鼻孔</a></li>
+          <li><a href="#">歯の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>四肢の異常
+          <li><a href="#">Made肺変形</a></li>
+          <li><a href="#">上肢の異常</a></li>
+          <li><a href="#">上腕骨の異常</a></li>
+          <li><a href="#">外反膝</a></li>
+          <li><a href="#">大腿骨の異常</a></li>
+          <li><a href="#">小肢症</a></li>
+          <li><a href="#">尺骨低形成</a></li>
+          <li><a href="#">橈足湾曲</a></li>
+          <li><a href="#">肘脱臼</a></li>
+          <li><a href="#">脛骨の異常</a></li>
+          <li><a href="#">骨幹端の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>心血管系
+          <li><a href="#">リンパ管腫</a></li>
+          <li><a href="#">動脈瘤</a></li>
+          <li><a href="#">心外膜の異常</a></li>
+          <li><a href="#">血管腫</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>内分泌系異常
+          <li><a href="#">思春期早発</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>免疫系の異常
+          <li><a href="#">リンパ管腫</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>外皮の異常
+          <li><a href="#">皮下結節</a></li>
+          <li><a href="#">皮膚潰瘍</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>神経系の異常
+          <li><a href="#">片麻痺/片側不全麻痺</a></li>
+          <li><a href="#">錐体路運動機能の異常</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>全身症状
+          <li><a href="#">骨痛</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>成長異常
+          <li><a href="#">低身長</a></li>
+          <li><a href="#">成長障害（成長不全）</a></li>
+        </ul>
+      </div>
+      <div>
+        <ul>新生物
+          <li><a href="#">リンパ管腫</a></li>
+          <li><a href="#">外骨症</a></li>
+          <li><a href="#">多発性外骨症</a></li>
+          <li><a href="#">肉腫</a></li>
+          <li><a href="#">血管腫</a></li>
+          <li><a href="#">軟骨肉腫</a></li>
+          <li><a href="#">骨盤外骨症</a></li>
+        </ul>
+      </div>
+    </div>
+  </details> --}}
+
   <details open>
     <summary>疾患階層情報</summary>
     <div class="hierarchy-view">
@@ -1483,7 +1485,7 @@
   </details>
 
   <details open>
-    <summary>難病特異的バイオリソース From Riken BRC</summary>
+    <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
     <div class="tab-wrap">
       {{#if result.cell}}
       <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
@@ -1523,7 +1525,7 @@
 
   {{!-- {{#if result.genetesting}} --}}
   <details open>
-    <summary>遺伝学的検査表示</summary>
+    <summary>診療用遺伝学的検査情報<small> From 難病領域における検体検査の精度管理体制の整備に資する研究班</small></summary>
     <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
 
     <togostanza-pagination-table
@@ -1540,7 +1542,7 @@
   </details>
   {{!-- {{/if}} --}}
 
-  <details open>
-    <summary>遺伝子多型 From MGeND</summary>
-  </details>
+  {{!-- <details open>
+    <summary>遺伝子多型<small> From MGeND</small></summary>
+  </details> --}}
 </div>
