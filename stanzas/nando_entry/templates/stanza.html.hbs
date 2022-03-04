@@ -2,6 +2,9 @@
   @import url('https://nanbyodata.jp/static/sass/main.css');
   @import url('https://nanbyodata.jp/static/sass/disease.css');
 
+  a[target="_blank"]::after {
+    display: none;
+  }
   .data-table > :nth-child(1) {
     border: solid 2px #C1C6D3;
     border-radius: 5px;
@@ -323,14 +326,13 @@
   }
   .hierarchy-view div {
     display: flex;
-    
   }
 </style>
 <div id="data-wrapper">
   <div class="data-table">
     <div>
       <div class="data-name">
-        <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
+        <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}"target="_blank" rel="noopener noreferrer">{{result.nando_id}}</a></span></h3>
         <h2>
           <ruby>{{result.label_ja}}<rt>せきずいせいきんいしゅくしょうにがた</h2></rt></ruby>
         </h2>
@@ -350,22 +352,22 @@
     color: #147786;">告示番号: <span>{{result.notification_number}}</span></div>
         {{#if result.mhlw.url}}
         <div>
-          <a href="{{result.mhlw.url}}">概要、診断基準等</a>
+          <a href="{{result.mhlw.url}}"target="_blank" rel="noopener noreferrer">概要、診断基準等</a>
         </div>
         {{/if}}
         {{#if result.source}}
         <div>
-          <a href="{{result.source}}">臨床調査個人票・医療意見書</a>
+          <a href="{{result.source}}"target="_blank" rel="noopener noreferrer">臨床調査個人票・医療意見書</a>
         </div>
         {{/if}}
         {{#if result.nanbyou.url}}
         <div>
-          <a href="{{result.nanbyou.url}}">難病情報センター</a>
+          <a href="{{result.nanbyou.url}}"target="_blank" rel="noopener noreferrer">難病情報センター</a>
         </div>
         {{/if}}
         {{#if result.shouman.url}}
         <div>
-          <a href="{{result.shouman.url}}">小児慢性特定疾病情報センター</a>
+          <a href="{{result.shouman.url}}"target="_blank" rel="noopener noreferrer">小児慢性特定疾病情報センター</a>
         </div>
         {{/if}}
         
@@ -434,7 +436,7 @@
       <div>遺伝形式
         <div>
           {{#each result.inheritance_uris}}
-            <span><a href="{{uri}}">{{id}}</a></span>
+            <span><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></span>
           {{/each}}
         </div>
       </div>
@@ -443,7 +445,7 @@
       <div>疾患原因遺伝子
         <div>
           {{#each result.gene_uris}}
-            <span><a href="{{uri}}">{{id}}</a></span>
+            <span><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></span>
           {{/each}}
         </div>
       </div>
@@ -506,7 +508,7 @@
         <div>
           <p>
             {{#each result.db_xrefs.omim}}
-            <a href="https://omim.org/entry/{{id}}">{{id}}</a>
+            <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
             {{/each}}
           </p>
         </div>
@@ -518,7 +520,7 @@
         <div>
           <p>
             {{#each result.db_xrefs.orphanet}}
-            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}">ORPHA:{{id}}</a>
+            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
             {{/each}}
           </p>
         </div>
@@ -530,7 +532,7 @@
         <div>
           <p>
             {{#each result.mondos}}
-            <a href="https://monarchinitiative.org/disease/{{id}}">{{id}}</a>
+            <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
             {{/each}}
           </p>
         </div>
@@ -541,7 +543,7 @@
         <h3>KEGG Disease</h3>
         <div>
           <p>
-            <a href="{{result.kegg.url}}">{{result.kegg.id}}</a>
+            <a href="{{result.kegg.url}}"target="_blank" rel="noopener noreferrer">{{result.kegg.id}}</a>
           </p>
         </div>
       </div>
@@ -703,7 +705,7 @@
       <div class="tab-content">
         {{#each result.mondo_decs}}
         {{id}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}"target="_blank" rel="noopener noreferrer"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
         {{/each}}
       </div>
       {{/if}}
@@ -711,7 +713,7 @@
       <input id="TAB-03" type="radio" name="TAB1" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="TAB-03"><small>From</small> MedGen</label>
       <div class="tab-content">
         {{result.medgen_definition}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}"target="_blank" rel="noopener noreferrer" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
       </div>
       {{/if}}
     </div>
