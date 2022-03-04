@@ -250,6 +250,7 @@
     transform: translate(0,-50%) rotate(-90deg);
   }
 
+
   .hierarchy-view ul {
     padding: 0 5px;
     font-weight: bold;
@@ -258,10 +259,21 @@
   }
 
   .hierarchy-view li{
-    height: 0;
-    overflow: hidden;
     display: flex;
-    justify-content: space-between;
+    height: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hierarchy-view li::marker {
+    margin-right: 5px;
+  }
+
+  .content {
+    display: inline-grid;
+    width: 100%;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
   }
 
   .checkbox:checked ~ ul label::before{
@@ -314,19 +326,29 @@
     background-color: #254571;
   }
   .centerline {
-    display: flex;
+    display: inline-grid;
     align-items: center;
+    grid-template-columns: 1px auto 1fr;
+    gap: 10px;
+  }
+  .centerline::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    background: #000;
+    border-radius: 50%;
+  }
+  .hierarchy-view > ul > label > .content > .centerline {
+    grid-template-columns: auto 1fr;
+  }
+  .hierarchy-view > ul > label > .content > .centerline::before {
+    display: none;
   }
   .centerline::after {
     border-top: #7F7F7F 1px dashed;
     content: "";
-    width: 517px;
-    margin-left: 4px;
-    margin-right: 4px;
   }
-  .hierarchy-view div {
-    display: flex;
-  }
+
 </style>
 <div id="data-wrapper">
   <div class="data-table">
@@ -1470,32 +1492,38 @@
     <div class="hierarchy-view">
     <input type="checkbox" id="hierarchy-view1" class="checkbox">
       <ul>
-        <label for="hierarchy-view1">Peripheral neuroepithelioma
-          <span class="centerline"></span>
-          <div>
-            <span class="icon -genetic-disease-testing"></span>
-            <span class="icon -designed-rare-disease"></span>
-            <span class="icon -chronic-pediatric"></span>
-            <span class="icon -mgend"></span>
+        <label for="hierarchy-view1">
+          <div class="content">
+            <span class="centerline">Peripheral neuroepithelioma</span>
+            <div>
+              <span class="icon -genetic-disease-testing"></span>
+              <span class="icon -designed-rare-disease"></span>
+              <span class="icon -chronic-pediatric"></span>
+              <span class="icon -mgend"></span>
+            </div>
           </div>
         </label>
         <li>
-          <span class="centerline">Askin tumor</span>
-          <div>
-            <span class="icon -genetic-disease-testing"></span>
-            <span class="icon -designed-rare-disease"></span>
-            <span class="icon -chronic-pediatric"></span>
-            <span class="icon -mgend"></span>
+          <div class="content">
+            <span class="centerline">Askin tumor</span>
+            <div>
+              <span class="icon -genetic-disease-testing"></span>
+              <span class="icon -designed-rare-disease"></span>
+              <span class="icon -chronic-pediatric"></span>
+              <span class="icon -mgend"></span>
+            </div>
           </div>
         </li>
         <li>
-          <span class="centerline">Ewing sarcoma</span>
-          <div>
-            <span class="icon -genetic-disease-testing"></span>
-            <span class="icon -designed-rare-disease"></span>
-            <span class="icon -chronic-pediatric"></span>
-            <span class="icon -mgend"></span>
-          </div>      
+          <div class="content">
+            <span class="centerline">Ewing sarcoma</span>
+            <div>
+              <span class="icon -genetic-disease-testing"></span>
+              <span class="icon -designed-rare-disease"></span>
+              <span class="icon -chronic-pediatric"></span>
+              <span class="icon -mgend"></span>
+            </div>
+          </div>    
         </li>
       </ul>
     </div>
