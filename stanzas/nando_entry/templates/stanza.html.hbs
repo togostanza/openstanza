@@ -526,6 +526,18 @@
         </div>
       </div>
       {{/if}}
+      {{#if result.medgen_id}}
+      <div>
+        <h3>MedGen</h3>
+        <div>
+          <p>
+            {{#if result.medgen_uri}}
+            <a href="{{result.medgen_uri}}" target="_blank" rel="noopener noreferrer">{{result.medgen_id}}</a>
+            {{/if}}
+          </p>
+        </div>
+      </div>
+      {{/if}}
       {{#if result.mondos}}
       <div>
         <h3>Monarch Initiative</h3>
@@ -548,6 +560,17 @@
         </div>
       </div>
       {{/if}}
+      {{#if result.urdbms.url}}
+      <div>
+        <h3>UR-DBMS</h3>
+        <div>
+          <p>
+            <a href="{{result.urdbms.url}}" target="_blank" rel="noopener noreferrer">{{result.urdbms.id}}</a>
+          </p>
+        </div>
+      </div>
+      {{/if}}
+    </div>
   </details>
 
   {{!-- {{#if result.db_xrefs.omim}}
