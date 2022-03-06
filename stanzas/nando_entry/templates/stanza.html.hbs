@@ -345,6 +345,7 @@
   }
 
 </style>
+
 <div id="data-wrapper">
   <div class="data-table">
     <div>
@@ -354,15 +355,6 @@
           <ruby>{{result.label_ja}}<rt>せきずいせいきんいしゅくしょうにがた</h2></rt></ruby>
         </h2>
         <h3>{{result.label_en}}</h2>
-
-        {{!-- <div class="data_number">
-        <h3>NANDO ID:<span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}">{{result.nando_id}}</a></span></h3>
-        <h3>告示番号:<span>{{result.notification_number}}</span></h3>
-        </div>
-        <div class="data_title">
-          <h2>{{result.label_ja}}</h2>
-          <h3>{{result.label_en}}</h3>
-        </div> --}}
       </div>
       <div class="data-info1">
         <div style="background-color: #fff;
@@ -387,47 +379,6 @@
           <a href="{{result.shouman.url}}"target="_blank" rel="noopener noreferrer">小児慢性特定疾病情報センター</a>
         </div>
         {{/if}}
-        
-        {{!-- <div class="data-list">
-          <div class="link-wrapper">
-            {{#if result.mhlw.url}}
-            <div class="data-link">
-              <span><a href="{{result.mhlw.url}}" target="_blank">概要、診断基準等</a></span>
-            </div>
-            {{/if}}
-            {{#if result.source}}
-            <div class="data-link">
-              <span><a href="{{result.source}}" target="_blank">臨床調査個人票・医療意見書</a></span>
-            </div>
-            {{/if}}
-            {{#if result.nanbyou.url}}
-            <div class="data-link">
-              <span><a href="{{result.nanbyou.url}}" target="_blank">難病情報センター</a></span>
-            </div>
-            {{/if}}
-            {{#if result.shouman.url}}
-            <div class="data-link">
-              <span><a href="{{result.shouman.url}}" target="_blank">小児慢性特定疾病情報センター</a></span>
-            </div>
-            {{/if}}
-          </div>
-          {{#if result.alt_label_ja_string}}
-          <div class="list-wrapper">
-            <h4>別疾患名(日):</h4>
-            <div class="list-contents">
-              <p>{{result.alt_label_ja_string}}</p>
-            </div>
-          </div>
-          {{/if}}
-          {{#if result.alt_label_en_string}}
-          <div class="list-wrapper">
-            <h4>別疾患名(英):</h4>
-            <div class="list-contents">
-              <p>{{result.alt_label_en_string}}</p>
-            </div>
-          </div>
-          {{/if}}
-        </div> --}}
       </div>
     </div>
     <div class="data-info2">
@@ -467,320 +418,196 @@
         </div>
       </div>
       {{/if}}
-      
-      {{!-- <div class="data-list">
-        {{#if result.alt_label_ja_string}}
-        <div class="list-wrapper">
-          <h4>別疾患名(日):</h4>
-          <div class="list-contents">
-            <p>{{result.alt_label_ja_string}}</p>
-          </div>
-        </div>
-        {{/if}}
-        {{#if result.alt_label_en_string}}
-        <div class="list-wrapper">
-          <h4>別疾患名(英):</h4>
-          <div class="list-contents">
-            <p>{{result.alt_label_en_string}}</p>
-          </div>
-        </div>
-        {{/if}}
-
-        {{#if result.inheritance_uris}}
-        <div class="list-wrapper">
-          <h4>遺伝形式:</h4>
-          <div class="list-contents">
-            <p>
-              {{#each result.inheritance_uris}}
-              <a href="{{uri}}" target="_blank">{{id}}</a>
-              {{/each}}
-            </p>
-          </div>
-        </div>
-        {{/if}}
-
-        {{#if result.gene_uris}}
-        <div class="list-wrapper">
-          <h4>疾患原因遺伝子:</h4>
-          <div class="list-contents">
-            <p>
-              {{#each result.gene_uris}}
-              <a href="{{uri}}" target="_blank">{{id}}</a>
-              {{/each}}
-            </p>
-          </div>
-        </div>
-        {{/if}}
-
-      </div> --}}
     </div>
   </div>
-
-  <details open>  
-    <summary>リンク一覧</summary>
-    <div class="data-list" id="#dev-edit-html">
-      {{#if result.db_xrefs.omim}}
-      <div>
-        <h3>OMIM</h3>
-        <div>
-          <p>
-            {{#each result.db_xrefs.omim}}
-            <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.db_xrefs.orphanet}}
-      <div>
-        <h3>Orphanet</h3>
-        <div>
-          <p>
-            {{#each result.db_xrefs.orphanet}}
-            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.medgen_id}}
-      <div>
-        <h3>MedGen</h3>
-        <div>
-          <p>
-            {{#if result.medgen_uri}}
-            <a href="{{result.medgen_uri}}" target="_blank" rel="noopener noreferrer">{{result.medgen_id}}</a>
-            {{/if}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.mondos}}
-      <div>
-        <h3>Monarch Initiative</h3>
-        <div>
-          <p>
-            {{#each result.mondos}}
-            <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.kegg.url}}
-      <div>
-        <h3>KEGG Disease</h3>
-        <div>
-          <p>
-            <a href="{{result.kegg.url}}"target="_blank" rel="noopener noreferrer">{{result.kegg.id}}</a>
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.urdbms.url}}
-      <div>
-        <h3>UR-DBMS</h3>
-        <div>
-          <p>
-            <a href="{{result.urdbms.url}}" target="_blank" rel="noopener noreferrer">{{result.urdbms.id}}</a>
-          </p>
-        </div>
-      </div>
-      {{/if}}
-    </div>
-  </details>
-
-  {{!-- {{#if result.db_xrefs.omim}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-  {{else}}
-    {{#if result.db_xrefs.orphanet}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-    {{else}}
-      {{#if result.medgen_id}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-      {{else}}
-        {{#if result.mondos}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-        {{else}}
-          {{#if result.kegg.url}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-          {{else}}
-            {{#if result.urdbms.url}}
-  <details open>
-    <summary>リンク一覧<!--&ensp;<a href="https://nanbyodata.jp//about_nando"><i class="far fa-question-circle"></i></a--></summary>
-    <div class="data-list" id="#dev-edit-html">
-            {{/if}}
-          {{/if}}
-        {{/if}}
-      {{/if}}
-    {{/if}}
-  {{/if}}
-      {{#if result.db_xrefs.omim}}
-      <div class="list-wrapper">
-        <h3>OMIM:</h3>
-        <div class="list-contents">
-          <p>
-            {{#each result.db_xrefs.omim}}
-            <a href="https://omim.org/entry/{{id}}" target="_blank">{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.db_xrefs.orphanet}}
-      <div class="list-wrapper">
-        <h3>Orphanet:</h3>
-        <div class="list-contents">
-          <p>
-            {{#each result.db_xrefs.orphanet}}
-            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}" target="_blank">ORPHA:{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.medgen_id}}
-      <div class="list-wrapper">
-        <h3>MedGen:</h3>
-        <div class="list-contents">
-    {{#if result.medgen_uri}}
-    <p><a href="{{result.medgen_uri}}" target="_blank">{{result.medgen_id}}</a></p>
-    {{/if}}
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.mondos}}
-      <div class="list-wrapper">
-        <h3>Monarch Initiative:</h3>
-        <div class="list-contents">
-          <p>
-            {{#each result.mondos}}
-            <a href="https://monarchinitiative.org/disease/{{id}}" target="_blank">{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.kegg.url}}
-      <div class="list-wrapper">
-        <h3>KEGG Disease:</h3>
-        <div class="list-contents">
-          <p>
-            <a href="{{result.kegg.url}}" target="_blank">{{result.kegg.id}}</a>
-          </p>
-        </div>
-      </div>
-      {{/if}}
-      {{#if result.urdbms.url}}
-      <div class="list-wrapper">
-        <h3>UR-DBMS:</h3>
-        <div class="list-contents">
-          <p>
-            <a href="{{result.urdbms.url}}" target="_blank">{{result.urdbms.id}}</a>
-          </p>
-        </div>
-      </div>
-      {{/if}}
+  
   {{#if result.db_xrefs.omim}}
-    </div>
-  </details>
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
   {{else}}
-    {{#if result.db_xrefs.orphanet}}
-    </div>
-  </details>
-    {{else}}
-      {{#if result.medgen_id}}
-    </div>
-  </details>
-      {{else}}
-        {{#if result.mondos}}
-    </div>
-  </details>
-        {{else}}
-          {{#if result.kegg.url}}
-    </div>
-  </details>
-          {{else}}
-            {{#if result.urdbms.url}}
-    </div>
-  </details>
-            {{/if}}
-          {{/if}}
+  {{#if result.db_xrefs.orphanet}}
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
+  {{else}}
+  {{#if result.medgen_id}}
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
+  {{else}}
+  {{#if result.mondos}}
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
+  {{else}}
+  {{#if result.kegg.url}}
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
+  {{else}}
+  {{#if result.urdbms.url}}
+    <details open>  
+      <summary>リンク一覧</summary>
+        <div class="data-list" id="#dev-edit-html">
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+        {{#if result.db_xrefs.omim}}
+          <div>
+            <h3>OMIM</h3>
+            <div>
+              <p>
+                {{#each result.db_xrefs.omim}}
+                <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
+                {{/each}}
+              </p>
+            </div>
+          </div>
         {{/if}}
-      {{/if}}
-    {{/if}}
-  {{/if}} --}}
+        {{#if result.db_xrefs.orphanet}}
+        <div>
+          <h3>Orphanet</h3>
+          <div>
+            <p>
+              {{#each result.db_xrefs.orphanet}}
+              <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
+              {{/each}}
+            </p>
+          </div>
+        </div>
+        {{/if}}
+        {{#if result.medgen_id}}
+        <div>
+          <h3>MedGen</h3>
+          <div>
+            <p>
+              {{#if result.medgen_uri}}
+              <a href="{{result.medgen_uri}}" target="_blank" rel="noopener noreferrer">{{result.medgen_id}}</a>
+              {{/if}}
+            </p>
+          </div>
+        </div>
+        {{/if}}
+        {{#if result.mondos}}
+        <div>
+          <h3>Monarch Initiative</h3>
+          <div>
+            <p>
+              {{#each result.mondos}}
+              <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
+              {{/each}}
+            </p>
+          </div>
+        </div>
+        {{/if}}
+        {{#if result.kegg.url}}
+        <div>
+          <h3>KEGG Disease</h3>
+          <div>
+            <p>
+              <a href="{{result.kegg.url}}"target="_blank" rel="noopener noreferrer">{{result.kegg.id}}</a>
+            </p>
+          </div>
+        </div>
+        {{/if}}
+        {{#if result.urdbms.url}}
+        <div>
+          <h3>UR-DBMS</h3>
+          <div>
+            <p>
+              <a href="{{result.urdbms.url}}" target="_blank" rel="noopener noreferrer">{{result.urdbms.id}}</a>
+            </p>
+          </div>
+        </div>
+        {{/if}}
+  {{#if result.db_xrefs.omim}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.db_xrefs.orphanet}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.medgen_id}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.mondos}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.kegg.url}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.urdbms.url}}
+      </div>
+    </details>
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
+  {{/if}}
 
-{{!-- 
   {{#if result.description}}
-  <details open>
-    <summary>概要</summary>
-    <div class="text">
-      {{result.description}}
-    </div>
-  </details>
-  {{/if}} --}}
-
-  <details open>
+    <details open>
     <summary>疾患定義</summary>
     <div class="tab-wrap">
+  {{else}}
+  {{#if result.mondo_decs}}
+    <details open>
+    <summary>疾患定義</summary>
+      <div class="tab-wrap">
+  {{else}}
+  {{#if result.medgen_definition}}
+    <details open>
+    <summary>疾患定義</summary>
+      <div class="tab-wrap">
+  {{/if}}
+  {{/if}}
+  {{/if}}
       {{#if result.description}}
-      <input id="description" type="radio" name="disease-definition" class="tab-switch" checked="checked" /><label class="tab-label" for="description"><small>From</small> 厚労省</label>
-      <div class="tab-content">
-        {{result.description}}
-      </div>
+        <input id="description" type="radio" name="disease-definition" class="tab-switch" checked="checked" /><label class="tab-label" for="description"><small>From</small> 厚労省</label>
+        <div class="tab-content">
+          {{result.description}}
+        </div>
       {{/if}}
       {{#if result.mondo_decs}}
-      <input id="mondo-decs" type="radio" name="disease-definition" class="tab-switch"{{#unless result.description}}checked="checked"{{/unless}}/><label class="tab-label" for="mondo-decs"><small>From</small> Monarch Initiative</label>
-      <div class="tab-content">
-        {{#each result.mondo_decs}}
-        {{id}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}"target="_blank" rel="noopener noreferrer"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
-        {{/each}}
-      </div>
+        <input id="mondo-decs" type="radio" name="disease-definition" class="tab-switch"{{#unless result.description}}checked="checked"{{/unless}}/><label class="tab-label" for="mondo-decs"><small>From</small> Monarch Initiative</label>
+        <div class="tab-content">
+          {{#each result.mondo_decs}}
+          {{id}}
+          <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}"target="_blank" rel="noopener noreferrer"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+          {{/each}}
+        </div>
       {{/if}}
       {{#if result.medgen_definition}}
-      <input id="medgen-definition" type="radio" name="disease-definition" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="medgen-definition"><small>From</small> MedGen</label>
-      <div class="tab-content">
-        {{result.medgen_definition}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}"target="_blank" rel="noopener noreferrer" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
-      </div>
+        <input id="medgen-definition" type="radio" name="disease-definition" class="tab-switch"{{#unless result.description}}{{#unless result.mondo_decs}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="medgen-definition"><small>From</small> MedGen</label>
+        <div class="tab-content">
+          {{result.medgen_definition}}
+          <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}"target="_blank" rel="noopener noreferrer" ><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
+        </div>
       {{/if}}
-    </div>
-  </details>
 
-  {{!-- 
-  {{#if result.medgen_definition}}
-  <details open>
-    <summary>疾患定義（From MedGen）</summary>
-    <div class="text">
-      {{result.medgen_definition}}
-      <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{result.medgen_definition}}" target="_blank"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
-    </div>
-  </details>
-  {{/if}}
-
+  {{#if result.description}}
+      </div>
+    </details>
+  {{else}}
   {{#if result.mondo_decs}}
-  <details open>
-    <summary>疾患定義（From Monarch Initiative）</summary>
-    <div class="text">
-      {{#each result.mondo_decs}}
-        {{id}}
-        <a href="https://translate.google.co.jp/?hl=ja#en/ja/{{id}}" target="_blank"><font color="#0431B4">&nbsp;&gt;&gt;&nbsp;翻訳 (Google)</font></a>
-      {{/each}}
-    </div>
-  </details>
-  {{/if}} --}}
+      </div>
+    </details>
+  {{else}}
+  {{#if result.medgen_definition}}
+      </div>
+    </details>
+  {{/if}}
+  {{/if}}
+  {{/if}}
 
   {{#if result.phenotype_flg}}
   <details open>
@@ -1040,449 +867,7 @@
   </details>
   {{/if}}
 
-  {{!-- {{#if result.phenotype_flg}}
-  <details open>
-    <summary>臨床的特徴 From HPO</summary>
-    <!-- HP_0025354 -->
-    <ul>
-      {{#if result.phenotype_HP_0025354_label}}
-      <li>{{result.phenotype_HP_0025354_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0025354}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001871 -->
-    <ul>
-      {{#if result.phenotype_HP_0001871_label}}
-      <li>{{result.phenotype_HP_0001871_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001871}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0003549 -->
-    <ul>
-      {{#if result.phenotype_HP_0003549_label}}
-      <li>{{result.phenotype_HP_0003549_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0003549}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000152 -->
-    <ul>
-      {{#if result.phenotype_HP_0000152_label}}
-      <li>{{result.phenotype_HP_0000152_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000152}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0040064 -->
-    <ul>
-      {{#if result.phenotype_HP_0040064_label}}
-      <li>{{result.phenotype_HP_0040064_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0040064}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001939 -->
-    <ul>
-      {{#if result.phenotype_HP_0001939_label}}
-      <li>{{result.phenotype_HP_0001939_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001939}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001197 -->
-    <ul>
-      {{#if result.phenotype_HP_0001197_label}}
-      <li>{{result.phenotype_HP_0001197_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001197}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000769 -->
-    <ul>
-      {{#if result.phenotype_HP_0000769_label}}
-      <li>{{result.phenotype_HP_0000769_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000769}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001626 -->
-    <ul>
-      {{#if result.phenotype_HP_0001626_label}}
-      <li>{{result.phenotype_HP_0001626_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001626}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0025031 -->
-    <ul>
-      {{#if result.phenotype_HP_0025031_label}}
-      <li>{{result.phenotype_HP_0025031_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0025031}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000598 -->
-    <ul>
-      {{#if result.phenotype_HP_0000598_label}}
-      <li>{{result.phenotype_HP_0000598_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000598}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000818 -->
-    <ul>
-      {{#if result.phenotype_HP_0000818_label}}
-      <li>{{result.phenotype_HP_0000818_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000818}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000478 -->
-    <ul>
-      {{#if result.phenotype_HP_0000478_label}}
-      <li>{{result.phenotype_HP_0000478_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000478}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000119 -->
-    <ul>
-      {{#if result.phenotype_HP_0000119_label}}
-      <li>{{result.phenotype_HP_0000119_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000119}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0002715 -->
-    <ul>
-      {{#if result.phenotype_HP_0002715_label}}
-      <li>{{result.phenotype_HP_0002715_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0002715}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001574 -->
-    <ul>
-      {{#if result.phenotype_HP_0001574_label}}
-      <li>{{result.phenotype_HP_0001574_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001574}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0003011 -->
-    <ul>
-      {{#if result.phenotype_HP_0003011_label}}
-      <li>{{result.phenotype_HP_0003011_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0003011}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000707 -->
-    <ul>
-      {{#if result.phenotype_HP_0000707_label}}
-      <li>{{result.phenotype_HP_0000707_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000707}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0002086 -->
-    <ul>
-      {{#if result.phenotype_HP_0002086_label}}
-      <li>{{result.phenotype_HP_0002086_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0002086}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0000924 -->
-    <ul>
-      {{#if result.phenotype_HP_0000924_label}}
-      <li>{{result.phenotype_HP_0000924_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0000924}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0045027 -->
-    <ul>
-      {{#if result.phenotype_HP_0045027_label}}
-      <li>{{result.phenotype_HP_0045027_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0045027}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001608 -->
-    <ul>
-      {{#if result.phenotype_HP_0001608_label}}
-      <li>{{result.phenotype_HP_0001608_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001608}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0025142 -->
-    <ul>
-      {{#if result.phenotype_HP_0025142_label}}
-      <li>{{result.phenotype_HP_0025142_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0025142}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0001507 -->
-    <ul>
-      {{#if result.phenotype_HP_0001507_label}}
-      <li>{{result.phenotype_HP_0001507_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0001507}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-    <!-- HP_0002664 -->
-    <ul>
-      {{#if result.phenotype_HP_0002664_label}}
-      <li>{{result.phenotype_HP_0002664_label}}
-        <div class="text">
-          <ul>
-            {{#each result.phenotype_HP_0002664}}
-            <li><a href="{{uri}}" target="_blank"><font color="#0431B4">{{id}}</font></a></li>
-            {{/each}}
-          </ul>
-        </div>
-      </li>
-      {{/if}}
-    </ul>
-  </details>
-  {{/if}} --}}
-
   {{!-- <details open>
-    <summary>臨床的特徴 TEST</summary>
-    <div class="phenotype-view">
-      <div>
-        <ul>血液および血液痙性組織の異常
-          <li><a href="#">凝固の異常</a></li>
-          <li><a href="#">貧血</a></li>
-          <li><a href="#">整脈血栓症</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>頭部と頸部の異常
-          <li><a href="#">上向きの鼻孔</a></li>
-          <li><a href="#">歯の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>四肢の異常
-          <li><a href="#">Made肺変形</a></li>
-          <li><a href="#">上肢の異常</a></li>
-          <li><a href="#">上腕骨の異常</a></li>
-          <li><a href="#">外反膝</a></li>
-          <li><a href="#">大腿骨の異常</a></li>
-          <li><a href="#">小肢症</a></li>
-          <li><a href="#">尺骨低形成</a></li>
-          <li><a href="#">橈足湾曲</a></li>
-          <li><a href="#">肘脱臼</a></li>
-          <li><a href="#">脛骨の異常</a></li>
-          <li><a href="#">骨幹端の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>心血管系
-          <li><a href="#">リンパ管腫</a></li>
-          <li><a href="#">動脈瘤</a></li>
-          <li><a href="#">心外膜の異常</a></li>
-          <li><a href="#">血管腫</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>内分泌系異常
-          <li><a href="#">思春期早発</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>免疫系の異常
-          <li><a href="#">リンパ管腫</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>外皮の異常
-          <li><a href="#">皮下結節</a></li>
-          <li><a href="#">皮膚潰瘍</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>神経系の異常
-          <li><a href="#">片麻痺/片側不全麻痺</a></li>
-          <li><a href="#">錐体路運動機能の異常</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>全身症状
-          <li><a href="#">骨痛</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>成長異常
-          <li><a href="#">低身長</a></li>
-          <li><a href="#">成長障害（成長不全）</a></li>
-        </ul>
-      </div>
-      <div>
-        <ul>新生物
-          <li><a href="#">リンパ管腫</a></li>
-          <li><a href="#">外骨症</a></li>
-          <li><a href="#">多発性外骨症</a></li>
-          <li><a href="#">肉腫</a></li>
-          <li><a href="#">血管腫</a></li>
-          <li><a href="#">軟骨肉腫</a></li>
-          <li><a href="#">骨盤外骨症</a></li>
-        </ul>
-      </div>
-    </div>
-  </details> --}}
-
-  <details open>
     <summary>疾患階層情報</summary>
     <div class="hierarchy-view">
       <label>
@@ -1530,12 +915,27 @@
         <span class="icon -mgend">MGeND</span>
       </p>
     </div>
-  </details>
+  </details> --}}
 
+
+  {{!-- {{#if result.cell}} --}}
   <details open>
     <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
     <div class="tab-wrap">
-      {{#if result.cell}}
+  {{!-- {{else}}
+  {{#if result.mus}}
+  <details open>
+    <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
+    <div class="tab-wrap">
+  {{else}}
+  {{#if result.dna}}
+  <details open>
+    <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
+    <div class="tab-wrap">
+  {{/if}}
+  {{/if}}
+  {{/if}}
+      {{#if result.cell}} --}}
       <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
       <div class="tab-content">
         細胞テーブル
@@ -1545,7 +945,7 @@
         page-slider="false"
         columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
-      {{/if}}
+      {{!-- {{/if}} --}}
       {{!-- {#if result.mus}} --}}
       <input id="mus" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}checked="checked"{{/unless}} /><label class="tab-label" for="mus">マウス</label>
       <div class="tab-content">
@@ -1568,8 +968,20 @@
         columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
       {{!-- {{/if}} --}}
+  {{!-- {{#if result.cell}} --}}
     </div>
   </details>
+  {{!-- {{else}}
+  {{#if result.mus}}
+    </div>
+  </details>
+  {{else}}
+  {{#if result.dna}}
+    </div>
+  </details>
+  {{/if}}
+  {{/if}}
+  {{/if}} --}}
 
   {{!-- {{#if result.genetesting}} --}}
   <details open>
