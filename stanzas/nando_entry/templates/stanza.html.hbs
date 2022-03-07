@@ -1,423 +1,117 @@
+<script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" ></script>
 <style>
-  @import url('https://nanbyodata.jp/static/sass/main.css');
-  @import url('https://nanbyodata.jp/static/sass/disease.css');
-
-  a[target="_blank"]::after {
-    display: none;
-  }
-  .data-table > :nth-child(1) {
-    border: solid 2px #C1C6D3;
-    border-radius: 5px;
-  }
-  .data-name > h2, h3, p{
-    margin: 0;
-  }
-  .data-name > h2 {
-    padding-top: 13px;
-  }
-  .data-name > h3 {
-    font-size: 12px;
-    font-weight: normal;
-  }
-  .data-name > h2 > ruby {
-    font-size: 24px;
-  }
-  .data-name > h2 > ruby > rt {
-    font-size: 8px;
-    font-weight: normal;
-  }
-  .data-name > h2 > h3 {
-    font-size: 14px;
-    font-weight: normal;
-  }
-  .data-info1 > div > p {
-    border: 1px solid;
-    border-radius: 3px;
-  }
-  .data-table > :nth-child(1) > div  {
-    padding: 10px;
-  }
-  .data-table > :nth-child(2) {
-    padding: 10px 0 20px;
-  }
-  .data-name {
-    border-bottom: 1px dashed #C1C6D3;
-    margin: 0;
-  }
-  .link-wrapper {
-    border-bottom: none;
-  }
-  .data-info1, .data-info2 {
-    display: flex;
-  }
-  .data-info1 > div {
-    display: inline;
-    border: #147786 1px solid;
-    border-radius: 3px;
-    margin-right: 5px;
-    font-size: 12px;
-    background-color: #147786;
-    color: #fff;
-    font-weight: bold;
-  }
-  .data-info1 > div:nth-child(1) {
-    padding: 4px 10px;
-  }
-  .data-info1 > div > a {
-    color: #fff;
-    text-decoration: none;
-    display: block;
-    padding: 4px 10px;
-  }
-  .data-info2 > div {
-    display: inline;
-    font-weight: bold;
-    background-color: rgba(20,119,134,0.2);
-    border-radius: 3px;
-    margin-right: 2px;
-    font-size: 10px;
-    padding: 2px 4px 6px;
-  }
-  .data-info2 > div > div > span{
-    border: rgb(20,119,134) 1px solid;
-    border-radius: 3px;
-    font-size: 12px;
-    background-color: rgb(20,119,134);
-    display: inline-flex;
-  }
-  .data-info2 > div:nth-child(1) > div > span {
-    padding: 4px 20px;
-  }
-  .data-info2 > div > div > span> a{
-    color: #fff;
-    text-decoration: none;
-    padding: 4px 20px;
-  }
-  details .data-list {
-    display: flex;
-    margin-top: 5px;
-  }
-  .data-list > div {
-    background-color: rgba(20,119,134,0.2);
-    border-radius: 3px;
-    margin-right: 2px;
-    font-size: 10px;
-    padding: 2px 4px 6px;
-  }
-  .data-list > div > h3 {
-    font-size: 10px;
-    font-weight: normal;
-  }
-  .data-list > div > div {
-    border: rgb(20,119,134) 1px solid;
-    border-radius: 3px;
-    background-color: rgb(20,119,134);
-  }
-  .data-list > div > div > p > a{
-    font-size: 12px;
-    font-weight: normal;
-    color: #fff;
-    text-decoration: none;
-    padding: 4px 20px;
-    display: block;
-  }
-  details summary {
-    border-bottom: none;
-  }
-  .tab-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  margin: 12px 0;
-  }
-  .tab-wrap:after {
-    content: '';
-    width: 100%;
-    height: 2px;
-    background: #13295A;;
-    display: block;
-    order: -1;
-  }
-  .tab-label {
-    white-space: nowrap;
-    text-align: center;
-    padding: 6px 16px;
-    order: -1;
-    position: relative;
-    cursor: pointer;
-    border-radius: 5px 5px 0 0;
-    color: #13295A;
-    font-weight: bold;
-  }
-  .tab-content {
-    width: 100%;
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
-  }
-  .tab-switch:checked+.tab-label {
-    border: #13295A 2px solid;
-    border-bottom: #fff 2px solid;
-    margin-bottom: -2px;
-  }
-  .tab-switch:checked+.tab-label+.tab-content {
-    height: auto;
-    overflow: auto;
-    padding: 10px 5px;
-    opacity: 1;
-    transition: .5s opacity;
-  }
-  .tab-switch {
-    display: none;
-  }
-  details {
-    z-index: 0;
-    position: relative;
-  }
-  #data-wrapper details summary {
-    color: #fff;
-  }
-  #data-wrapper details summary:before {
-    width: 100%;
-    height: 28px;
-    z-index: -1;
-    position: absolute;
-  }
-  #data-wrapper details[open] summary:after {
-    left: 7px;
-  }
-  #data-wrapper details summary:after {
-    left: 9px;
-  }
-  .phenotype-view {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    max-height: 550px;
-  }
-  .phenotype-view > div > ul {
-    padding: 0 5px;
-    list-style: none;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  .phenotype-view > div > ul > li {
-    font-weight: normal;
-    padding-top: 4px;
-  }
-  .checkbox{
-  display: none;
-  }
-  .hierarchy-view {
-    margin-left: 20px;
-  }
-  .hierarchy-view label{
-    position: relative;
-    cursor: pointer;
-    justify-content: space-between;
-  }
-  .hierarchy-view ul {
-    padding: 0 5px;
-    font-weight: bold;
-    font-size: 12px;
-    list-style-position: inside;
-  }
-  .hierarchy-view li{
-    display: flex;
-    height: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .hierarchy-view li::marker {
-    margin-right: 5px;
-  }
-  .content {
-    display: inline-grid;
-    width: 100%;
-    grid-template-columns: 1fr auto;
-    gap: 10px;
-  }
-  .checkbox:checked ~ ul > .content > .headline::before{
-    transform: translate(0,-50%);  
-  }
-  .checkbox:checked ~ ul > li{
-    height: auto;
-    padding-top: 5px;
-  }
-  .genre-view {
-    text-align: right;
-    padding: 10px 0;
-  }
-  .genre-view > p {
-    display: inline;
-    background-color: rgba(19, 41, 90, 0.1);
-    padding: 15px 20px;
-    border-radius: 5px;
-  }
-  .genre-view > p > span {
-    color: #000;
-    font-size: 12px;
-    font-weight: bold;
-    margin-right: 10px;
-  }
-  .icon::before {
-    color: #fff;
-    padding: 2.8px 5px;
-    margin-right: 3px;
-    font-weight: normal;
-    font-size: 9.6px;
-  }
-  .-genetic-disease-testing::before {
-    content: "G";
-    background-color: #5D639D;
-  }
-  .-designed-rare-disease::before {
-    content: "D";
-    background-color: #005FB6;
-  }
-  .-chronic-pediatric::before {
-    content: "C";
-    background-color: #E35480;
-  }
-  .-mgend::before {
-    content: "M";
-    background-color: #254571;
-  }
-  .disease-name {
-    display: inline-grid;
-    align-items: center;
-    grid-template-columns: 1px auto 1fr;
-    gap: 10px;
-  }
-  .disease-name::before {
-    content: "";
-    width: 5px;
-    height: 5px;
-    background: #000;
-    border-radius: 50%;
-  }
-  .hierarchy-view > label > ul > .content > .disease-name {
-    grid-template-columns: auto 1fr;
-  }
-  .hierarchy-view > label > ul > .content > .headline::before {
-    content:'';
-    display: block;
-    border-left:5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 7px solid #000;
-    position: absolute;
-    top: 8px;
-    left: -11px;
-    transform: translate(0,-50%) rotate(-90deg);
-  }
-  .disease-name::after {
-    border-top: #7F7F7F 1px dashed;
-    content: "";
+@import url('https://nanbyodata.jp/static/sass/main.css');
+@import url('https://nanbyodata.jp/static/sass/disease.css');
+  togostanza-pagination-table {
+    --togostanza-background-color: transparent;
   }
 </style>
 
-<div id="data-wrapper">
-  <div class="data-table">
-    <div>
-      <div class="data-name">
-        <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}"target="_blank" rel="noopener noreferrer">{{result.nando_id}}</a></span></h3>
-        <h2>
-          <ruby>{{result.label_ja}}<rt>せきずいせいきんいしゅくしょうにがた</h2></rt></ruby>
-        </h2>
-        <h3>{{result.label_en}}</h2>
-      </div>
-      <div class="data-info1">
-        <div style="background-color: #fff; color: #147786;">告示番号: <span>{{result.notification_number}}</span></div>
-        {{#if result.mhlw.url}}
-        <div>
-          <a href="{{result.mhlw.url}}"target="_blank" rel="noopener noreferrer">概要、診断基準等</a>
-        </div>
-        {{/if}}
-        {{#if result.source}}
-        <div>
-          <a href="{{result.source}}"target="_blank" rel="noopener noreferrer">臨床調査個人票・医療意見書</a>
-        </div>
-        {{/if}}
-        {{#if result.nanbyou.url}}
-        <div>
-          <a href="{{result.nanbyou.url}}"target="_blank" rel="noopener noreferrer">難病情報センター</a>
-        </div>
-        {{/if}}
-        {{#if result.shouman.url}}
-        <div>
-          <a href="{{result.shouman.url}}"target="_blank" rel="noopener noreferrer">小児慢性特定疾病情報センター</a>
-        </div>
-        {{/if}}
-      </div>
+<div id="data-wrapper" class="disease-summary">
+  <header class="summary-header">
+    <div class="data-name">
+      <h3>NANDO ID: <span><a href="http://nanbyodata.jp/ontology/nando#{{result.nando_id}}"target="_blank" rel="noopener noreferrer">{{result.nando_id}}</a></span></h3>
+      <h2>
+        <ruby>{{result.label_ja}}<rt>せきずいせいきんいしゅくしょうにがた</h2></rt></ruby>
+      </h2>
+      <h3>{{result.label_en}}</h2>
     </div>
-    <div class="data-info2">
-      {{#if result.alt_label_ja}}
-      <div>別疾患名（日）
-        <div>
-          {{#each result.alt_label_ja}}
-          <span style="background-color: #fff; color: rgb(20,119,134);">{{this}}</span>
-          {{/each}}
-        </div>
+    <div class="external-links">
+      <div class="linked-item -unlinked">告示番号: <span>{{result.notification_number}}</span></div>
+      {{#if result.mhlw.url}}
+      <div class="linked-item">
+        <a href="{{result.mhlw.url}}"target="_blank" rel="noopener noreferrer">概要、診断基準等</a>
       </div>
       {{/if}}
-      {{!-- {{#if result.alt_label_en}}
-      <div>別疾患名（英）
-        <div>
-          {{#each result.alt_label_en}}
-          <span>{{this}}</span>
-          {{/each}}
-        </div>
-      </div>
-      {{/if}} --}}
-      {{#if result.inheritance_uris}}
-      <div>遺伝形式
-        <div>
-          {{#each result.inheritance_uris}}
-            <span><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></span>
-          {{/each}}
-        </div>
+      {{#if result.source}}
+      <div class="linked-item">
+        <a href="{{result.source}}"target="_blank" rel="noopener noreferrer">臨床調査個人票・医療意見書</a>
       </div>
       {{/if}}
-      {{#if result.gene_uris}}
-      <div>疾患原因遺伝子
-        <div>
-          {{#each result.gene_uris}}
-            <span><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></span>
-          {{/each}}
-        </div>
+      {{#if result.nanbyou.url}}
+      <div class="linked-item">
+        <a href="{{result.nanbyou.url}}"target="_blank" rel="noopener noreferrer">難病情報センター</a>
+      </div>
+      {{/if}}
+      {{#if result.shouman.url}}
+      <div class="linked-item">
+        <a href="{{result.shouman.url}}"target="_blank" rel="noopener noreferrer">小児慢性特定疾病情報センター</a>
       </div>
       {{/if}}
     </div>
+  </header>
+  <div class="aliases">
+    {{#if result.alt_label_ja}}
+    <dl>
+      <dt>別疾患名（日）</dt>
+      {{#each result.alt_label_ja}}
+      <dd>{{this}}</dd>
+      {{/each}}
+    </dl>
+    {{/if}}
+    {{#if result.alt_label_en}}
+    <dl>
+      <dt>別疾患名（英）</dt>
+      {{#each result.alt_label_en}}
+      <dd>{{this}}</dd>
+      {{/each}}
+    </dl>
+    {{/if}}
+  </div>
+  <div class="properties">
+    {{#if result.inheritance_uris}}
+    <dl class="linked-items">
+      <dt>遺伝形式</dt>
+      {{#each result.inheritance_uris}}
+      <dd class="linked-item"><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></dd>
+      {{/each}}
+    </dl>
+    {{/if}}
+    {{#if result.gene_uris}}
+    <dl class="linked-items">
+      <dt>疾患原因遺伝子</dt>
+      {{#each result.gene_uris}}
+      <dd class="linked-item"><a href="{{uri}}"target="_blank" rel="noopener noreferrer">{{id}}</a></dd>
+      {{/each}}
+    </dl>
+    {{/if}}
   </div>
   
   {{#if result.db_xrefs.omim}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{else}}
   {{#if result.db_xrefs.orphanet}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{else}}
   {{#if result.medgen_id}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{else}}
   {{#if result.mondos}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{else}}
   {{#if result.kegg.url}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{else}}
   {{#if result.urdbms.url}}
   <details open>  
     <summary>リンク一覧</summary>
-      <div class="data-list" id="#dev-edit-html">
+    <div class="links-list">
+      <div class="properties" id="#dev-edit-html">
   {{/if}}
   {{/if}}
   {{/if}}
@@ -425,94 +119,88 @@
   {{/if}}
   {{/if}}
       {{#if result.db_xrefs.omim}}
-        <div>
-          <h3>OMIM</h3>
-          <div>
-            <p>
-              {{#each result.db_xrefs.omim}}
-              <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-              {{/each}}
-            </p>
-          </div>
-        </div>
+      <dl class="linked-items">
+        <dt>OMIM</dt>
+        <dd class="linked-item">
+          {{#each result.db_xrefs.omim}}
+          <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
+          {{/each}}
+        </dd>
+      </dl>
       {{/if}}
       {{#if result.db_xrefs.orphanet}}
-      <div>
-        <h3>Orphanet</h3>
-        <div>
-          <p>
-            {{#each result.db_xrefs.orphanet}}
-            <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
+      <dl class="linked-items">
+        <dt>Orphanet</dt>
+        <dd class="linked-item">
+          {{#each result.db_xrefs.orphanet}}
+          <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
+          {{/each}}
+        </dd>
+      </dl>
       {{/if}}
       {{#if result.medgen_id}}
-      <div>
-        <h3>MedGen</h3>
-        <div>
-          <p>
-            {{#if result.medgen_uri}}
-            <a href="{{result.medgen_uri}}" target="_blank" rel="noopener noreferrer">{{result.medgen_id}}</a>
-            {{/if}}
-          </p>
-        </div>
-      </div>
+      <dl class="linked-items">
+        <dt>MedGen</dt>
+        <dd class="linked-item">
+          {{#if result.medgen_uri}}
+          <a href="{{result.medgen_uri}}" target="_blank" rel="noopener noreferrer">{{result.medgen_id}}</a>
+          {{/if}}
+        </dd>
+      </dl>
       {{/if}}
       {{#if result.mondos}}
-      <div>
-        <h3>Monarch Initiative</h3>
-        <div>
-          <p>
-            {{#each result.mondos}}
-            <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-            {{/each}}
-          </p>
-        </div>
-      </div>
+      <dl class="linked-items">
+        <dt>Monarch Initiative</dt>
+        <dd class="linked-item">
+          {{#each result.mondos}}
+          <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
+          {{/each}}
+        </dd>
+      </dl>
       {{/if}}
       {{#if result.kegg.url}}
-      <div>
-        <h3>KEGG Disease</h3>
-        <div>
-          <p>
-            <a href="{{result.kegg.url}}"target="_blank" rel="noopener noreferrer">{{result.kegg.id}}</a>
-          </p>
-        </div>
-      </div>
+      <dl class="linked-items">
+        <dt>KEGG Disease</dt>
+        <dd class="linked-item">
+          <a href="{{result.kegg.url}}"target="_blank" rel="noopener noreferrer">{{result.kegg.id}}</a>
+        </dd>
+      </dl>
       {{/if}}
       {{#if result.urdbms.url}}
-      <div>
-        <h3>UR-DBMS</h3>
-        <div>
-          <p>
-            <a href="{{result.urdbms.url}}" target="_blank" rel="noopener noreferrer">{{result.urdbms.id}}</a>
-          </p>
-        </div>
-      </div>
+      <dl class="linked-items">
+        <dt>UR-DBMS</dt>
+        <dd class="linked-item">
+          <a href="{{result.urdbms.url}}" target="_blank" rel="noopener noreferrer">{{result.urdbms.id}}</a>
+        </dd>
+      </dl>
       {{/if}}
   {{#if result.db_xrefs.omim}}
+      </div>
     </div>
   </details>
   {{else}}
   {{#if result.db_xrefs.orphanet}}
+      </div>
     </div>
   </details>
   {{else}}
   {{#if result.medgen_id}}
+      </div>
     </div>
   </details>
   {{else}}
   {{#if result.mondos}}
+      </div>
     </div>
   </details>
   {{else}}
   {{#if result.kegg.url}}
+      </div>
     </div>
   </details>
   {{else}}
   {{#if result.urdbms.url}}
+      </div>
     </div>
   </details>
   {{/if}}
@@ -884,11 +572,11 @@
   </details> --}}
 
 
-  {{!-- {{#if result.cell}} --}}
+  {{#if result.cell}}
   <details open>
     <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
     <div class="tab-wrap">
-  {{!-- {{else}}
+  {{else}}
   {{#if result.mus}}
   <details open>
     <summary>難病特異的バイオリソース<small> From Riken BRC</small></summary>
@@ -901,43 +589,38 @@
   {{/if}}
   {{/if}}
   {{/if}}
-      {{#if result.cell}} --}}
+      {{#if result.cell}}
       <input id="cell" type="radio" name="TAB2" class="tab-switch" checked="checked" /><label class="tab-label" for="cell">細胞</label>
       <div class="tab-content">
-        細胞テーブル
-        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
         <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
         page-size-option="10,20,50,100"
         page-slider="false"
         columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
-      {{!-- {{/if}} --}}
-      {{!-- {#if result.mus}} --}}
+      {{/if}}
+      {{#if result.mus}}
       <input id="mus" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}checked="checked"{{/unless}} /><label class="tab-label" for="mus">マウス</label>
       <div class="tab-content">
-        マウステーブル
-        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
         <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
         page-size-option="10,20,50,100"
         page-slider="false"
         columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
-      {{!-- {{/if}} --}}
-      {{!-- {#if result.dna}} --}}
+      {{/if}}
+      {{#if result.dna}}
       <input id="dna" type="radio" name="TAB2" class="tab-switch"{{#unless result.cell}}{{#unless result.mus}}checked="checked"{{/unless}}{{/unless}} /><label class="tab-label" for="dna">遺伝子</label>
       <div class="tab-content">
         遺伝子テーブル
-        <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
         <togostanza-pagination-table data-url="https://nanbyodata.jp/sparqlist/api/nanbyodata_get_riken_brc_cell_info_by_nando_id?nando_id={{result.nando_id}}" data-type="json"
         page-size-option="10,20,50,100"
         page-slider="false"
         columns="[{&quot;id&quot;: &quot;ID&quot;,&quot;label&quot;:&quot;RIKEN_BRC 細胞番号&quot;}, {&quot;id&quot;: &quot;Homepage&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;Homepage&quot;}, {&quot;id&quot;: &quot;Cell_name&quot;,&quot;label&quot;:&quot;細胞名&quot;}, {&quot;id&quot;: &quot;Description_e&quot;,&quot;label&quot;:&quot;細胞特性(英語)&quot;,&quot;escape&quot;:false},{&quot;id&quot;: &quot;Description_j&quot;,&quot;label&quot;:&quot;細胞特性(日本語)&quot;,&quot;escape&quot;:false}]"></togostanza-pagination-table>
       </div>
-      {{!-- {{/if}} --}}
-  {{!-- {{#if result.cell}} --}}
+      {{/if}}
+  {{#if result.cell}}
     </div>
   </details>
-  {{!-- {{else}}
+  {{else}}
   {{#if result.mus}}
     </div>
   </details>
@@ -947,25 +630,24 @@
   </details>
   {{/if}}
   {{/if}}
-  {{/if}} --}}
+  {{/if}}
 
   {{!-- {{#if result.genetesting}} --}}
   <details open>
     <summary>診療用遺伝学的検査情報<small> From 難病領域における検体検査の精度管理体制の整備に資する研究班</small></summary>
-    診療用遺伝学的検査情報テーブル
-    <script type="module" src="https://togostanza.github.io/metastanza/pagination-table.js" async></script>
-
-    <togostanza-pagination-table
-      data-url="https://pubcasefinder.dbcls.jp/sparqlist/api/nanbyodata_get_gene_test?nando_id={{result.nando_id}}"
-      data-type="json"
-      custom-css-url=""
-      width=""
-      fixed-columns="1"
-      padding="0px"
-      page-size-option="10,20,50,100"
-      page-slider="true"
-      columns="[{&quot;id&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Test name&quot;},{&quot;id&quot;:&quot;hp&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;hp&quot;},{&quot;id&quot;:&quot;gene&quot;,&quot;label&quot;:&quot;Gene&quot;},{&quot;id&quot;:&quot;contact&quot;,&quot;label&quot;:&quot;Contact&quot;,&quot;link&quot;:&quot;contact&quot;}]"
-    ></togostanza-pagination-table>
+    <div class="inspection-view">
+      <togostanza-pagination-table
+        data-url="https://pubcasefinder.dbcls.jp/sparqlist/api/nanbyodata_get_gene_test?nando_id={{result.nando_id}}"
+        data-type="json"
+        custom-css-url=""
+        width=""
+        fixed-columns="1"
+        padding="0px"
+        page-size-option="10,20,50,100"
+        page-slider="true"
+        columns="[{&quot;id&quot;:&quot;label&quot;,&quot;label&quot;:&quot;Test name&quot;},{&quot;id&quot;:&quot;hp&quot;,&quot;label&quot;:&quot;Homepage&quot;,&quot;link&quot;:&quot;hp&quot;},{&quot;id&quot;:&quot;gene&quot;,&quot;label&quot;:&quot;Gene&quot;},{&quot;id&quot;:&quot;contact&quot;,&quot;label&quot;:&quot;Contact&quot;,&quot;link&quot;:&quot;contact&quot;}]"
+      ></togostanza-pagination-table>
+    </div>
   </details>
   {{!-- {{/if}} --}}
 
