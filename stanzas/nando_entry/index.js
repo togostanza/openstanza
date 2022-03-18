@@ -5,12 +5,12 @@ export default class NandoEntry extends Stanza {
 
     console.log(this.params);
 
+    // https://nanbyodata.jp/sparqlist/api/get_nando_entry_by_nando_id?nando_id=1200001
     const apiUrl = 'https://nanbyodata.jp/sparqlist/api/';
-    const apiName = 'get_nando_entry_by_nando_id';
+    const apiName = 'get_nando_entry_by_nando_id?nando_id=' + this.params.nando_id;
     let options = {
-      method: 'POST',
+      method: 'GET',
       mode:  'cors',
-      body: this.params,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/x-www-form-urlencoded'
