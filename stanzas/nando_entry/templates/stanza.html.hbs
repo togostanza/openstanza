@@ -122,21 +122,21 @@
       {{#if result.db_xrefs.omim}}
       <dl class="linked-items">
         <dt>OMIM</dt>
+        {{#each result.db_xrefs.omim}}
         <dd class="linked-item">
-          {{#each result.db_xrefs.omim}}
           <a href="https://omim.org/entry/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-          {{/each}}
         </dd>
+        {{/each}}
       </dl>
       {{/if}}
       {{#if result.db_xrefs.orphanet}}
       <dl class="linked-items">
         <dt>Orphanet</dt>
+        {{#each result.db_xrefs.orphanet}}
         <dd class="linked-item">
-          {{#each result.db_xrefs.orphanet}}
           <a href="https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Expert={{id}}"target="_blank" rel="noopener noreferrer">ORPHA:{{id}}</a>
-          {{/each}}
         </dd>
+        {{/each}}
       </dl>
       {{/if}}
       {{#if result.medgen_id}}
@@ -152,11 +152,11 @@
       {{#if result.mondos}}
       <dl class="linked-items">
         <dt>Monarch Initiative</dt>
+        {{#each result.mondos}}
         <dd class="linked-item">
-          {{#each result.mondos}}
           <a href="https://monarchinitiative.org/disease/{{id}}"target="_blank" rel="noopener noreferrer">{{id}}</a>
-          {{/each}}
         </dd>
+        {{/each}}
       </dl>
       {{/if}}
       {{#if result.kegg.url}}
