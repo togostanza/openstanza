@@ -40,7 +40,6 @@ a[target="_blank"]::after {
   font-weight: normal;
 }
 .properties {
-  padding: 0 0 20px;
   display: flex;
   flex-wrap: wrap;
   gap: 3px;
@@ -178,6 +177,9 @@ details {
 #data-wrapper {
   margin-top: inherit;
   padding: 0 25px;
+  > .properties {
+    padding: 0 0 20px;
+  }
   details {
     summary {
       color: #fff;
