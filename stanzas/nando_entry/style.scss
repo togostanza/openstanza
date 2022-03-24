@@ -7,6 +7,12 @@
   border-radius: 3px;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Sriracha&display=swap');
+
+.disease-summary {
+  font-family: 'Poppins', sans-serif;
+}
+
 a[target="_blank"]::after {
   display: none;
 }
@@ -345,4 +351,14 @@ display: none;
 }
 .inspection-view {
   padding-top: 10px;
+}
+
+//shadow-root 適用されない？
+.wrapper {
+  > .tableOptionWrapper {
+    min-height: 0;
+    > .tableWrapper {
+      min-height: 0;
+    }
+  }
 }
