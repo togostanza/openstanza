@@ -354,11 +354,16 @@ display: none;
 }
 
 //shadow-root 適用されない？
+
+togostanza-pagination-table {
+  border: yellow;
+}
 .wrapper {
+  border: solid 1px red;
   > .tableOptionWrapper {
-    min-height: 0;
+    min-height: 0 !important;
     > .tableWrapper {
-      min-height: 0;
+      min-height: 0 !important;
     }
   }
 }
