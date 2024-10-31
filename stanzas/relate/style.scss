@@ -1,0 +1,180 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+
+#container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: calc(100vh - 10px);
+  margin: 0;
+  padding: 5px;
+}
+
+#Container {
+  font-family: "Roboto Condensed", sans-serif;
+  position: relative;
+  --transition-duration: 0.2s;
+  --long-transition-duration: 0.5s;
+  --selected-color: #2a71ff;
+  flex: 1;
+  overflow: auto;
+}
+
+#RelateViewer {
+  &:has(.region-indicator-view:hover),
+  &.-selectedregion {
+    --fadeout-opacity: 0.1;
+
+    .haplotype-view > g[data-region],
+    #RegionSelectorView > .scale,
+    .region-indicator-view {
+      opacity: var(--fadeout-opacity);
+    }
+  }
+}
+
+#input {
+  flex-shrink: 0;
+  column-gap: 10px;
+
+  > div {
+    flex-grow: 1;
+
+    > textarea {
+      font-size: 10px;
+      font-family: courier;
+      height: 5lh;
+      width: 100%;
+    }
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 12px;
+  }
+}
+
+#DendrogramView {
+  & > g {
+    position: relative;
+    & > line {
+      stroke: black;
+      stroke-width: 1px;
+
+      &.-hovered {
+        stroke: var(--selected-color);
+      }
+    }
+
+    & > circle {
+      fill: black;
+      cursor: pointer;
+    }
+  }
+
+  .labels {
+    transition: ease-in-out var(--transition-duration);
+  }
+  .labels-bg {
+    fill: white;
+    opacity: 0.8;
+  }
+}
+
+#HaplotypesView {
+  &:has(.haplotype-view:hover) {
+    > .haplotype-view {
+      opacity: 0.2;
+    }
+  }
+  g[data-index] {
+    transition: ease-in-out var(--long-transition-duration);
+  }
+
+  > .haplotype-view:hover {
+    opacity: 1 !important;
+  }
+}
+
+.haplotype-view {
+  > g {
+    > .bg {
+      fill: #f8f8f8;
+    }
+  }
+  .checkbox {
+    cursor: pointer;
+    user-select: none;
+    transition: ease-in-out var(--long-transition-duration);
+
+    > text {
+      font-size: 10px;
+
+      > tspan:nth-child(1) {
+        font-weight: bold;
+      }
+
+      > tspan.haplotype {
+        font-weight: 350;
+        font-size: 0.85em;
+      }
+
+      &.-selected {
+        fill: white;
+      }
+    }
+
+    > rect.checkbox-bg {
+      fill: transparent;
+      &.-selected {
+        fill: var(--selected-color);
+      }
+    }
+  }
+}
+
+#RegionSelectorView {
+  > path.scale {
+    stroke: #0008;
+    stroke-width: 0.5px;
+    stroke-dasharray: 1, 1;
+  }
+
+  > .region-indicator-view {
+    cursor: pointer;
+
+    > path {
+      stroke: #0008;
+      stroke-width: 0.5px;
+      fill: transparent;
+    }
+
+    > text {
+      font-size: 10px;
+      text-anchor: start;
+      dominant-baseline: middle;
+
+      > tspan:nth-child(1) {
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+#Tooltip {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+
+  > div#TooltipText {
+    padding: 5px;
+    background: #fff;
+    border: 1px solid #000;
+    font-size: 10px;
+  }
+
+  &.-visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s;
+  }
+}
