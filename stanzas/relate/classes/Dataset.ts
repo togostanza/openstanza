@@ -1,13 +1,49 @@
 import { loadFiles } from "../util.js";
+import { type EthnicityDatum } from "./HaploEthnicities";
 
+export type Branch = {
+  branchId: number;
+  parentBranchId: number;
+  distance: number;
+  weight: number;
+  branchFrom: number;
+  branchTo: number;
+  line?: SVGLineElement & { ethnic?: EthnicityDatum };
+  beam?: SVGLineElement;
+  children?: Branch[];
+};
+
+export type Mutation = {
+  snp: number;
+  posOfSnp: number;
+  dist: number;
+  rsId: string;
+  treeIndex: number;
+  branchIndices: number[];
+  isNotMapping: number;
+  isFlipped: number;
+  ageBegin: number;
+  ageEnd: number;
+  alleles: string[];
+};
+
+export type Region = {
+  start: number;
+  end: number;
+};
+
+export type Ancestor = {
+  branches: Branch[];
+  region: Region;
+};
 /**
  * Class representing a dataset containing haplotypes, mutations, and ancestor information.
  */
 class Dataset {
-  #haplotypes;
-  #mutations;
-  #ancestors;
-  #mutationsByHaplotype;
+  #haplotypes: string[] = [];
+  #mutations: Mutation[] = [];
+  #ancestors: Ancestor[] = [];
+  #mutationsByHaplotype: number[][] = [];
 
   static #instance: Dataset | null = null;
 
@@ -25,13 +61,13 @@ class Dataset {
    *
    * @param {string} id - The identifier for the dataset files.
    */
-  async define(id) {
+  async define(id: string) {
     const path = "/relate/assets/data/" + id;
     try {
       const [ancData, mutData, hapData] = await loadFiles(
         [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
-          (ext) => path + ext
-        )
+          (ext) => path + ext,
+        ),
       );
       this.#parseHaprotypes(hapData);
       this.#parseMutations(mutData);
@@ -44,10 +80,8 @@ class Dataset {
 
   /**
    * Parses the haplotype data.
-   *
-   * @param {string} hapData - The raw haplotype data as a string.
    */
-  #parseHaprotypes(hapData) {
+  #parseHaprotypes(hapData: string) {
     // Get haplotypes
     this.#haplotypes = hapData
       .split("\n")
@@ -57,10 +91,8 @@ class Dataset {
 
   /**
    * Parses the mutation data.
-   *
-   * @param {string} mutData - The raw mutation data as a string.
    */
-  #parseMutations(mutData) {
+  #parseMutations(mutData: string) {
     const lines = mutData.trim().split("\n").slice(1); // Exclude header line
     this.#mutations = lines
       .filter((line) => line.length > 0)
@@ -86,14 +118,12 @@ class Dataset {
 
   /**
    * Parses the ancestor data.
-   *
-   * @param {string} ancData - The raw ancestor data as a string.
    */
-  #parseAncestors(ancData) {
+  #parseAncestors(ancData: string) {
     const treesRawData = ancData.trim().split("\n").slice(2);
     const startNumbers = treesRawData
       .filter((line) => line.length > 0)
-      .map((tree) => parseInt(tree.match(/^(\d+)/)[0]));
+      .map((tree) => parseInt(tree.match(/^(\d+)/)![0]));
 
     const regions = startNumbers.map((start, index) => {
       return {
@@ -105,30 +135,30 @@ class Dataset {
     });
 
     this.#ancestors = treesRawData.map((tree, index) => {
-      const treeData = tree.match(/:\s*(.+)/)[1];
+      const treeData = tree.match(/:\s*(.+)/)![1];
 
       const branches = treeData
         .split(") ")
-        .filter((branch) => branch)
-        .map((branch, index) => {
+        .filter((branch: string) => branch)
+        .map((branch: string, index: number) => {
           // Restore the closing parenthesis lost during split
           branch = branch.trim().endsWith(")") ? branch : branch + ")";
           const branchParts = branch.match(
-            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/
+            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/,
           );
           return {
             branchId: index,
-            parentBranchId: parseInt(branchParts[1], 10),
-            distance: parseFloat(branchParts[2]),
-            weight: parseFloat(branchParts[3]),
-            branchFrom: parseInt(branchParts[4], 10),
-            branchTo: parseInt(branchParts[5], 10),
+            parentBranchId: parseInt(branchParts![1], 10),
+            distance: parseFloat(branchParts![2]),
+            weight: parseFloat(branchParts![3]),
+            branchFrom: parseInt(branchParts![4], 10),
+            branchTo: parseInt(branchParts![5], 10),
           };
-        });
+        }) as Branch[];
 
       for (const branch of branches) {
         const children = branches.filter(
-          (child) => child.parentBranchId === branch.branchId
+          (child) => child.parentBranchId === branch.branchId,
         );
         if (children.length > 0) {
           branch.children = children;
@@ -142,10 +172,14 @@ class Dataset {
    * Creates a matrix of mutations by haplotype.
    */
   #getMutationsByHaplotype() {
-    const findChildren = (branchId, treeIndex, mutatedBranches) => {
+    const findChildren = (
+      branchId: number,
+      treeIndex: number,
+      mutatedBranches: number[],
+    ) => {
       mutatedBranches.push(branchId);
       const branches = this.#ancestors[treeIndex].branches.filter(
-        (branch) => branch.parentBranchId === branchId
+        (branch) => branch.parentBranchId === branchId,
       );
       if (branches.length !== 0) {
         for (const branch of branches) {
@@ -157,9 +191,10 @@ class Dataset {
     this.#mutationsByHaplotype = new Array(this.#haplotypes.length)
       .fill(null)
       .map(() => new Array(this.#mutations.length).fill(0));
+
     for (let i = 0; i < this.#mutations.length; i++) {
       const { treeIndex, branchIndices } = this.#mutations[i];
-      const mutatedBranches = [];
+      const mutatedBranches: number[] = [];
       for (const branchId of branchIndices) {
         findChildren(branchId, treeIndex, mutatedBranches);
       }
@@ -171,10 +206,14 @@ class Dataset {
     }
   }
 
-  getLeafBranches(branch) {
-    const leaves = [];
+  getLeafBranches(branch: Branch | undefined): Branch[] {
+    if (!branch) {
+      return [];
+    }
 
-    const findLeaves = (branch) => {
+    const leaves: Branch[] = [];
+
+    const findLeaves = (branch: Branch) => {
       if (branch.children) {
         for (const child of branch.children) {
           findLeaves(child);
@@ -189,10 +228,10 @@ class Dataset {
     return leaves;
   }
 
-  getDescendantsBranches(branch) {
-    const descendants = [];
+  getDescendantsBranches(branch: Branch): Branch[] {
+    const descendants: Branch[] = [];
 
-    const findDescendants = (branch) => {
+    const findDescendants = (branch: Branch) => {
       descendants.push(branch);
       if (branch.children) {
         for (const child of branch.children) {
@@ -206,30 +245,21 @@ class Dataset {
     return descendants;
   }
 
-  /**
-   * @returns {string[]}
-   */
   get haplotypes() {
     return this.#haplotypes;
   }
-  /**
-   * @returns {Object[]}
-   */
+
   get mutations() {
     return this.#mutations;
   }
-  /**
-   * @returns {Object[]}
-   */
+
   get ancestors() {
     return this.#ancestors;
   }
   get mutationTotalLength() {
     return this.#ancestors[this.#ancestors.length - 1].region.end;
   }
-  /**
-   * @returns {number[][]}
-   */
+
   get mutationsByHaplotype() {
     return this.#mutationsByHaplotype;
   }

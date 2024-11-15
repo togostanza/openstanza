@@ -2,7 +2,7 @@
 
 import { loadFiles } from "../util.js";
 
-type EthnicityDatum = {
+export type EthnicityDatum = {
   sampleid: string;
   popname: string;
   gpopname: string;

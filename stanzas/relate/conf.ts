@@ -45,6 +45,9 @@ const CONF = {
     return this.stagePadding.top + this.innerHeight + this.stagePadding.bottom;
   },
   get stageWidth() {
+    if (!RegionSelectorView.instance) {
+      throw new Error("RegionSelectorView instance not found");
+    }
     return (
       this.stagePadding.left +
       Math.max(this.mutationWidth, RegionSelectorView.instance.width) +
@@ -71,6 +74,6 @@ const CONF = {
   get regions() {
     return Dataset.instance.ancestors.map((ancestor) => ancestor.region);
   },
-};
+} as const;
 
 export default CONF;

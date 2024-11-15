@@ -5,18 +5,18 @@ class CheckboxInSVG {
   static textPadding = { x: 2, y: 0 };
 
   #checked = false;
-  #container = null;
-  #rect = null;
-  #parentEl = null;
-  #labelEl = null;
+  #container: SVGElement | null = null;
+  #rect: SVGElement | null = null;
+  #parentEl: Element | null = null;
+  #labelEl: SVGTextElement | null = null;
 
-  #handleClick = (e) => {
+  #handleClick = (e: any) => {
     e.stopPropagation();
 
     this.#dispatchEvent(e.shiftKey);
   };
 
-  constructor(parentEl, labelEl) {
+  constructor(parentEl: Element, labelEl: SVGTextElement) {
     this.#parentEl = parentEl;
     this.#labelEl = labelEl;
 
@@ -50,10 +50,10 @@ class CheckboxInSVG {
       const x = -width + CheckboxInSVG.textPadding.x;
       const y = -CONF.haplotypeViewGap / 2;
 
-      this.#rect.setAttribute("width", width);
-      this.#rect.setAttribute("height", height);
-      this.#rect.setAttribute("x", x);
-      this.#rect.setAttribute("y", y);
+      this.#rect!.setAttribute("width", `${width}`);
+      this.#rect!.setAttribute("height", `${height}`);
+      this.#rect!.setAttribute("x", `${x}`);
+      this.#rect!.setAttribute("y", `${y}`);
     });
 
     this.#container.removeChild(labelEl);
@@ -62,8 +62,8 @@ class CheckboxInSVG {
     this.#update();
   }
 
-  setAttribute(key, value) {
-    this.#container.setAttribute(key, value);
+  setAttribute(key: string, value: string) {
+    this.#container!.setAttribute(key, value);
   }
 
   set checked(value) {
@@ -75,29 +75,29 @@ class CheckboxInSVG {
     return this.#checked;
   }
 
-  #dispatchEvent(shiftKey) {
-    this.#container.dispatchEvent(
+  #dispatchEvent(shiftKey: boolean) {
+    this.#container?.dispatchEvent(
       new CustomEvent("change", {
         bubbles: true,
         detail: {
           shiftKey,
         },
-      })
+      }),
     );
   }
 
   #update() {
     if (this.#checked) {
-      for (const tspan of this.#labelEl.children) {
-        tspan.style.fill = "white";
+      for (const tspan of this.#labelEl?.children || []) {
+        (tspan as SVGTextElement).style.fill = "white";
       }
     } else {
-      for (const tspan of this.#labelEl.children) {
-        tspan.style.fill = "";
+      for (const tspan of this.#labelEl?.children || []) {
+        (tspan as SVGTextElement).style.fill = "";
       }
     }
 
-    this.#rect.classList.toggle("-selected", this.#checked);
+    this.#rect?.classList.toggle("-selected", this.#checked);
   }
 }
 

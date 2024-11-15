@@ -1,8 +1,8 @@
 class Tooltip {
   arrowHeight = 5;
-  #tip = null;
-  #tooltipTextElement = null;
-  #tipBorder = null;
+  #tip: HTMLDivElement | null = null;
+  #tooltipTextElement: HTMLDivElement | null = null;
+  #tipBorder: HTMLDivElement | null = null;
   #element: HTMLElement | null = null;
 
   static #instance: Tooltip | null = null;
@@ -11,7 +11,7 @@ class Tooltip {
     return Tooltip.#instance;
   }
 
-  static initialise(root: HTMLElement) {
+  static initialise(root: HTMLElement | null) {
     if (!root) {
       throw new Error("Root element not found");
     }
@@ -24,7 +24,7 @@ class Tooltip {
     }
   }
 
-  private init(parent) {
+  private init(parent: Element | null) {
     if (!parent) {
       throw new Error("Tooltip parent is not defined");
     }
@@ -37,7 +37,7 @@ class Tooltip {
     this.#tooltipTextElement = document.createElement("div");
     this.#tooltipTextElement.id = "TooltipText";
 
-    this.#tooltipTextElement.style.zIndex = 10;
+    this.#tooltipTextElement.style.zIndex = "10";
     this.#tooltipTextElement.style.position = "relative";
     this.#tooltipTextElement.style.backgroundColor = "white";
     this.#tooltipTextElement.style.padding = "5px";
@@ -49,14 +49,14 @@ class Tooltip {
     this.#tip.style.backgroundColor = "white";
     this.#tip.style.left = "50%";
     this.#tip.style.transform = "translateX(-50%) rotate(45deg)";
-    this.#tip.style.zIndex = 20;
+    this.#tip.style.zIndex = "20";
 
     this.#tipBorder = document.createElement("div");
     this.#tipBorder.style.position = "absolute";
     this.#tipBorder.style.backgroundColor = "black";
     this.#tipBorder.style.left = "50%";
     this.#tipBorder.style.transform = "translateX(-50%) rotate(45deg)";
-    this.#tipBorder.style.zIndex = 5;
+    this.#tipBorder.style.zIndex = "5";
 
     this.#element.appendChild(this.#tip);
     this.#element.appendChild(this.#tipBorder);
@@ -73,6 +73,14 @@ class Tooltip {
   }
 
   #updateTip() {
+    if (!this.#tip) {
+      return;
+    }
+
+    if (!this.#tipBorder) {
+      return;
+    }
+
     this.#tip.style.width = this.arrowSquareSize + "px";
     this.#tip.style.height = this.arrowSquareSize + "px";
     this.#tip.style.bottom = -this.arrowHeight + 4 + "px";
@@ -85,7 +93,15 @@ class Tooltip {
     return Math.sqrt(2 * Math.pow(this.arrowHeight, 2));
   }
 
-  show(message, x, y) {
+  show(message: string, x: number, y: number) {
+    if (!this.#element) {
+      return;
+    }
+
+    if (!this.#tooltipTextElement) {
+      return;
+    }
+
     this.#tooltipTextElement.innerText = message;
     this.#element.classList.add("-visible");
     const { width, height } = this.#element.getBoundingClientRect();
@@ -95,7 +111,7 @@ class Tooltip {
   }
 
   hide() {
-    this.#element.classList.remove("-visible");
+    this.#element?.classList.remove("-visible");
   }
 }
 

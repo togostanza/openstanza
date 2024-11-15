@@ -6,7 +6,11 @@ export default class Relate extends Stanza {
   async render() {
     this.renderTemplate({ template: "stanza.template.hbs", parameters: {} });
 
-    await init(this.element.shadowRoot?.querySelector("main"));
+    const root = this.element.shadowRoot?.querySelector("main");
+
+    if (!root) return;
+
+    await init(root);
   }
 
   async getData(id: string) {

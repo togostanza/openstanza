@@ -17,5 +17,5 @@ export function createSVGElement<T extends keyof SVGElementTagNameMap>(
   for (const [key, value] of Object.entries(attributes)) {
     element.setAttribute(key, value.toString());
   }
-  return element as SVGElementTagNameMap[T];
+  return element as SVGElementTagNameMap[T] & Record<string, any>;
 }

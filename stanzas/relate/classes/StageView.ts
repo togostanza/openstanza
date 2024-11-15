@@ -25,7 +25,7 @@ class StageView {
   }
 
   private constructor(root: HTMLElement) {
-    this.#el = root.querySelector("#RelateViewer");
+    this.#el = root.querySelector("#RelateViewer")!;
   }
 
   init() {
@@ -34,7 +34,7 @@ class StageView {
   }
 
   #handleDeselectAll = () => {
-    HaplotypesView.instance.selectedIndices = [];
+    HaplotypesView.instance!.selectedIndices = [];
   };
 
   update() {
@@ -42,14 +42,14 @@ class StageView {
     this.#el.style.height = CONF.stageHeight + "px";
   }
 
-  #handleClickHaplotype = (e) => {
+  #handleClickHaplotype = (e: any) => {
     if (e.detail.shiftKey) {
-      HaplotypesView.instance.selectedIndices = [
-        ...HaplotypesView.instance.selectedIndices,
+      HaplotypesView.instance!.selectedIndices = [
+        ...HaplotypesView.instance!.selectedIndices,
         ...e.detail.indexes,
       ];
     } else {
-      HaplotypesView.instance.selectedIndices = e.detail.indexes;
+      HaplotypesView.instance!.selectedIndices = e.detail.indexes;
     }
   };
 }

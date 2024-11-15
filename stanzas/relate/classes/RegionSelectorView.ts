@@ -13,8 +13,8 @@ class RegionSelectorView {
   static #instance: RegionSelectorView | null = null;
 
   private constructor(root: HTMLElement) {
-    this.#el = root.querySelector("#RegionSelectorView");
-    this.#RelateViewer = root.querySelector("#RelateViewer");
+    this.#el = root.querySelector("#RegionSelectorView")!;
+    this.#RelateViewer = root.querySelector("#RelateViewer")!;
     this.#style = document.createElement("style");
     console.log("this.#el", this.#el);
   }
@@ -76,36 +76,36 @@ class RegionSelectorView {
       d += `M ${x3} ${0} L ${x3} ${haplotypesHeight} `;
 
       // Add region selector
-      const regionIndicator = regionIndicatorTemplate.cloneNode(true);
+      const regionIndicator = regionIndicatorTemplate.cloneNode(
+        true,
+      ) as Element;
       const path = regionIndicator.querySelector("path");
       this.#totalWidth = Math.max(this.#totalWidth + INDICATOR_WIDTH, x2);
 
-      path.setAttribute("d", `M ${x2} 0 L ${this.#totalWidth} -20`);
+      path?.setAttribute("d", `M ${x2} 0 L ${this.#totalWidth} -20`);
 
-      const text = regionIndicator.querySelector("text");
+      const text = regionIndicator.querySelector("text")!;
       text.setAttribute(
         "transform",
-        `translate(${this.#totalWidth} -20) rotate(-90)`
+        `translate(${this.#totalWidth} -20) rotate(-90)`,
       );
       text.innerHTML = `<tspan>${i}</tspan><tspan> ${ancestor.region.start}-${ancestor.region.end}</tspan>`;
 
       // Add data-region attribute
-      regionIndicator.setAttribute("data-region", i);
+      regionIndicator.setAttribute("data-region", `${i}`);
 
       // Add click event listener to show dendrogram
       regionIndicator.addEventListener("click", (e) => {
         e.stopPropagation();
         if (this.#RelateViewer.dataset.selectedRegion === `${i}`) {
-          console.log("here");
           this.#RelateViewer.dataset.selectedRegion = "";
           this.#RelateViewer.classList.remove("-selectedregion");
-          DendrogramView.instance.clear();
-          DendrogramView.instance.moveLabelsBack();
+          DendrogramView.instance?.clear();
+          DendrogramView.instance?.moveLabelsBack();
         } else {
-          console.log("here2");
-          this.#RelateViewer.dataset.selectedRegion = i;
+          this.#RelateViewer.dataset.selectedRegion = `${i}`;
           this.#RelateViewer.classList.add("-selectedregion");
-          DendrogramView.instance.draw(i, x3 - CONF.stagePadding.left);
+          DendrogramView.instance?.draw(i, x3 - CONF.stagePadding.left);
         }
       });
 
@@ -124,14 +124,16 @@ class RegionSelectorView {
    * Generate dynamic CSS for hover effects on region elements.
    * @param {Array} ancestors - The list of ancestors with regions.
    */
-  generateDynamicCSS(ancestors) {
+  generateDynamicCSS(ancestors: any) {
+    if (!this.#style || !this.#style.sheet) return;
+
     while (this.#style.sheet.cssRules?.length > 0) {
       this.#style.sheet.deleteRule(0);
     }
     const sheet = this.#style.sheet;
 
-    ancestors.forEach((_, i) => {
-      sheet.insertRule(`
+    ancestors.forEach((_: any, i: number) => {
+      sheet?.insertRule(`
         #RelateViewer:has(.region-indicator-view[data-region="${i}"]:hover), #RelateViewer[data-selected-region="${i}"] {
           .haplotype-view > g[data-region="${i}"],
           .region-indicator-view[data-region="${i}"] {

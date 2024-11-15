@@ -1,12 +1,12 @@
 import { Dataset } from "./Dataset";
 import { HaploEthnicities } from "./HaploEthnicities";
-import HaplotypeView from "./HaplotypeView.js";
+import HaplotypeView from "./HaplotypeView";
 import CONF from "../conf.js";
 
 class HaplotypesView {
   #el: HTMLElement;
-  #haplotypeViews = [];
-  #selectedIndices = [];
+  #haplotypeViews: HaplotypeView[] = [];
+  #selectedIndices: number[] = [];
 
   static #instance: HaplotypesView | null = null;
 
@@ -28,7 +28,7 @@ class HaplotypesView {
   }
 
   private constructor(root: HTMLElement) {
-    this.#el = root.querySelector("#HaplotypesView");
+    this.#el = root.querySelector("#HaplotypesView")!;
   }
 
   clear() {
@@ -44,7 +44,7 @@ class HaplotypesView {
     this.#el.setAttributeNS(
       null,
       "transform",
-      `translate(${CONF.stagePadding.left}, ${CONF.stagePadding.top})`
+      `translate(${CONF.stagePadding.left}, ${CONF.stagePadding.top})`,
     );
 
     // Draw mutations

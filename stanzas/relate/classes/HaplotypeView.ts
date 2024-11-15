@@ -1,11 +1,12 @@
 import { Dataset } from "./Dataset";
 import CONF from "../conf.js";
 import { createSVGElement } from "../util.js";
-import { CheckboxInSVG } from "./SVGCheckbox.js";
+import { CheckboxInSVG } from "./SVGCheckbox";
+import { EthnicityDatum } from "./HaploEthnicities";
 
 export default class HaplotypeView {
   #el = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  #checkbox = null;
+  #checkbox: CheckboxInSVG | null = null;
 
   /**
    * Constructor for the HaplotypeView class.
@@ -16,17 +17,29 @@ export default class HaplotypeView {
    * @param {number} params.index - The index of the haplotype.
    * @param {array} params.regions - The array of regions to be visualized.
    */
-  constructor({ unitHeight, haplotype, ethnic, index, regions }) {
+  constructor({
+    unitHeight,
+    haplotype,
+    ethnic,
+    index,
+    regions,
+  }: {
+    unitHeight: number;
+    haplotype: string;
+    ethnic: EthnicityDatum | undefined;
+    index: number;
+    regions: any[];
+  }) {
     // Create an SVG group element (<g>) and set its attributes
 
     this.#el.setAttribute(
       "transform",
       `translate(0,${
         (CONF.haplotypeViewWidth + CONF.haplotypeViewGap) * index
-      })`
+      })`,
     );
     this.#el.setAttribute("data-haplotype", haplotype);
-    this.#el.setAttribute("data-index", index);
+    this.#el.setAttribute("data-index", `${index}`);
     this.#el.classList.add("haplotype-view");
 
     this.#el.addEventListener("change", this.#handleCheckboxChange);
@@ -52,7 +65,7 @@ export default class HaplotypeView {
       g.appendChild(bgPath);
 
       // Clone the path element and draw mutations for each region
-      const path2 = path.cloneNode();
+      const path2 = path.cloneNode() as Element;
       let d = "";
       for (let i = region.start; i < region.end; i++) {
         if (Dataset.instance.mutationsByHaplotype[index][i] === 1) {
@@ -67,10 +80,10 @@ export default class HaplotypeView {
         Dataset.instance.mutationsByHaplotype[index][region.end - 1] === 1;
 
       if (isMutationInRegion) {
-        path2.setAttribute("data-region", regionIndex);
+        path2.setAttribute("data-region", `${regionIndex}`);
       }
       g.appendChild(path2);
-      g.setAttribute("data-region", regionIndex);
+      g.setAttribute("data-region", `${regionIndex}`);
       this.#el.appendChild(g);
     }
 
@@ -87,14 +100,14 @@ export default class HaplotypeView {
     this.#checkbox = new CheckboxInSVG(this.#el, text);
   }
 
-  #handleCheckboxChange = (e) => {
+  #handleCheckboxChange = (e: any) => {
     e.stopPropagation();
 
     this.#dispatchEvent(e.detail.shiftKey);
   };
 
   get selected() {
-    return this.#checkbox.checked;
+    return this.#checkbox?.checked;
   }
 
   set selected(value) {
@@ -104,22 +117,22 @@ export default class HaplotypeView {
       delete this.#el.dataset.selected;
     }
 
-    this.#checkbox.checked = value;
+    this.#checkbox!.checked = !!value;
   }
 
   get index() {
-    return parseInt(this.#el.dataset.index);
+    return parseInt(this.#el.dataset.index || "-1");
   }
 
-  #dispatchEvent(shiftKey) {
+  #dispatchEvent(shiftKey: boolean) {
     this.#el.dispatchEvent(
       new CustomEvent("select-haplotype", {
         detail: {
-          indexes: [parseInt(this.#el.dataset.index)],
+          indexes: [parseInt(this.#el.dataset.index || "-1")],
           shiftKey,
         },
         bubbles: true,
-      })
+      }),
     );
   }
 
@@ -137,7 +150,7 @@ export default class HaplotypeView {
  * @param {number} height - The height of the parallelogram.
  * @returns {string} - The path data for the parallelogram.
  */
-function rectangle(x, y, width, height) {
+function rectangle(x: number, y: number, width: number, height: number) {
   return `M ${x} ${y} L ${x + width} ${y} L ${x + width} ${y + height} L ${x} ${
     y + height
   } Z`;
