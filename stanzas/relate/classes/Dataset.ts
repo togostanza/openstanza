@@ -1,4 +1,4 @@
-import { loadFiles } from "../util.js";
+import { loadFiles } from "../util";
 import { type EthnicityDatum } from "./HaploEthnicities";
 
 export type Branch = {
@@ -56,25 +56,38 @@ class Dataset {
 
   private constructor() {}
 
+  static async initialise({
+    id,
+    folderURL,
+  }: {
+    id: string;
+    folderURL: string;
+  }) {
+    await this.instance.init(id, folderURL);
+
+    return this.instance;
+  }
+
   /**
    * Defines the dataset by loading and parsing the data files.
    *
    * @param {string} id - The identifier for the dataset files.
    */
-  async define(id: string) {
-    const path = "/relate/assets/data/" + id;
+  async init(id: string, folderURL: string) {
+    console.log("init", id, folderURL);
+    const path = `${folderURL}${id}`;
     try {
       const [ancData, mutData, hapData] = await loadFiles(
         [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
-          (ext) => path + ext,
-        ),
+          (ext) => path + ext
+        )
       );
       this.#parseHaprotypes(hapData);
       this.#parseMutations(mutData);
       this.#parseAncestors(ancData);
       this.#getMutationsByHaplotype();
     } catch (error) {
-      console.error("Error fetching file:", error);
+      throw new Error("Error fetching file:" + error);
     }
   }
 
@@ -144,7 +157,7 @@ class Dataset {
           // Restore the closing parenthesis lost during split
           branch = branch.trim().endsWith(")") ? branch : branch + ")";
           const branchParts = branch.match(
-            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/,
+            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/
           );
           return {
             branchId: index,
@@ -158,7 +171,7 @@ class Dataset {
 
       for (const branch of branches) {
         const children = branches.filter(
-          (child) => child.parentBranchId === branch.branchId,
+          (child) => child.parentBranchId === branch.branchId
         );
         if (children.length > 0) {
           branch.children = children;
@@ -175,11 +188,11 @@ class Dataset {
     const findChildren = (
       branchId: number,
       treeIndex: number,
-      mutatedBranches: number[],
+      mutatedBranches: number[]
     ) => {
       mutatedBranches.push(branchId);
       const branches = this.#ancestors[treeIndex].branches.filter(
-        (branch) => branch.parentBranchId === branchId,
+        (branch) => branch.parentBranchId === branchId
       );
       if (branches.length !== 0) {
         for (const branch of branches) {

@@ -8,6 +8,9 @@ class Tooltip {
   static #instance: Tooltip | null = null;
 
   static get instance() {
+    if (!Tooltip.#instance) {
+      throw new Error("Tooltip not initialised");
+    }
     return Tooltip.#instance;
   }
 
@@ -15,13 +18,9 @@ class Tooltip {
     if (!root) {
       throw new Error("Root element not found");
     }
+    this.#instance = new Tooltip(root);
 
-    if (this.#instance) {
-      return this.#instance;
-    } else {
-      this.#instance = new Tooltip(root);
-      return this.#instance;
-    }
+    return this.#instance;
   }
 
   private init(parent: Element | null) {

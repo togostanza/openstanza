@@ -11,6 +11,9 @@ class HaplotypesView {
   static #instance: HaplotypesView | null = null;
 
   static get instance() {
+    if (!this.#instance) {
+      throw new Error("HaplotypesView not initialised");
+    }
     return this.#instance;
   }
 
@@ -19,12 +22,8 @@ class HaplotypesView {
       throw new Error("Root element not found");
     }
 
-    if (this.#instance) {
-      return this.#instance;
-    } else {
-      this.#instance = new HaplotypesView(root);
-      return this.#instance;
-    }
+    this.#instance = new HaplotypesView(root);
+    return this.#instance;
   }
 
   private constructor(root: HTMLElement) {
@@ -33,6 +32,8 @@ class HaplotypesView {
 
   clear() {
     this.#el.innerHTML = "";
+    this.#haplotypeViews = [];
+    this.#selectedIndices = [];
     this.#haplotypeViews = [];
   }
 
@@ -44,7 +45,7 @@ class HaplotypesView {
     this.#el.setAttributeNS(
       null,
       "transform",
-      `translate(${CONF.stagePadding.left}, ${CONF.stagePadding.top})`,
+      `translate(${CONF.stagePadding.left}, ${CONF.stagePadding.top})`
     );
 
     // Draw mutations

@@ -9,7 +9,7 @@ const numberFormatter = new Intl.NumberFormat("en-US");
 function debounce(
   func: (...args: any[]) => any,
   wait: number,
-  immediate?: boolean,
+  immediate?: boolean
 ) {
   let timeout: ReturnType<typeof setTimeout> | undefined;
   return function (this: any, ...args: any[]) {
@@ -70,7 +70,7 @@ class DendrogramView {
    * Initialize the DendrogramView.
    * Sets the initial transform attribute for the SVG element.
    */
-  init() {
+  private init() {
     if (!this.#el) {
       throw new Error("DendrogramView element not found");
     }
@@ -82,13 +82,13 @@ class DendrogramView {
     this.#el.setAttributeNS(
       null,
       "transform",
-      `translate(${CONF.stagePadding.left}, ${CONF.haplotypeViewWidth / 2})`,
+      `translate(${CONF.stagePadding.left}, ${CONF.haplotypeViewWidth / 2})`
     );
     this.#el.appendChild(this.#inner);
 
     this.#grid.setAttribute(
       "transform",
-      `translate(0, ${CONF.stagePadding.top - CONF.haplotypeViewWidth / 2})`,
+      `translate(0, ${CONF.stagePadding.top - CONF.haplotypeViewWidth / 2})`
     );
     this.#grid.style.pointerEvents = "none";
 
@@ -102,7 +102,7 @@ class DendrogramView {
 
     this.#container.addEventListener(
       "scroll",
-      debounce(this.#updateLabelsPositions, 300),
+      debounce(this.#updateLabelsPositions, 300)
     );
 
     this.#inner.addEventListener("mouseover", this.#handleMutationHover);
@@ -123,7 +123,7 @@ class DendrogramView {
         new CustomEvent("select-haplotype", {
           detail: { shiftKey: e.shiftKey, indexes: branchIds },
           bubbles: true,
-        }),
+        })
       );
     }
   };
@@ -134,7 +134,7 @@ class DendrogramView {
       e.target.dataset.type === "click-handle"
     ) {
       const decendants = Dataset.instance.getDescendantsBranches(
-        e.target.branch,
+        e.target.branch
       );
       decendants.forEach((branch) => {
         branch.line?.classList.add("-hovered");
@@ -151,7 +151,7 @@ class DendrogramView {
       e.target.dataset.type === "click-handle"
     ) {
       const decendants = Dataset.instance.getDescendantsBranches(
-        e.target.branch,
+        e.target.branch
       );
       decendants.forEach((branch) => {
         branch.line?.classList.remove("-hovered");
@@ -175,7 +175,7 @@ class DendrogramView {
     Tooltip.instance?.show(
       `Alleles: ${mutation.alleles.join(", ")}\nPosition: ${mutation.snp}`,
       x + CONF.stagePadding.left,
-      y + CONF.haplotypeViewWidth / 2,
+      y + CONF.haplotypeViewWidth / 2
     );
   };
 
@@ -208,12 +208,12 @@ class DendrogramView {
         const branch = terminalBranches[i];
 
         const g = this.#RelateViewer!.querySelector(
-          `#HaplotypesView > g[data-index="${branch.line?.dataset.branchId}"]`,
+          `#HaplotypesView > g[data-index="${branch.line?.dataset.branchId}"]`
         );
 
         if (i === 0) {
           const bgRect = g!.querySelector(
-            `g[data-region="${selectedRegion}"] > rect.bg`,
+            `g[data-region="${selectedRegion}"] > rect.bg`
           );
           //@ts-ignore
           textX = bgRect.x.baseVal.value;
@@ -228,7 +228,7 @@ class DendrogramView {
             `translate(0 , ${
               +branch.line.dataset.index *
               (CONF.haplotypeViewWidth + CONF.haplotypeViewGap)
-            })`,
+            })`
           );
         }
       }
@@ -243,7 +243,7 @@ class DendrogramView {
       const haplotypes = Dataset.instance.haplotypes;
       for (let i = 0; i < haplotypes.length; i++) {
         const g = this.#RelateViewer!.querySelector(
-          `#HaplotypesView > g[data-index="${i}"]`,
+          `#HaplotypesView > g[data-index="${i}"]`
         );
         const checkbox = g!.querySelector("g.checkbox");
         checkbox!.setAttribute("transform", `translate(-4, 0)`);
@@ -252,7 +252,7 @@ class DendrogramView {
           "transform",
           `translate(0 , ${
             i * (CONF.haplotypeViewWidth + CONF.haplotypeViewGap)
-          })`,
+          })`
         );
       }
     });
@@ -281,7 +281,7 @@ class DendrogramView {
     let overAllLength = branch.distance;
     while (true) {
       const parentBranch = tree.find(
-        (parentBranch) => parentBranch.branchId === branch.parentBranchId,
+        (parentBranch) => parentBranch.branchId === branch.parentBranchId
       );
       if (!parentBranch) {
         break;
@@ -304,7 +304,7 @@ class DendrogramView {
       x0,
       overAllLength,
       (CONF.haplotypeViewWidth + CONF.haplotypeViewGap) *
-        terminalBranches.length,
+        terminalBranches.length
     );
 
     const drawnBranches: Branch[] = [];
@@ -338,7 +338,7 @@ class DendrogramView {
       branch.line = line;
 
       const siblingBranch = drawnBranches.find(
-        (drawnBranch) => drawnBranch.parentBranchId === branch.parentBranchId,
+        (drawnBranch) => drawnBranch.parentBranchId === branch.parentBranchId
       );
       if (siblingBranch) {
         existingSiblingBranches.push(siblingBranch);
@@ -352,7 +352,7 @@ class DendrogramView {
     // Remove terminal branches from undrawnBranches
     for (const terminalBranch of terminalBranches) {
       const index = undrawnBranches.findIndex(
-        (branch) => branch.branchId === terminalBranch.branchId,
+        (branch) => branch.branchId === terminalBranch.branchId
       );
       undrawnBranches.splice(index, 1);
     }
@@ -366,8 +366,8 @@ class DendrogramView {
         drawnBranches.find(
           (branch) =>
             branch.parentBranchId === childBranches[0]?.parentBranchId &&
-            branch.branchId !== childBranches[0].branchId,
-        ),
+            branch.branchId !== childBranches[0].branchId
+        )
       );
       const ethnic =
         childBranches[0]?.line?.ethnic &&
@@ -377,7 +377,7 @@ class DendrogramView {
           : undefined;
 
       const branch = tree.find(
-        (branch) => branch.branchId === childBranches[0]?.parentBranchId,
+        (branch) => branch.branchId === childBranches[0]?.parentBranchId
       );
 
       // Draw branch
@@ -430,8 +430,7 @@ class DendrogramView {
       branch.beam = beam;
 
       const siblingBranche = drawnBranches.find(
-        (drawnBranche) =>
-          drawnBranche.parentBranchId === branch?.parentBranchId,
+        (drawnBranche) => drawnBranche.parentBranchId === branch?.parentBranchId
       );
       if (siblingBranche) {
         existingSiblingBranches.push(siblingBranche);
@@ -439,21 +438,21 @@ class DendrogramView {
       drawnBranches.push(branch);
       // Remove from undrawnBranches and existingSiblingBranches
       const index = drawnBranches.findIndex(
-        (b) => b.branchId === childBranches[1]?.branchId,
+        (b) => b.branchId === childBranches[1]?.branchId
       );
       drawnBranches.splice(index, 1);
     }
 
     // Map mutations
     const mutationsOfThisTree = Dataset.instance.mutations.filter(
-      (mutation) => mutation.treeIndex === treeIndex,
+      (mutation) => mutation.treeIndex === treeIndex
     );
     for (const mutation of mutationsOfThisTree) {
       if (mutation.isNotMapping) {
         continue;
       }
       const branch = tree.find(
-        (branch) => branch.branchId === mutation.branchIndices[0],
+        (branch) => branch.branchId === mutation.branchIndices[0]
       );
       const x =
         ((branch?.line?.x1.baseVal.value ?? 0) +
@@ -553,14 +552,14 @@ class DendrogramView {
     if (scrollTop < CONF.stagePadding.top) {
       labelsG.setAttribute(
         "transform",
-        `translate(${this.#x0}, ${-this.#gridLabelYMargin})`,
+        `translate(${this.#x0}, ${-this.#gridLabelYMargin})`
       );
       return;
     }
 
     labelsG.setAttribute(
       "transform",
-      `translate(${this.#x0}, ${scrollTop - CONF.stagePadding.top})`,
+      `translate(${this.#x0}, ${scrollTop - CONF.stagePadding.top})`
     );
   };
 }

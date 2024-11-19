@@ -13,62 +13,30 @@
   "stanza:updated": "2024-10-11",
   "stanza:parameter": [
     {
-      "stanza:key": "hapmap-data-url",
-      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/main/samples/json/scorecard.json",
+      "stanza:key": "data-url",
+      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/refs/heads/main/samples/other/hapmap3204.pop.tsv",
       "stanza:description": "Hapmap data source URL",
       "stanza:required": true
     },
     {
-      "stanza:key": "ancestors-data-url",
-      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/main/samples/json/scorecard.json",
-      "stanza:description": "Ancestors data source URL",
-      "stanza:required": true
-    },
-    {
-      "stanza:key": "mutations-data-url",
-      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/main/samples/json/scorecard.json",
-      "stanza:description": "Mutations data source URL",
-      "stanza:required": true
-    },
-    {
-      "stanza:key": "haploidid-data-url",
-      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/main/samples/json/scorecard.json",
-      "stanza:description": "haploidid data source URL",
-      "stanza:required": true
-    },
-    {
       "stanza:key": "data-type",
-      "stanza:type": "single-choice",
-      "stanza:choice": ["text"],
-      "stanza:example": "text",
+      "stanza:example": "tsv",
       "stanza:description": "Data type",
       "stanza:required": true
     },
     {
-      "stanza:key": "data-score_key",
-      "stanza:type": "text",
-      "stanza:example": "value",
-      "stanza:description": "Data key for score",
+      "stanza:key": "data-folder-url",
+      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/refs/heads/main/samples/other/",
+      "stanza:description": "Data folder url",
       "stanza:required": true
     },
     {
-      "stanza:key": "data-title_key",
-      "stanza:type": "text",
-      "stanza:example": "key",
-      "stanza:description": "Key of the title text. If not set, fallback to score-key param value"
+      "stanza:key": "data-id",
+      "stanza:example": "A2M_chr12_9062708_9120919",
+      "stanza:description": "ID of the analysis data",
+      "stanza:required": true
     },
-    {
-      "stanza:key": "affix-prefix",
-      "stanza:type": "text",
-      "stanza:example": "avg.",
-      "stanza:description": "Prefix text"
-    },
-    {
-      "stanza:key": "affix-suffix",
-      "stanza:type": "text",
-      "stanza:example": "%",
-      "stanza:description": "Suffix text"
-    },
+
     {
       "stanza:key": "togostanza-custom_css_url",
       "stanza:example": "",

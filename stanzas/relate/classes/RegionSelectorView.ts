@@ -16,20 +16,18 @@ class RegionSelectorView {
     this.#el = root.querySelector("#RegionSelectorView")!;
     this.#RelateViewer = root.querySelector("#RelateViewer")!;
     this.#style = document.createElement("style");
-    console.log("this.#el", this.#el);
   }
 
   static initialise(root: HTMLElement) {
-    if (this.#instance) {
-      return this.#instance;
-    } else {
-      this.#instance = new RegionSelectorView(root);
-      this.#instance.init();
-      return this.#instance;
-    }
+    this.#instance = new RegionSelectorView(root);
+    this.#instance.init();
+    return this.#instance;
   }
 
   static get instance() {
+    if (!this.#instance) {
+      throw new Error("RegionSelectorView not initialised");
+    }
     return this.#instance;
   }
 
@@ -77,7 +75,7 @@ class RegionSelectorView {
 
       // Add region selector
       const regionIndicator = regionIndicatorTemplate.cloneNode(
-        true,
+        true
       ) as Element;
       const path = regionIndicator.querySelector("path");
       this.#totalWidth = Math.max(this.#totalWidth + INDICATOR_WIDTH, x2);
@@ -87,7 +85,7 @@ class RegionSelectorView {
       const text = regionIndicator.querySelector("text")!;
       text.setAttribute(
         "transform",
-        `translate(${this.#totalWidth} -20) rotate(-90)`,
+        `translate(${this.#totalWidth} -20) rotate(-90)`
       );
       text.innerHTML = `<tspan>${i}</tspan><tspan> ${ancestor.region.start}-${ancestor.region.end}</tspan>`;
 

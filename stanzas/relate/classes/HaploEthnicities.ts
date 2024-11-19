@@ -15,26 +15,26 @@ class HaploEthnicities {
 
   static get instance() {
     if (!this.#instance) {
-      this.#instance = new HaploEthnicities();
+      // this.#instance = new HaploEthnicities();
+      throw new Error("HaploEthnicities not initialised");
     }
     return this.#instance;
   }
 
-  static async initialise() {
-    await this.instance.init();
+  static async initialise(hapmapFileURL: string) {
+    this.#instance = new HaploEthnicities();
+    await this.#instance.init(hapmapFileURL);
 
-    return this.instance;
+    return this.#instance;
   }
 
-  private constructor() {
-    this.init();
-  }
+  private constructor() {}
 
-  private async init() {
+  private async init(hapmapFileURL: string) {
     // Load ethnicities data file
-    const filePath = "/relate/assets/data/hapmap3204.pop.tsv";
+
     try {
-      const [text] = await loadFiles([filePath]);
+      const [text] = await loadFiles([hapmapFileURL]);
       // Parse and return ethnicities associated with haplotypes
 
       text
@@ -45,8 +45,10 @@ class HaploEthnicities {
           const [sampleid, popname, gpopname] = eth.split("\t");
           this.#data.set(sampleid, { sampleid, popname, gpopname });
         });
+
+      return this;
     } catch (error) {
-      console.error("Error fetching file:", error);
+      throw new Error("Error fetching hapmap file:" + error);
     }
   }
 

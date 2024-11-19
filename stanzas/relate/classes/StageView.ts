@@ -7,6 +7,9 @@ class StageView {
   static #instance: StageView | null = null;
 
   static get instance() {
+    if (!this.#instance) {
+      throw new Error("StageView not initialised");
+    }
     return this.#instance;
   }
 
@@ -15,13 +18,9 @@ class StageView {
       throw new Error("Root element not found");
     }
 
-    if (this.#instance) {
-      return this.#instance;
-    } else {
-      this.#instance = new StageView(root);
-      this.#instance.init();
-      return this.#instance;
-    }
+    this.#instance = new StageView(root);
+    this.#instance.init();
+    return this.#instance;
   }
 
   private constructor(root: HTMLElement) {
