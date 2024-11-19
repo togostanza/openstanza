@@ -52,10 +52,9 @@ class DendrogramView {
   }
 
   static initialise(root: HTMLElement) {
-    if (!this.#instance) {
-      this.#instance = new DendrogramView(root);
-      this.#instance.init();
-    }
+    this.#instance = new DendrogramView(root);
+    this.#instance.init();
+
     return this.#instance;
   }
 
@@ -201,6 +200,7 @@ class DendrogramView {
   moveLabels(terminalBranches: Branch[]) {
     // Move label positions to branch positions
     window.requestAnimationFrame(() => {
+      console.log("this.#RelateViewer", this.#RelateViewer);
       const selectedRegion = this.#RelateViewer!.dataset.selectedRegion;
       let textX = 0;
 
