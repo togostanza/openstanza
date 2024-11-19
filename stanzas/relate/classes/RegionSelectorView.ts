@@ -15,7 +15,16 @@ class RegionSelectorView {
   private constructor(root: HTMLElement) {
     this.#el = root.querySelector("#RegionSelectorView")!;
     this.#RelateViewer = root.querySelector("#RelateViewer")!;
+
+    const existingStyle = (root.getRootNode() as ShadowRoot).querySelector(
+      "style#dynamic-css"
+    );
+    if (existingStyle) {
+      existingStyle.remove();
+    }
+
     this.#style = document.createElement("style");
+    this.#style.id = "dynamic-css";
   }
 
   static initialise(root: HTMLElement) {
@@ -37,7 +46,7 @@ class RegionSelectorView {
    */
   private init() {
     this.#el.setAttribute("transform", `translate(0 ${CONF.mutationTop})`);
-    document.head.appendChild(this.#style);
+    (this.#el.getRootNode() as ShadowRoot).appendChild(this.#style);
   }
 
   /**
@@ -125,10 +134,10 @@ class RegionSelectorView {
   generateDynamicCSS(ancestors: any) {
     if (!this.#style || !this.#style.sheet) return;
 
-    while (this.#style.sheet.cssRules?.length > 0) {
-      this.#style.sheet.deleteRule(0);
-    }
     const sheet = this.#style.sheet;
+    while (sheet.cssRules?.length > 0) {
+      sheet.deleteRule(0);
+    }
 
     ancestors.forEach((_: any, i: number) => {
       sheet?.insertRule(`
