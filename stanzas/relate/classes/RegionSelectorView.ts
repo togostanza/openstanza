@@ -1,9 +1,7 @@
 import { Dataset } from "./Dataset";
 import { DendrogramView } from "./DendrogramView.js";
-import CONF from "../conf.js";
+import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
-
-const INDICATOR_WIDTH = 10;
 
 class RegionSelectorView {
   #el: HTMLElement;
@@ -45,7 +43,10 @@ class RegionSelectorView {
    * Binds the SVG element and sets its initial transform attribute.
    */
   private init() {
-    this.#el.setAttribute("transform", `translate(0 ${CONF.mutationTop})`);
+    this.#el.setAttribute(
+      "transform",
+      `translate(0 ${Conf.instance.mutationTop})`
+    );
     (this.#el.getRootNode() as ShadowRoot).appendChild(this.#style);
   }
 
@@ -62,21 +63,24 @@ class RegionSelectorView {
   draw() {
     this.clear(); // Clear existing content
 
-    const unitWidth = CONF.mutationWidth / Dataset.instance.mutations.length;
+    const unitWidth =
+      Conf.instance.mutationWidth / Dataset.instance.mutations.length;
     let d = "";
     const fragment = new DocumentFragment();
     const regionIndicatorTemplate = createRegionIndicatorTemplate();
     this.#totalWidth = 0;
 
-    const haplotypesHeight = CONF.innerHeight;
+    const haplotypesHeight = Conf.instance.innerHeight;
     const ancestors = Dataset.instance.ancestors;
 
     ancestors.forEach((ancestor, i) => {
       // get start and end positions
       // get middle of the region (x2, y2)
 
-      const x1 = CONF.stagePadding.left + ancestor.region.start * unitWidth;
-      const x3 = CONF.stagePadding.left + ancestor.region.end * unitWidth;
+      const x1 =
+        Conf.instance.stagePadding.left + ancestor.region.start * unitWidth;
+      const x3 =
+        Conf.instance.stagePadding.left + ancestor.region.end * unitWidth;
       const x2 = (x1 + x3) * 0.5;
 
       // Add border line
@@ -87,7 +91,10 @@ class RegionSelectorView {
         true
       ) as Element;
       const path = regionIndicator.querySelector("path");
-      this.#totalWidth = Math.max(this.#totalWidth + INDICATOR_WIDTH, x2);
+      this.#totalWidth = Math.max(
+        this.#totalWidth + Conf.instance.haplotypeViewWidth,
+        x2
+      );
 
       path?.setAttribute("d", `M ${x2} 0 L ${this.#totalWidth} -20`);
 
@@ -112,7 +119,10 @@ class RegionSelectorView {
         } else {
           this.#RelateViewer.dataset.selectedRegion = `${i}`;
           this.#RelateViewer.classList.add("-selectedregion");
-          DendrogramView.instance?.draw(i, x3 - CONF.stagePadding.left);
+          DendrogramView.instance?.draw(
+            i,
+            x3 - Conf.instance.stagePadding.left
+          );
         }
       });
 

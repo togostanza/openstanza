@@ -1,49 +1,53 @@
+import { Margins } from "../../lib/utils";
 import { Dataset } from "./classes/Dataset";
 import { RegionSelectorView } from "./classes/RegionSelectorView";
 
+type Params = { padding: Margins; fontHeightPx: number };
 // Height (width after rotating) of the dendrogram
 const CLUSTER_WIDTH = 300;
 const MUTATION_WIDTH = 1.5;
 
-const CONF = {
-  // get sectionSize() {
-  //   return {
-  //     cluster: 0.5,
-  //     mutation: 0.5,
-  //   };
-  // },
+class Conf {
+  static #instance: Conf;
+
+  static initialise(params: Params) {
+    this.#instance = new Conf(params);
+    return this.#instance;
+  }
+
+  static get instance() {
+    return this.#instance;
+  }
+
+  constructor(private params: Params) {}
+
   get haplotypeViewWidth() {
-    return 8;
-  },
+    return Math.max(8, this.params.fontHeightPx);
+  }
   get haplotypeViewGap() {
     return 4;
-  },
+  }
   get stagePadding() {
-    return {
-      top: 100,
-      right: 10,
-      bottom: 100,
-      left: 100,
-    };
-  },
+    return this.params.padding;
+  }
   get clusterWidth() {
     return CLUSTER_WIDTH;
-  },
+  }
   get mutationWidth() {
     return MUTATION_WIDTH * Dataset.instance.mutations.length;
-  },
+  }
   get mutationTop() {
     return this.stagePadding.top;
-  },
+  }
   get innerHeight() {
     return (
       this.haplotypeViewWidth * Dataset.instance.haplotypes.length +
       this.haplotypeViewGap * (Dataset.instance.haplotypes.length - 1)
     );
-  },
+  }
   get stageHeight() {
     return this.stagePadding.top + this.innerHeight + this.stagePadding.bottom;
-  },
+  }
   get stageWidth() {
     if (!RegionSelectorView.instance) {
       throw new Error("RegionSelectorView instance not found");
@@ -54,26 +58,11 @@ const CONF = {
       this.clusterWidth +
       this.stagePadding.right
     );
-  },
-  // get stageRect() {
-  //   if (!this._stageRect) {
-  //     // Calculate and store the dimensions of the SVG element, considering padding
-  //     this._stageRect = document.getElementById("svg").getBoundingClientRect();
-  //   }
-  //   return {
-  //     width:
-  //       this._stageRect.width -
-  //       this.stagePadding.left -
-  //       this.stagePadding.right,
-  //     height:
-  //       this._stageRect.height -
-  //       this.stagePadding.top -
-  //       this.stagePadding.bottom,
-  //   };
-  // },
+  }
+
   get regions() {
     return Dataset.instance.ancestors.map((ancestor) => ancestor.region);
-  },
-} as const;
+  }
+}
 
-export default CONF;
+export { Conf };

@@ -1,4 +1,4 @@
-import CONF from "../conf.js";
+import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
 
 class CheckboxInSVG {
@@ -46,9 +46,10 @@ class CheckboxInSVG {
         width = 10;
       }
 
-      const height = CONF.haplotypeViewWidth + CONF.haplotypeViewGap;
+      const height =
+        Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap;
       const x = -width + CheckboxInSVG.textPadding.x;
-      const y = -CONF.haplotypeViewGap / 2;
+      const y = -Conf.instance.haplotypeViewGap / 2;
 
       this.#rect!.setAttribute("width", `${width}`);
       this.#rect!.setAttribute("height", `${height}`);
@@ -82,7 +83,7 @@ class CheckboxInSVG {
         detail: {
           shiftKey,
         },
-      }),
+      })
     );
   }
 

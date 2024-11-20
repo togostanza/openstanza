@@ -1,4 +1,4 @@
-import CONF from "../conf.js";
+import { Conf } from "../conf";
 import { HaplotypesView } from "./HaplotypesView";
 
 class StageView {
@@ -37,8 +37,8 @@ class StageView {
   };
 
   update() {
-    this.#el.style.width = CONF.stageWidth + "px";
-    this.#el.style.height = CONF.stageHeight + "px";
+    this.#el.style.width = Conf.instance.stageWidth + "px";
+    this.#el.style.height = Conf.instance.stageHeight + "px";
   }
 
   #handleClickHaplotype = (e: any) => {

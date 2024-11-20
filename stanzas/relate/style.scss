@@ -1,25 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
 
-#container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: calc(100vh - 10px);
-  margin: 0;
-  padding: 5px;
-}
-
-#Container {
-  font-family: "Roboto Condensed", sans-serif;
+main {
+  font-family: var(--togostanza-fonts-font_family);
+  height: calc(var(--togostanza-canvas-height) * 1px);
   position: relative;
   --transition-duration: 0.2s;
   --long-transition-duration: 0.5s;
   --selected-color: #2a71ff;
-  flex: 1;
   overflow: auto;
 }
 
 #RelateViewer {
+  text {
+    fill: var(--togostanza-fonts-font_color_primary);
+    font-size: calc(var(--togostanza-fonts-font_size_primary) * 1px);
+    font-weight: var(--togostanza-fonts-font_weight_primary);
+  }
   &:has(.region-indicator-view:hover),
   &.-selectedregion {
     --fadeout-opacity: 0.1;
@@ -29,27 +25,6 @@
     .region-indicator-view {
       opacity: var(--fadeout-opacity);
     }
-  }
-}
-
-#input {
-  flex-shrink: 0;
-  column-gap: 10px;
-
-  > div {
-    flex-grow: 1;
-
-    > textarea {
-      font-size: 10px;
-      font-family: courier;
-      height: 5lh;
-      width: 100%;
-    }
-  }
-
-  h2 {
-    margin: 0;
-    font-size: 12px;
   }
 }
 
@@ -90,43 +65,40 @@
     transition: ease-in-out var(--long-transition-duration);
   }
 
-  > .haplotype-view:hover {
-    opacity: 1 !important;
-  }
-}
-
-.haplotype-view {
-  > g {
-    > .bg {
-      fill: #f8f8f8;
+  .haplotype-view {
+    &:hover {
+      opacity: 1 !important;
     }
-  }
-  .checkbox {
-    cursor: pointer;
-    user-select: none;
-    transition: ease-in-out var(--long-transition-duration);
-
-    > text {
-      font-size: 10px;
-
-      > tspan:nth-child(1) {
-        font-weight: bold;
-      }
-
-      > tspan.haplotype {
-        font-weight: 350;
-        font-size: 0.85em;
-      }
-
-      &.-selected {
-        fill: white;
+    > g {
+      > .bg {
+        fill: #f8f8f8;
       }
     }
+    .checkbox {
+      cursor: pointer;
+      user-select: none;
+      transition: ease-in-out var(--long-transition-duration);
 
-    > rect.checkbox-bg {
-      fill: transparent;
-      &.-selected {
-        fill: var(--selected-color);
+      > text {
+        > tspan:nth-child(1) {
+          font-weight: bold;
+        }
+
+        > tspan.haplotype {
+          font-weight: 350;
+          font-size: 0.85em;
+        }
+
+        &.-selected {
+          fill: white;
+        }
+      }
+
+      > rect.checkbox-bg {
+        fill: transparent;
+        &.-selected {
+          fill: var(--selected-color);
+        }
       }
     }
   }
@@ -149,7 +121,6 @@
     }
 
     > text {
-      font-size: 10px;
       text-anchor: start;
       dominant-baseline: middle;
 

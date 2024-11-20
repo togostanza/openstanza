@@ -1,6 +1,6 @@
 import { Dataset, type Branch } from "./Dataset";
 import { HaploEthnicities } from "./HaploEthnicities";
-import CONF from "../conf";
+import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
 import { Tooltip } from "./Tooltip";
 
@@ -61,7 +61,7 @@ class DendrogramView {
   private constructor(root: HTMLElement) {
     this.#el = root.querySelector("#DendrogramView");
     this.#RelateViewer = root.querySelector("#RelateViewer");
-    this.#container = this.#el?.closest("#Container") || null;
+    this.#container = this.#el?.closest("main") || null;
 
     Tooltip.initialise(this.#container);
   }
@@ -81,13 +81,17 @@ class DendrogramView {
     this.#el.setAttributeNS(
       null,
       "transform",
-      `translate(${CONF.stagePadding.left}, ${CONF.haplotypeViewWidth / 2})`
+      `translate(${Conf.instance.stagePadding.left}, ${
+        Conf.instance.haplotypeViewWidth / 2
+      })`
     );
     this.#el.appendChild(this.#inner);
 
     this.#grid.setAttribute(
       "transform",
-      `translate(0, ${CONF.stagePadding.top - CONF.haplotypeViewWidth / 2})`
+      `translate(0, ${
+        Conf.instance.stagePadding.top - Conf.instance.haplotypeViewWidth / 2
+      })`
     );
     this.#grid.style.pointerEvents = "none";
 
@@ -173,8 +177,8 @@ class DendrogramView {
 
     Tooltip.instance?.show(
       `Alleles: ${mutation.alleles.join(", ")}\nPosition: ${mutation.snp}`,
-      x + CONF.stagePadding.left,
-      y + CONF.haplotypeViewWidth / 2
+      x + Conf.instance.stagePadding.left,
+      y + Conf.instance.haplotypeViewWidth / 2
     );
   };
 
@@ -227,7 +231,8 @@ class DendrogramView {
             "transform",
             `translate(0 , ${
               +branch.line.dataset.index *
-              (CONF.haplotypeViewWidth + CONF.haplotypeViewGap)
+              (Conf.instance.haplotypeViewWidth +
+                Conf.instance.haplotypeViewGap)
             })`
           );
         }
@@ -251,7 +256,8 @@ class DendrogramView {
         g!.setAttribute(
           "transform",
           `translate(0 , ${
-            i * (CONF.haplotypeViewWidth + CONF.haplotypeViewGap)
+            i *
+            (Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap)
           })`
         );
       }
@@ -296,14 +302,14 @@ class DendrogramView {
     }
 
     // Draw the dendrogram
-    // const minGap = CONF.innerWidth / Dataset.instance.haplotypes.length;
-    const hRatio = CONF.clusterWidth / overAllLength;
+    // const minGap = Conf.instance.innerWidth / Dataset.instance.haplotypes.length;
+    const hRatio = Conf.instance.clusterWidth / overAllLength;
 
     this.addGridlines(
       hRatio,
       x0,
       overAllLength,
-      (CONF.haplotypeViewWidth + CONF.haplotypeViewGap) *
+      (Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap) *
         terminalBranches.length
     );
 
@@ -320,8 +326,8 @@ class DendrogramView {
       const ethnic = HaploEthnicities.instance.getSample(haplotype);
 
       const y =
-        CONF.stagePadding.top +
-        (CONF.haplotypeViewWidth + CONF.haplotypeViewGap) * i;
+        Conf.instance.stagePadding.top +
+        (Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap) * i;
 
       const line = createSVGElement("line", {
         x1: x0,
@@ -549,7 +555,7 @@ class DendrogramView {
       return;
     }
 
-    if (scrollTop < CONF.stagePadding.top) {
+    if (scrollTop < Conf.instance.stagePadding.top) {
       labelsG.setAttribute(
         "transform",
         `translate(${this.#x0}, ${-this.#gridLabelYMargin})`
@@ -559,7 +565,7 @@ class DendrogramView {
 
     labelsG.setAttribute(
       "transform",
-      `translate(${this.#x0}, ${scrollTop - CONF.stagePadding.top})`
+      `translate(${this.#x0}, ${scrollTop - Conf.instance.stagePadding.top})`
     );
   };
 }

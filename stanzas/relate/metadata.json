@@ -46,21 +46,15 @@
   "stanza:menu-placement": "bottom-right",
   "stanza:style": [
     {
-      "stanza:key": "--togostanza-canvas-width",
-      "stanza:type": "number",
-      "stanza:default": 320,
-      "stanza:description": "Metastanza width in px"
-    },
-    {
       "stanza:key": "--togostanza-canvas-height",
       "stanza:type": "number",
-      "stanza:default": 110,
+      "stanza:default": 700,
       "stanza:description": "Metastanza height in px"
     },
     {
       "stanza:key": "--togostanza-canvas-padding",
       "stanza:type": "text",
-      "stanza:default": "10px",
+      "stanza:default": "100px",
       "stanza:description": "Padding of a stanza. CSS padding-like text (10px 10px 10px 10px)"
     },
     {
@@ -72,7 +66,7 @@
     {
       "stanza:key": "--togostanza-fonts-font_family",
       "stanza:type": "text",
-      "stanza:default": "Helvetica, Arial, sans-serif",
+      "stanza:default": "'Roboto Condensed', sans-serif",
       "stanza:description": "Font family"
     },
     {
@@ -84,32 +78,14 @@
     {
       "stanza:key": "--togostanza-fonts-font_size_primary",
       "stanza:type": "number",
-      "stanza:default": 36,
+      "stanza:default": 10,
       "stanza:description": "Font size for value"
     },
     {
       "stanza:key": "--togostanza-fonts-font_weight_primary",
       "stanza:type": "number",
-      "stanza:default": 500,
-      "stanza:description": "Font weight for value"
-    },
-    {
-      "stanza:key": "--togostanza-fonts-font_color_secondary",
-      "stanza:type": "color",
-      "stanza:default": "#6590e6",
-      "stanza:description": "Font color for key"
-    },
-    {
-      "stanza:key": "--togostanza-fonts-font_size_secondary",
-      "stanza:type": "number",
-      "stanza:default": 16,
-      "stanza:description": "Font size for key"
-    },
-    {
-      "stanza:key": "--togostanza-fonts-font_weight_secondary",
-      "stanza:type": "number",
       "stanza:default": 400,
-      "stanza:description": "Font weight for key"
+      "stanza:description": "Font weight for value"
     }
   ]
 }

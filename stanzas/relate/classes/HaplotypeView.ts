@@ -1,5 +1,5 @@
 import { Dataset } from "./Dataset";
-import CONF from "../conf.js";
+import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
 import { CheckboxInSVG } from "./SVGCheckbox";
 import { EthnicityDatum } from "./HaploEthnicities";
@@ -35,8 +35,9 @@ export default class HaplotypeView {
     this.#el.setAttribute(
       "transform",
       `translate(0,${
-        (CONF.haplotypeViewWidth + CONF.haplotypeViewGap) * index
-      })`,
+        (Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap) *
+        index
+      })`
     );
     this.#el.setAttribute("data-haplotype", haplotype);
     this.#el.setAttribute("data-index", `${index}`);
@@ -59,7 +60,7 @@ export default class HaplotypeView {
         x: region.start * unitHeight,
         y: 0,
         width: (region.end - region.start) * unitHeight,
-        height: CONF.haplotypeViewWidth,
+        height: Conf.instance.haplotypeViewWidth,
         class: "bg",
       });
       g.appendChild(bgPath);
@@ -70,7 +71,12 @@ export default class HaplotypeView {
       for (let i = region.start; i < region.end; i++) {
         if (Dataset.instance.mutationsByHaplotype[index][i] === 1) {
           const originalX = i * unitHeight;
-          d += rectangle(originalX, 0, unitHeight, CONF.haplotypeViewWidth);
+          d += rectangle(
+            originalX,
+            0,
+            unitHeight,
+            Conf.instance.haplotypeViewWidth
+          );
         }
       }
       path2.setAttribute("d", d);
@@ -132,7 +138,7 @@ export default class HaplotypeView {
           shiftKey,
         },
         bubbles: true,
-      }),
+      })
     );
   }
 

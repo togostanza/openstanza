@@ -1,5 +1,3 @@
-// Import JSDoc typedef from types.js for reference
-
 import { loadFiles } from "../util.js";
 
 export type EthnicityDatum = {

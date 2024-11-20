@@ -1,7 +1,7 @@
 import { Dataset } from "./Dataset";
 import { HaploEthnicities } from "./HaploEthnicities";
 import HaplotypeView from "./HaplotypeView";
-import CONF from "../conf.js";
+import { Conf } from "../conf";
 
 class HaplotypesView {
   #el: HTMLElement;
@@ -41,15 +41,16 @@ class HaplotypesView {
     // empty
     this.clear();
 
-    const unitHeight = CONF.mutationWidth / Dataset.instance.mutations.length;
+    const unitHeight =
+      Conf.instance.mutationWidth / Dataset.instance.mutations.length;
     this.#el.setAttributeNS(
       null,
       "transform",
-      `translate(${CONF.stagePadding.left}, ${CONF.stagePadding.top})`
+      `translate(${Conf.instance.stagePadding.left}, ${Conf.instance.stagePadding.top})`
     );
 
     // Draw mutations
-    const regions = CONF.regions;
+    const regions = Conf.instance.regions;
 
     for (let i = 0; i < Dataset.instance.haplotypes.length; i++) {
       const haplotype = Dataset.instance.haplotypes[i];
