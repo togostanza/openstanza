@@ -5,8 +5,13 @@
   "repository": "https://github.com/togostanza/openstanza",
   "dependencies": {
     "d3": "^6.7.0",
-    "togostanza": "^3.0.0-beta.29",
-    "togostanza-utils": "git+https://github.com/togostanza/togostanza-utils.git"
+    "togostanza": "^3.0.0-beta.56",
+    "togostanza-utils": "github:togostanza/togostanza-utils"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.3.0"
   },
   "engines": {
     "node": ">=14"

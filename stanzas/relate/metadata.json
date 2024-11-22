@@ -1,0 +1,91 @@
+{
+  "@context": {
+    "stanza": "http://togostanza.org/resource/stanza#"
+  },
+  "@id": "relate",
+  "stanza:label": "Relate",
+  "stanza:definition": "Relate MetaStanza",
+  "stanza:license": "MIT",
+  "stanza:author": "DBCLS",
+  "stanza:address": "https://github.com/togostanza/metastanza",
+  "stanza:contributor": ["PENQE", "Enishi Tech"],
+  "stanza:created": "2024-10-11",
+  "stanza:updated": "2024-10-11",
+  "stanza:parameter": [
+    {
+      "stanza:key": "data-url",
+      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/refs/heads/main/samples/other/hapmap3204.pop.tsv",
+      "stanza:description": "Hapmap data source URL",
+      "stanza:required": true
+    },
+    {
+      "stanza:key": "data-type",
+      "stanza:example": "tsv",
+      "stanza:description": "Data type",
+      "stanza:required": true
+    },
+    {
+      "stanza:key": "data-folder-url",
+      "stanza:example": "https://raw.githubusercontent.com/togostanza/togostanza-data/refs/heads/main/samples/other/",
+      "stanza:description": "Data folder url",
+      "stanza:required": true
+    },
+    {
+      "stanza:key": "data-id",
+      "stanza:example": "A2M_chr12_9062708_9120919",
+      "stanza:description": "ID of the analysis data",
+      "stanza:required": true
+    },
+
+    {
+      "stanza:key": "togostanza-custom_css_url",
+      "stanza:example": "",
+      "stanza:description": "Stylesheet(css file) URL to override current style"
+    }
+  ],
+  "stanza:menu-placement": "bottom-right",
+  "stanza:style": [
+    {
+      "stanza:key": "--togostanza-canvas-height",
+      "stanza:type": "number",
+      "stanza:default": 700,
+      "stanza:description": "Metastanza height in px"
+    },
+    {
+      "stanza:key": "--togostanza-canvas-padding",
+      "stanza:type": "text",
+      "stanza:default": "100px",
+      "stanza:description": "Padding of a stanza. CSS padding-like text (10px 10px 10px 10px)"
+    },
+    {
+      "stanza:key": "--togostanza-theme-background_color",
+      "stanza:type": "color",
+      "stanza:default": "rgba(255,255,255,0)",
+      "stanza:description": "Background color"
+    },
+    {
+      "stanza:key": "--togostanza-fonts-font_family",
+      "stanza:type": "text",
+      "stanza:default": "'Roboto Condensed', sans-serif",
+      "stanza:description": "Font family"
+    },
+    {
+      "stanza:key": "--togostanza-fonts-font_color_primary",
+      "stanza:type": "color",
+      "stanza:default": "#4E5059",
+      "stanza:description": "Font color for value"
+    },
+    {
+      "stanza:key": "--togostanza-fonts-font_size_primary",
+      "stanza:type": "number",
+      "stanza:default": 10,
+      "stanza:description": "Font size for value"
+    },
+    {
+      "stanza:key": "--togostanza-fonts-font_weight_primary",
+      "stanza:type": "number",
+      "stanza:default": 400,
+      "stanza:description": "Font weight for value"
+    }
+  ]
+}
