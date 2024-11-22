@@ -1,1163 +1,1305 @@
-import { d as defineComponent, h as computed, a as createElementBlock, e as createBaseVNode, f as createCommentVNode, i as createTextVNode, t as toDisplayString, F as Fragment, b as renderList, n as normalizeClass, o as openBlock, j as ref, k as octicons, m as mergeProps, l as createVNode, c as createBlock, p as normalizeProps, q as guardReactiveProps, u as resolveDynamicComponent, r as resolveComponent, s as script$4, w as withCtx, v as pushScopeId, x as popScopeId, y as n, g as createApp } from './Layout-8d857fcd.js';
+import { d as defineComponent, h as ref, i as octicons, b as createElementBlock, F as Fragment, a as createBaseVNode, j as createTextVNode, m as mergeProps, o as openBlock, k as computed, l as watch, c as createBlock, n as normalizeProps, p as guardReactiveProps, q as resolveDynamicComponent, u as createVNode, t as toDisplayString, r as resolveComponent, e as renderList, v as n, f as createCommentVNode, x as normalizeClass, y as unref, z as normalizeStyle, s as script$8, A as onMounted, w as withCtx, g as createApp } from './Layout-efd7b83e.js';
 
 var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-var tab = {exports: {}};
-
-var eventHandler = {exports: {}};
-
-/*!
-  * Bootstrap event-handler.js v5.1.1 (https://getbootstrap.com/)
-  * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
-
-(function (module, exports) {
-(function (global, factory) {
-  module.exports = factory() ;
-}(commonjsGlobal, (function () {
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  const getjQuery = () => {
-    const {
-      jQuery
-    } = window;
-
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
-      return jQuery;
-    }
-
-    return null;
-  };
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): dom/event-handler.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  /**
-   * ------------------------------------------------------------------------
-   * Constants
-   * ------------------------------------------------------------------------
-   */
-
-  const namespaceRegex = /[^.]*(?=\..*)\.|.*/;
-  const stripNameRegex = /\..*/;
-  const stripUidRegex = /::\d+$/;
-  const eventRegistry = {}; // Events storage
-
-  let uidEvent = 1;
-  const customEvents = {
-    mouseenter: 'mouseover',
-    mouseleave: 'mouseout'
-  };
-  const customEventsRegex = /^(mouseenter|mouseleave)/i;
-  const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
-  /**
-   * ------------------------------------------------------------------------
-   * Private methods
-   * ------------------------------------------------------------------------
-   */
-
-  function getUidEvent(element, uid) {
-    return uid && `${uid}::${uidEvent++}` || element.uidEvent || uidEvent++;
-  }
-
-  function getEvent(element) {
-    const uid = getUidEvent(element);
-    element.uidEvent = uid;
-    eventRegistry[uid] = eventRegistry[uid] || {};
-    return eventRegistry[uid];
-  }
-
-  function bootstrapHandler(element, fn) {
-    return function handler(event) {
-      event.delegateTarget = element;
-
-      if (handler.oneOff) {
-        EventHandler.off(element, event.type, fn);
-      }
-
-      return fn.apply(element, [event]);
-    };
-  }
-
-  function bootstrapDelegationHandler(element, selector, fn) {
-    return function handler(event) {
-      const domElements = element.querySelectorAll(selector);
-
-      for (let {
-        target
-      } = event; target && target !== this; target = target.parentNode) {
-        for (let i = domElements.length; i--;) {
-          if (domElements[i] === target) {
-            event.delegateTarget = target;
-
-            if (handler.oneOff) {
-              EventHandler.off(element, event.type, selector, fn);
-            }
-
-            return fn.apply(target, [event]);
-          }
-        }
-      } // To please ESLint
-
-
-      return null;
-    };
-  }
-
-  function findHandler(events, handler, delegationSelector = null) {
-    const uidEventList = Object.keys(events);
-
-    for (let i = 0, len = uidEventList.length; i < len; i++) {
-      const event = events[uidEventList[i]];
-
-      if (event.originalHandler === handler && event.delegationSelector === delegationSelector) {
-        return event;
-      }
-    }
-
-    return null;
-  }
-
-  function normalizeParams(originalTypeEvent, handler, delegationFn) {
-    const delegation = typeof handler === 'string';
-    const originalHandler = delegation ? delegationFn : handler;
-    let typeEvent = getTypeEvent(originalTypeEvent);
-    const isNative = nativeEvents.has(typeEvent);
-
-    if (!isNative) {
-      typeEvent = originalTypeEvent;
-    }
-
-    return [delegation, originalHandler, typeEvent];
-  }
-
-  function addHandler(element, originalTypeEvent, handler, delegationFn, oneOff) {
-    if (typeof originalTypeEvent !== 'string' || !element) {
-      return;
-    }
-
-    if (!handler) {
-      handler = delegationFn;
-      delegationFn = null;
-    } // in case of mouseenter or mouseleave wrap the handler within a function that checks for its DOM position
-    // this prevents the handler from being dispatched the same way as mouseover or mouseout does
-
-
-    if (customEventsRegex.test(originalTypeEvent)) {
-      const wrapFn = fn => {
-        return function (event) {
-          if (!event.relatedTarget || event.relatedTarget !== event.delegateTarget && !event.delegateTarget.contains(event.relatedTarget)) {
-            return fn.call(this, event);
-          }
-        };
-      };
-
-      if (delegationFn) {
-        delegationFn = wrapFn(delegationFn);
-      } else {
-        handler = wrapFn(handler);
-      }
-    }
-
-    const [delegation, originalHandler, typeEvent] = normalizeParams(originalTypeEvent, handler, delegationFn);
-    const events = getEvent(element);
-    const handlers = events[typeEvent] || (events[typeEvent] = {});
-    const previousFn = findHandler(handlers, originalHandler, delegation ? handler : null);
-
-    if (previousFn) {
-      previousFn.oneOff = previousFn.oneOff && oneOff;
-      return;
-    }
-
-    const uid = getUidEvent(originalHandler, originalTypeEvent.replace(namespaceRegex, ''));
-    const fn = delegation ? bootstrapDelegationHandler(element, handler, delegationFn) : bootstrapHandler(element, handler);
-    fn.delegationSelector = delegation ? handler : null;
-    fn.originalHandler = originalHandler;
-    fn.oneOff = oneOff;
-    fn.uidEvent = uid;
-    handlers[uid] = fn;
-    element.addEventListener(typeEvent, fn, delegation);
-  }
-
-  function removeHandler(element, events, typeEvent, handler, delegationSelector) {
-    const fn = findHandler(events[typeEvent], handler, delegationSelector);
-
-    if (!fn) {
-      return;
-    }
-
-    element.removeEventListener(typeEvent, fn, Boolean(delegationSelector));
-    delete events[typeEvent][fn.uidEvent];
-  }
-
-  function removeNamespacedHandlers(element, events, typeEvent, namespace) {
-    const storeElementEvent = events[typeEvent] || {};
-    Object.keys(storeElementEvent).forEach(handlerKey => {
-      if (handlerKey.includes(namespace)) {
-        const event = storeElementEvent[handlerKey];
-        removeHandler(element, events, typeEvent, event.originalHandler, event.delegationSelector);
-      }
-    });
-  }
-
-  function getTypeEvent(event) {
-    // allow to get the native events from namespaced events ('click.bs.button' --> 'click')
-    event = event.replace(stripNameRegex, '');
-    return customEvents[event] || event;
-  }
-
-  const EventHandler = {
-    on(element, event, handler, delegationFn) {
-      addHandler(element, event, handler, delegationFn, false);
-    },
-
-    one(element, event, handler, delegationFn) {
-      addHandler(element, event, handler, delegationFn, true);
-    },
-
-    off(element, originalTypeEvent, handler, delegationFn) {
-      if (typeof originalTypeEvent !== 'string' || !element) {
-        return;
-      }
-
-      const [delegation, originalHandler, typeEvent] = normalizeParams(originalTypeEvent, handler, delegationFn);
-      const inNamespace = typeEvent !== originalTypeEvent;
-      const events = getEvent(element);
-      const isNamespace = originalTypeEvent.startsWith('.');
-
-      if (typeof originalHandler !== 'undefined') {
-        // Simplest case: handler is passed, remove that listener ONLY.
-        if (!events || !events[typeEvent]) {
-          return;
-        }
-
-        removeHandler(element, events, typeEvent, originalHandler, delegation ? handler : null);
-        return;
-      }
-
-      if (isNamespace) {
-        Object.keys(events).forEach(elementEvent => {
-          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
-        });
-      }
-
-      const storeElementEvent = events[typeEvent] || {};
-      Object.keys(storeElementEvent).forEach(keyHandlers => {
-        const handlerKey = keyHandlers.replace(stripUidRegex, '');
-
-        if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
-          const event = storeElementEvent[keyHandlers];
-          removeHandler(element, events, typeEvent, event.originalHandler, event.delegationSelector);
-        }
-      });
-    },
-
-    trigger(element, event, args) {
-      if (typeof event !== 'string' || !element) {
-        return null;
-      }
-
-      const $ = getjQuery();
-      const typeEvent = getTypeEvent(event);
-      const inNamespace = event !== typeEvent;
-      const isNative = nativeEvents.has(typeEvent);
-      let jQueryEvent;
-      let bubbles = true;
-      let nativeDispatch = true;
-      let defaultPrevented = false;
-      let evt = null;
-
-      if (inNamespace && $) {
-        jQueryEvent = $.Event(event, args);
-        $(element).trigger(jQueryEvent);
-        bubbles = !jQueryEvent.isPropagationStopped();
-        nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
-        defaultPrevented = jQueryEvent.isDefaultPrevented();
-      }
-
-      if (isNative) {
-        evt = document.createEvent('HTMLEvents');
-        evt.initEvent(typeEvent, bubbles, true);
-      } else {
-        evt = new CustomEvent(event, {
-          bubbles,
-          cancelable: true
-        });
-      } // merge custom information in our event
-
-
-      if (typeof args !== 'undefined') {
-        Object.keys(args).forEach(key => {
-          Object.defineProperty(evt, key, {
-            get() {
-              return args[key];
-            }
-
-          });
-        });
-      }
-
-      if (defaultPrevented) {
-        evt.preventDefault();
-      }
-
-      if (nativeDispatch) {
-        element.dispatchEvent(evt);
-      }
-
-      if (evt.defaultPrevented && typeof jQueryEvent !== 'undefined') {
-        jQueryEvent.preventDefault();
-      }
-
-      return evt;
-    }
-
-  };
-
-  return EventHandler;
-
-})));
-
-}(eventHandler));
-
-var selectorEngine = {exports: {}};
-
-/*!
-  * Bootstrap selector-engine.js v5.1.1 (https://getbootstrap.com/)
-  * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
-
-(function (module, exports) {
-(function (global, factory) {
-  module.exports = factory() ;
-}(commonjsGlobal, (function () {
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  const isElement = obj => {
-    if (!obj || typeof obj !== 'object') {
-      return false;
-    }
-
-    if (typeof obj.jquery !== 'undefined') {
-      obj = obj[0];
-    }
-
-    return typeof obj.nodeType !== 'undefined';
-  };
-
-  const isVisible = element => {
-    if (!isElement(element) || element.getClientRects().length === 0) {
-      return false;
-    }
-
-    return getComputedStyle(element).getPropertyValue('visibility') === 'visible';
-  };
-
-  const isDisabled = element => {
-    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
-      return true;
-    }
-
-    if (element.classList.contains('disabled')) {
-      return true;
-    }
-
-    if (typeof element.disabled !== 'undefined') {
-      return element.disabled;
-    }
-
-    return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false';
-  };
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): dom/selector-engine.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  const NODE_TEXT = 3;
-  const SelectorEngine = {
-    find(selector, element = document.documentElement) {
-      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
-    },
-
-    findOne(selector, element = document.documentElement) {
-      return Element.prototype.querySelector.call(element, selector);
-    },
-
-    children(element, selector) {
-      return [].concat(...element.children).filter(child => child.matches(selector));
-    },
-
-    parents(element, selector) {
-      const parents = [];
-      let ancestor = element.parentNode;
-
-      while (ancestor && ancestor.nodeType === Node.ELEMENT_NODE && ancestor.nodeType !== NODE_TEXT) {
-        if (ancestor.matches(selector)) {
-          parents.push(ancestor);
-        }
-
-        ancestor = ancestor.parentNode;
-      }
-
-      return parents;
-    },
-
-    prev(element, selector) {
-      let previous = element.previousElementSibling;
-
-      while (previous) {
-        if (previous.matches(selector)) {
-          return [previous];
-        }
-
-        previous = previous.previousElementSibling;
-      }
-
-      return [];
-    },
-
-    next(element, selector) {
-      let next = element.nextElementSibling;
-
-      while (next) {
-        if (next.matches(selector)) {
-          return [next];
-        }
-
-        next = next.nextElementSibling;
-      }
-
-      return [];
-    },
-
-    focusableChildren(element) {
-      const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(', ');
-      return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el));
-    }
-
-  };
-
-  return SelectorEngine;
-
-})));
-
-}(selectorEngine));
-
-var baseComponent = {exports: {}};
-
-var data = {exports: {}};
-
-/*!
-  * Bootstrap data.js v5.1.1 (https://getbootstrap.com/)
-  * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
-
-(function (module, exports) {
-(function (global, factory) {
-  module.exports = factory() ;
-}(commonjsGlobal, (function () {
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): dom/data.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  /**
-   * ------------------------------------------------------------------------
-   * Constants
-   * ------------------------------------------------------------------------
-   */
-  const elementMap = new Map();
-  var data = {
-    set(element, key, instance) {
-      if (!elementMap.has(element)) {
-        elementMap.set(element, new Map());
-      }
-
-      const instanceMap = elementMap.get(element); // make it clear we only want one instance per element
-      // can be removed later when multiple key/instances are fine to be used
-
-      if (!instanceMap.has(key) && instanceMap.size !== 0) {
-        // eslint-disable-next-line no-console
-        console.error(`Bootstrap doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
-        return;
-      }
-
-      instanceMap.set(key, instance);
-    },
-
-    get(element, key) {
-      if (elementMap.has(element)) {
-        return elementMap.get(element).get(key) || null;
-      }
-
-      return null;
-    },
-
-    remove(element, key) {
-      if (!elementMap.has(element)) {
-        return;
-      }
-
-      const instanceMap = elementMap.get(element);
-      instanceMap.delete(key); // free up element references if there are no instances left for an element
-
-      if (instanceMap.size === 0) {
-        elementMap.delete(element);
-      }
-    }
-
-  };
-
-  return data;
-
-})));
-
-}(data));
-
-/*!
-  * Bootstrap base-component.js v5.1.1 (https://getbootstrap.com/)
-  * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
-
-(function (module, exports) {
-(function (global, factory) {
-  module.exports = factory(data.exports, eventHandler.exports) ;
-}(commonjsGlobal, (function (Data, EventHandler) {
-  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-  var Data__default = /*#__PURE__*/_interopDefaultLegacy(Data);
-  var EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  const MILLISECONDS_MULTIPLIER = 1000;
-  const TRANSITION_END = 'transitionend'; // Shoutout AngusCroll (https://goo.gl/pxwQGp)
-
-  const getTransitionDurationFromElement = element => {
-    if (!element) {
-      return 0;
-    } // Get transition-duration of the element
-
-
-    let {
-      transitionDuration,
-      transitionDelay
-    } = window.getComputedStyle(element);
-    const floatTransitionDuration = Number.parseFloat(transitionDuration);
-    const floatTransitionDelay = Number.parseFloat(transitionDelay); // Return 0 if element or transition duration is not found
-
-    if (!floatTransitionDuration && !floatTransitionDelay) {
-      return 0;
-    } // If multiple durations are defined, take the first
-
-
-    transitionDuration = transitionDuration.split(',')[0];
-    transitionDelay = transitionDelay.split(',')[0];
-    return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER;
-  };
-
-  const triggerTransitionEnd = element => {
-    element.dispatchEvent(new Event(TRANSITION_END));
-  };
-
-  const isElement = obj => {
-    if (!obj || typeof obj !== 'object') {
-      return false;
-    }
-
-    if (typeof obj.jquery !== 'undefined') {
-      obj = obj[0];
-    }
-
-    return typeof obj.nodeType !== 'undefined';
-  };
-
-  const getElement = obj => {
-    if (isElement(obj)) {
-      // it's a jQuery object or a node element
-      return obj.jquery ? obj[0] : obj;
-    }
-
-    if (typeof obj === 'string' && obj.length > 0) {
-      return document.querySelector(obj);
-    }
-
-    return null;
-  };
-
-  const execute = callback => {
-    if (typeof callback === 'function') {
-      callback();
-    }
-  };
-
-  const executeAfterTransition = (callback, transitionElement, waitForTransition = true) => {
-    if (!waitForTransition) {
-      execute(callback);
-      return;
-    }
-
-    const durationPadding = 5;
-    const emulatedDuration = getTransitionDurationFromElement(transitionElement) + durationPadding;
-    let called = false;
-
-    const handler = ({
-      target
-    }) => {
-      if (target !== transitionElement) {
-        return;
-      }
-
-      called = true;
-      transitionElement.removeEventListener(TRANSITION_END, handler);
-      execute(callback);
-    };
-
-    transitionElement.addEventListener(TRANSITION_END, handler);
-    setTimeout(() => {
-      if (!called) {
-        triggerTransitionEnd(transitionElement);
-      }
-    }, emulatedDuration);
-  };
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): base-component.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  /**
-   * ------------------------------------------------------------------------
-   * Constants
-   * ------------------------------------------------------------------------
-   */
-
-  const VERSION = '5.1.1';
-
-  class BaseComponent {
-    constructor(element) {
-      element = getElement(element);
-
-      if (!element) {
-        return;
-      }
-
-      this._element = element;
-      Data__default['default'].set(this._element, this.constructor.DATA_KEY, this);
-    }
-
-    dispose() {
-      Data__default['default'].remove(this._element, this.constructor.DATA_KEY);
-      EventHandler__default['default'].off(this._element, this.constructor.EVENT_KEY);
-      Object.getOwnPropertyNames(this).forEach(propertyName => {
-        this[propertyName] = null;
-      });
-    }
-
-    _queueCallback(callback, element, isAnimated = true) {
-      executeAfterTransition(callback, element, isAnimated);
-    }
-    /** Static */
-
-
-    static getInstance(element) {
-      return Data__default['default'].get(getElement(element), this.DATA_KEY);
-    }
-
-    static getOrCreateInstance(element, config = {}) {
-      return this.getInstance(element) || new this(element, typeof config === 'object' ? config : null);
-    }
-
-    static get VERSION() {
-      return VERSION;
-    }
-
-    static get NAME() {
-      throw new Error('You have to implement the static method "NAME", for each component!');
-    }
-
-    static get DATA_KEY() {
-      return `bs.${this.NAME}`;
-    }
-
-    static get EVENT_KEY() {
-      return `.${this.DATA_KEY}`;
-    }
-
-  }
-
-  return BaseComponent;
-
-})));
-
-}(baseComponent));
-
-/*!
-  * Bootstrap tab.js v5.1.1 (https://getbootstrap.com/)
-  * Copyright 2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
-  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-  */
-
-(function (module, exports) {
-(function (global, factory) {
-  module.exports = factory(eventHandler.exports, selectorEngine.exports, baseComponent.exports) ;
-}(commonjsGlobal, (function (EventHandler, SelectorEngine, BaseComponent) {
-  function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-  var EventHandler__default = /*#__PURE__*/_interopDefaultLegacy(EventHandler);
-  var SelectorEngine__default = /*#__PURE__*/_interopDefaultLegacy(SelectorEngine);
-  var BaseComponent__default = /*#__PURE__*/_interopDefaultLegacy(BaseComponent);
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): util/index.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-
-  const getSelector = element => {
-    let selector = element.getAttribute('data-bs-target');
-
-    if (!selector || selector === '#') {
-      let hrefAttr = element.getAttribute('href'); // The only valid content that could double as a selector are IDs or classes,
-      // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
-      // `document.querySelector` will rightfully complain it is invalid.
-      // See https://github.com/twbs/bootstrap/issues/32273
-
-      if (!hrefAttr || !hrefAttr.includes('#') && !hrefAttr.startsWith('.')) {
-        return null;
-      } // Just in case some CMS puts out a full URL with the anchor appended
-
-
-      if (hrefAttr.includes('#') && !hrefAttr.startsWith('#')) {
-        hrefAttr = `#${hrefAttr.split('#')[1]}`;
-      }
-
-      selector = hrefAttr && hrefAttr !== '#' ? hrefAttr.trim() : null;
-    }
-
-    return selector;
-  };
-
-  const getElementFromSelector = element => {
-    const selector = getSelector(element);
-    return selector ? document.querySelector(selector) : null;
-  };
-
-  const isDisabled = element => {
-    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
-      return true;
-    }
-
-    if (element.classList.contains('disabled')) {
-      return true;
-    }
-
-    if (typeof element.disabled !== 'undefined') {
-      return element.disabled;
-    }
-
-    return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false';
-  };
-  /**
-   * Trick to restart an element's animation
-   *
-   * @param {HTMLElement} element
-   * @return void
-   *
-   * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
-   */
-
-
-  const reflow = element => {
-    // eslint-disable-next-line no-unused-expressions
-    element.offsetHeight;
-  };
-
-  const getjQuery = () => {
-    const {
-      jQuery
-    } = window;
-
-    if (jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
-      return jQuery;
-    }
-
-    return null;
-  };
-
-  const DOMContentLoadedCallbacks = [];
-
-  const onDOMContentLoaded = callback => {
-    if (document.readyState === 'loading') {
-      // add listener on the first call when the document is in loading state
-      if (!DOMContentLoadedCallbacks.length) {
-        document.addEventListener('DOMContentLoaded', () => {
-          DOMContentLoadedCallbacks.forEach(callback => callback());
-        });
-      }
-
-      DOMContentLoadedCallbacks.push(callback);
-    } else {
-      callback();
-    }
-  };
-
-  const defineJQueryPlugin = plugin => {
-    onDOMContentLoaded(() => {
-      const $ = getjQuery();
-      /* istanbul ignore if */
-
-      if ($) {
-        const name = plugin.NAME;
-        const JQUERY_NO_CONFLICT = $.fn[name];
-        $.fn[name] = plugin.jQueryInterface;
-        $.fn[name].Constructor = plugin;
-
-        $.fn[name].noConflict = () => {
-          $.fn[name] = JQUERY_NO_CONFLICT;
-          return plugin.jQueryInterface;
-        };
-      }
-    });
-  };
-
-  /**
-   * --------------------------------------------------------------------------
-   * Bootstrap (v5.1.1): tab.js
-   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
-   * --------------------------------------------------------------------------
-   */
-  /**
-   * ------------------------------------------------------------------------
-   * Constants
-   * ------------------------------------------------------------------------
-   */
-
-  const NAME = 'tab';
-  const DATA_KEY = 'bs.tab';
-  const EVENT_KEY = `.${DATA_KEY}`;
-  const DATA_API_KEY = '.data-api';
-  const EVENT_HIDE = `hide${EVENT_KEY}`;
-  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
-  const EVENT_SHOW = `show${EVENT_KEY}`;
-  const EVENT_SHOWN = `shown${EVENT_KEY}`;
-  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}${DATA_API_KEY}`;
-  const CLASS_NAME_DROPDOWN_MENU = 'dropdown-menu';
-  const CLASS_NAME_ACTIVE = 'active';
-  const CLASS_NAME_FADE = 'fade';
-  const CLASS_NAME_SHOW = 'show';
-  const SELECTOR_DROPDOWN = '.dropdown';
-  const SELECTOR_NAV_LIST_GROUP = '.nav, .list-group';
-  const SELECTOR_ACTIVE = '.active';
-  const SELECTOR_ACTIVE_UL = ':scope > li > .active';
-  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]';
-  const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
-  const SELECTOR_DROPDOWN_ACTIVE_CHILD = ':scope > .dropdown-menu .active';
-  /**
-   * ------------------------------------------------------------------------
-   * Class Definition
-   * ------------------------------------------------------------------------
-   */
-
-  class Tab extends BaseComponent__default['default'] {
-    // Getters
-    static get NAME() {
-      return NAME;
-    } // Public
-
-
-    show() {
-      if (this._element.parentNode && this._element.parentNode.nodeType === Node.ELEMENT_NODE && this._element.classList.contains(CLASS_NAME_ACTIVE)) {
-        return;
-      }
-
-      let previous;
-      const target = getElementFromSelector(this._element);
-
-      const listElement = this._element.closest(SELECTOR_NAV_LIST_GROUP);
-
-      if (listElement) {
-        const itemSelector = listElement.nodeName === 'UL' || listElement.nodeName === 'OL' ? SELECTOR_ACTIVE_UL : SELECTOR_ACTIVE;
-        previous = SelectorEngine__default['default'].find(itemSelector, listElement);
-        previous = previous[previous.length - 1];
-      }
-
-      const hideEvent = previous ? EventHandler__default['default'].trigger(previous, EVENT_HIDE, {
-        relatedTarget: this._element
-      }) : null;
-      const showEvent = EventHandler__default['default'].trigger(this._element, EVENT_SHOW, {
-        relatedTarget: previous
-      });
-
-      if (showEvent.defaultPrevented || hideEvent !== null && hideEvent.defaultPrevented) {
-        return;
-      }
-
-      this._activate(this._element, listElement);
-
-      const complete = () => {
-        EventHandler__default['default'].trigger(previous, EVENT_HIDDEN, {
-          relatedTarget: this._element
-        });
-        EventHandler__default['default'].trigger(this._element, EVENT_SHOWN, {
-          relatedTarget: previous
-        });
-      };
-
-      if (target) {
-        this._activate(target, target.parentNode, complete);
-      } else {
-        complete();
-      }
-    } // Private
-
-
-    _activate(element, container, callback) {
-      const activeElements = container && (container.nodeName === 'UL' || container.nodeName === 'OL') ? SelectorEngine__default['default'].find(SELECTOR_ACTIVE_UL, container) : SelectorEngine__default['default'].children(container, SELECTOR_ACTIVE);
-      const active = activeElements[0];
-      const isTransitioning = callback && active && active.classList.contains(CLASS_NAME_FADE);
-
-      const complete = () => this._transitionComplete(element, active, callback);
-
-      if (active && isTransitioning) {
-        active.classList.remove(CLASS_NAME_SHOW);
-
-        this._queueCallback(complete, element, true);
-      } else {
-        complete();
-      }
-    }
-
-    _transitionComplete(element, active, callback) {
-      if (active) {
-        active.classList.remove(CLASS_NAME_ACTIVE);
-        const dropdownChild = SelectorEngine__default['default'].findOne(SELECTOR_DROPDOWN_ACTIVE_CHILD, active.parentNode);
-
-        if (dropdownChild) {
-          dropdownChild.classList.remove(CLASS_NAME_ACTIVE);
-        }
-
-        if (active.getAttribute('role') === 'tab') {
-          active.setAttribute('aria-selected', false);
-        }
-      }
-
-      element.classList.add(CLASS_NAME_ACTIVE);
-
-      if (element.getAttribute('role') === 'tab') {
-        element.setAttribute('aria-selected', true);
-      }
-
-      reflow(element);
-
-      if (element.classList.contains(CLASS_NAME_FADE)) {
-        element.classList.add(CLASS_NAME_SHOW);
-      }
-
-      let parent = element.parentNode;
-
-      if (parent && parent.nodeName === 'LI') {
-        parent = parent.parentNode;
-      }
-
-      if (parent && parent.classList.contains(CLASS_NAME_DROPDOWN_MENU)) {
-        const dropdownElement = element.closest(SELECTOR_DROPDOWN);
-
-        if (dropdownElement) {
-          SelectorEngine__default['default'].find(SELECTOR_DROPDOWN_TOGGLE, dropdownElement).forEach(dropdown => dropdown.classList.add(CLASS_NAME_ACTIVE));
-        }
-
-        element.setAttribute('aria-expanded', true);
-      }
-
-      if (callback) {
-        callback();
-      }
-    } // Static
-
-
-    static jQueryInterface(config) {
-      return this.each(function () {
-        const data = Tab.getOrCreateInstance(this);
-
-        if (typeof config === 'string') {
-          if (typeof data[config] === 'undefined') {
-            throw new TypeError(`No method named "${config}"`);
-          }
-
-          data[config]();
-        }
-      });
-    }
-
-  }
-  /**
-   * ------------------------------------------------------------------------
-   * Data Api implementation
-   * ------------------------------------------------------------------------
-   */
-
-
-  EventHandler__default['default'].on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
-    if (['A', 'AREA'].includes(this.tagName)) {
-      event.preventDefault();
-    }
-
-    if (isDisabled(this)) {
-      return;
-    }
-
-    const data = Tab.getOrCreateInstance(this);
-    data.show();
-  });
-  /**
-   * ------------------------------------------------------------------------
-   * jQuery
-   * ------------------------------------------------------------------------
-   * add .Tab to jQuery only if jQuery is present
-   */
-
-  defineJQueryPlugin(Tab);
-
-  return Tab;
-
-})));
-
-}(tab));
-
-var script$3 = defineComponent({
-  props: [
-    'choices',
-    'helpText',
-    'input',
-    'name',
-    'required',
-    'type',
-  ],
-
-  setup(props) {
-    const formType = computed(() => {
-      return props.type === "datetime" ? "datetime-local" : props.type;
-    });
-
-    return {...props, formType};
-  }
-});
-
-const _hoisted_1$3 = { class: "form-label d-flex" };
-const _hoisted_2$3 = { class: "me-auto" };
-const _hoisted_3$3 = {
-  key: 0,
-  class: "text-danger"
-};
-const _hoisted_4$2 = { class: "text-muted" };
-const _hoisted_5$2 = { class: "input-group" };
-const _hoisted_6$1 = ["value"];
-const _hoisted_7$1 = ["value"];
-const _hoisted_8$1 = { class: "input-group-text" };
-const _hoisted_9$1 = ["checked", "id"];
-const _hoisted_10$1 = ["for"];
-const _hoisted_11$1 = ["type", "value"];
-const _hoisted_12$1 = ["disabled"];
-const _hoisted_13$1 = {
-  key: 0,
-  class: "form-text text-muted"
+var tabExports = {};
+var tab = {
+  get exports(){ return tabExports; },
+  set exports(v){ tabExports = v; },
 };
 
-function render$3(_ctx, _cache, $props, $setup, $data, $options) {
-  return (openBlock(), createElementBlock(Fragment, null, [
-    createBaseVNode("label", _hoisted_1$3, [
-      createBaseVNode("span", _hoisted_2$3, [
-        (_ctx.required)
-          ? (openBlock(), createElementBlock("span", _hoisted_3$3, "*"))
-          : createCommentVNode("v-if", true),
-        createTextVNode(" " + toDisplayString(_ctx.name), 1 /* TEXT */)
-      ]),
-      createBaseVNode("small", _hoisted_4$2, toDisplayString(_ctx.type || 'string'), 1 /* TEXT */)
-    ]),
-    createBaseVNode("div", _hoisted_5$2, [
-      (_ctx.formType === 'single-choice')
-        ? (openBlock(), createElementBlock("select", {
-            key: 0,
-            value: _ctx.input.valueStr.value,
-            onChange: _cache[0] || (_cache[0] = $event => (_ctx.input.setValueStr($event.target.value))),
-            class: "form-select"
-          }, [
-            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.choices, (choice) => {
-              return (openBlock(), createElementBlock("option", {
-                value: choice,
-                key: choice
-              }, toDisplayString(choice), 9 /* TEXT, PROPS */, _hoisted_7$1))
-            }), 128 /* KEYED_FRAGMENT */))
-          ], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6$1))
-        : (_ctx.formType === 'boolean')
-          ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-              createBaseVNode("div", _hoisted_8$1, [
-                createBaseVNode("input", {
-                  class: "form-check-input mt-0",
-                  type: "checkbox",
-                  checked: _ctx.input.valueParsed.value,
-                  onChange: _cache[1] || (_cache[1] = $event => (_ctx.input.setValueStr($event.target.checked.toString()))),
-                  id: _ctx.name
-                }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_9$1)
-              ]),
-              createBaseVNode("label", {
-                class: "input-group-text flex-fill bg-body",
-                for: _ctx.name
-              }, toDisplayString(_ctx.helpText), 9 /* TEXT, PROPS */, _hoisted_10$1)
-            ], 64 /* STABLE_FRAGMENT */))
-          : (openBlock(), createElementBlock("input", {
-              key: 2,
-              type: _ctx.formType,
-              value: _ctx.input.valueStr.value,
-              onInput: _cache[2] || (_cache[2] = $event => (_ctx.input.setValueStr($event.target.value))),
-              class: normalizeClass(["form-control mw-100", {'form-control-color': _ctx.formType === 'color'}])
-            }, null, 42 /* CLASS, PROPS, HYDRATE_EVENTS */, _hoisted_11$1)),
-      (_ctx.input.hasDefault)
-        ? (openBlock(), createElementBlock("button", {
-            key: 3,
-            onClick: _cache[3] || (_cache[3] = $event => (_ctx.input.resetToDefault())),
-            disabled: _ctx.input.isDefault.value,
-            type: "button",
-            class: "btn btn-light border"
-          }, "Reset", 8 /* PROPS */, _hoisted_12$1))
-        : createCommentVNode("v-if", true)
-    ]),
-    (_ctx.formType !== 'boolean')
-      ? (openBlock(), createElementBlock("small", _hoisted_13$1, toDisplayString(_ctx.helpText), 1 /* TEXT */))
-      : createCommentVNode("v-if", true)
-  ], 64 /* STABLE_FRAGMENT */))
+var baseComponentExports = {};
+var baseComponent = {
+  get exports(){ return baseComponentExports; },
+  set exports(v){ baseComponentExports = v; },
+};
+
+var dataExports = {};
+var data = {
+  get exports(){ return dataExports; },
+  set exports(v){ dataExports = v; },
+};
+
+/*!
+  * Bootstrap data.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredData;
+
+function requireData () {
+	if (hasRequiredData) return dataExports;
+	hasRequiredData = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory() ;
+		})(commonjsGlobal, (function () {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap dom/data.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+		  /**
+		   * Constants
+		   */
+
+		  const elementMap = new Map();
+		  const data = {
+		    set(element, key, instance) {
+		      if (!elementMap.has(element)) {
+		        elementMap.set(element, new Map());
+		      }
+		      const instanceMap = elementMap.get(element);
+
+		      // make it clear we only want one instance per element
+		      // can be removed later when multiple key/instances are fine to be used
+		      if (!instanceMap.has(key) && instanceMap.size !== 0) {
+		        // eslint-disable-next-line no-console
+		        console.error(`Bootstrap doesn't allow more than one instance per element. Bound instance: ${Array.from(instanceMap.keys())[0]}.`);
+		        return;
+		      }
+		      instanceMap.set(key, instance);
+		    },
+		    get(element, key) {
+		      if (elementMap.has(element)) {
+		        return elementMap.get(element).get(key) || null;
+		      }
+		      return null;
+		    },
+		    remove(element, key) {
+		      if (!elementMap.has(element)) {
+		        return;
+		      }
+		      const instanceMap = elementMap.get(element);
+		      instanceMap.delete(key);
+
+		      // free up element references if there are no instances left for an element
+		      if (instanceMap.size === 0) {
+		        elementMap.delete(element);
+		      }
+		    }
+		  };
+
+		  return data;
+
+		}));
+		
+} (data));
+	return dataExports;
 }
 
-script$3.render = render$3;
-script$3.__file = "node_modules/togostanza/src/components/FormField.vue";
+var eventHandlerExports = {};
+var eventHandler = {
+  get exports(){ return eventHandlerExports; },
+  set exports(v){ eventHandlerExports = v; },
+};
+
+var utilExports = {};
+var util = {
+  get exports(){ return utilExports; },
+  set exports(v){ utilExports = v; },
+};
+
+/*!
+  * Bootstrap index.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredUtil;
+
+function requireUtil () {
+	if (hasRequiredUtil) return utilExports;
+	hasRequiredUtil = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  factory(exports) ;
+		})(commonjsGlobal, (function (exports) {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap util/index.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+		  const MAX_UID = 1000000;
+		  const MILLISECONDS_MULTIPLIER = 1000;
+		  const TRANSITION_END = 'transitionend';
+
+		  /**
+		   * Properly escape IDs selectors to handle weird IDs
+		   * @param {string} selector
+		   * @returns {string}
+		   */
+		  const parseSelector = selector => {
+		    if (selector && window.CSS && window.CSS.escape) {
+		      // document.querySelector needs escaping to handle IDs (html5+) containing for instance /
+		      selector = selector.replace(/#([^\s"#']+)/g, (match, id) => `#${CSS.escape(id)}`);
+		    }
+		    return selector;
+		  };
+
+		  // Shout-out Angus Croll (https://goo.gl/pxwQGp)
+		  const toType = object => {
+		    if (object === null || object === undefined) {
+		      return `${object}`;
+		    }
+		    return Object.prototype.toString.call(object).match(/\s([a-z]+)/i)[1].toLowerCase();
+		  };
+
+		  /**
+		   * Public Util API
+		   */
+
+		  const getUID = prefix => {
+		    do {
+		      prefix += Math.floor(Math.random() * MAX_UID);
+		    } while (document.getElementById(prefix));
+		    return prefix;
+		  };
+		  const getTransitionDurationFromElement = element => {
+		    if (!element) {
+		      return 0;
+		    }
+
+		    // Get transition-duration of the element
+		    let {
+		      transitionDuration,
+		      transitionDelay
+		    } = window.getComputedStyle(element);
+		    const floatTransitionDuration = Number.parseFloat(transitionDuration);
+		    const floatTransitionDelay = Number.parseFloat(transitionDelay);
+
+		    // Return 0 if element or transition duration is not found
+		    if (!floatTransitionDuration && !floatTransitionDelay) {
+		      return 0;
+		    }
+
+		    // If multiple durations are defined, take the first
+		    transitionDuration = transitionDuration.split(',')[0];
+		    transitionDelay = transitionDelay.split(',')[0];
+		    return (Number.parseFloat(transitionDuration) + Number.parseFloat(transitionDelay)) * MILLISECONDS_MULTIPLIER;
+		  };
+		  const triggerTransitionEnd = element => {
+		    element.dispatchEvent(new Event(TRANSITION_END));
+		  };
+		  const isElement = object => {
+		    if (!object || typeof object !== 'object') {
+		      return false;
+		    }
+		    if (typeof object.jquery !== 'undefined') {
+		      object = object[0];
+		    }
+		    return typeof object.nodeType !== 'undefined';
+		  };
+		  const getElement = object => {
+		    // it's a jQuery object or a node element
+		    if (isElement(object)) {
+		      return object.jquery ? object[0] : object;
+		    }
+		    if (typeof object === 'string' && object.length > 0) {
+		      return document.querySelector(parseSelector(object));
+		    }
+		    return null;
+		  };
+		  const isVisible = element => {
+		    if (!isElement(element) || element.getClientRects().length === 0) {
+		      return false;
+		    }
+		    const elementIsVisible = getComputedStyle(element).getPropertyValue('visibility') === 'visible';
+		    // Handle `details` element as its content may falsie appear visible when it is closed
+		    const closedDetails = element.closest('details:not([open])');
+		    if (!closedDetails) {
+		      return elementIsVisible;
+		    }
+		    if (closedDetails !== element) {
+		      const summary = element.closest('summary');
+		      if (summary && summary.parentNode !== closedDetails) {
+		        return false;
+		      }
+		      if (summary === null) {
+		        return false;
+		      }
+		    }
+		    return elementIsVisible;
+		  };
+		  const isDisabled = element => {
+		    if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+		      return true;
+		    }
+		    if (element.classList.contains('disabled')) {
+		      return true;
+		    }
+		    if (typeof element.disabled !== 'undefined') {
+		      return element.disabled;
+		    }
+		    return element.hasAttribute('disabled') && element.getAttribute('disabled') !== 'false';
+		  };
+		  const findShadowRoot = element => {
+		    if (!document.documentElement.attachShadow) {
+		      return null;
+		    }
+
+		    // Can find the shadow root otherwise it'll return the document
+		    if (typeof element.getRootNode === 'function') {
+		      const root = element.getRootNode();
+		      return root instanceof ShadowRoot ? root : null;
+		    }
+		    if (element instanceof ShadowRoot) {
+		      return element;
+		    }
+
+		    // when we don't find a shadow root
+		    if (!element.parentNode) {
+		      return null;
+		    }
+		    return findShadowRoot(element.parentNode);
+		  };
+		  const noop = () => {};
+
+		  /**
+		   * Trick to restart an element's animation
+		   *
+		   * @param {HTMLElement} element
+		   * @return void
+		   *
+		   * @see https://www.charistheo.io/blog/2021/02/restart-a-css-animation-with-javascript/#restarting-a-css-animation
+		   */
+		  const reflow = element => {
+		    element.offsetHeight; // eslint-disable-line no-unused-expressions
+		  };
+		  const getjQuery = () => {
+		    if (window.jQuery && !document.body.hasAttribute('data-bs-no-jquery')) {
+		      return window.jQuery;
+		    }
+		    return null;
+		  };
+		  const DOMContentLoadedCallbacks = [];
+		  const onDOMContentLoaded = callback => {
+		    if (document.readyState === 'loading') {
+		      // add listener on the first call when the document is in loading state
+		      if (!DOMContentLoadedCallbacks.length) {
+		        document.addEventListener('DOMContentLoaded', () => {
+		          for (const callback of DOMContentLoadedCallbacks) {
+		            callback();
+		          }
+		        });
+		      }
+		      DOMContentLoadedCallbacks.push(callback);
+		    } else {
+		      callback();
+		    }
+		  };
+		  const isRTL = () => document.documentElement.dir === 'rtl';
+		  const defineJQueryPlugin = plugin => {
+		    onDOMContentLoaded(() => {
+		      const $ = getjQuery();
+		      /* istanbul ignore if */
+		      if ($) {
+		        const name = plugin.NAME;
+		        const JQUERY_NO_CONFLICT = $.fn[name];
+		        $.fn[name] = plugin.jQueryInterface;
+		        $.fn[name].Constructor = plugin;
+		        $.fn[name].noConflict = () => {
+		          $.fn[name] = JQUERY_NO_CONFLICT;
+		          return plugin.jQueryInterface;
+		        };
+		      }
+		    });
+		  };
+		  const execute = (possibleCallback, args = [], defaultValue = possibleCallback) => {
+		    return typeof possibleCallback === 'function' ? possibleCallback(...args) : defaultValue;
+		  };
+		  const executeAfterTransition = (callback, transitionElement, waitForTransition = true) => {
+		    if (!waitForTransition) {
+		      execute(callback);
+		      return;
+		    }
+		    const durationPadding = 5;
+		    const emulatedDuration = getTransitionDurationFromElement(transitionElement) + durationPadding;
+		    let called = false;
+		    const handler = ({
+		      target
+		    }) => {
+		      if (target !== transitionElement) {
+		        return;
+		      }
+		      called = true;
+		      transitionElement.removeEventListener(TRANSITION_END, handler);
+		      execute(callback);
+		    };
+		    transitionElement.addEventListener(TRANSITION_END, handler);
+		    setTimeout(() => {
+		      if (!called) {
+		        triggerTransitionEnd(transitionElement);
+		      }
+		    }, emulatedDuration);
+		  };
+
+		  /**
+		   * Return the previous/next element of a list.
+		   *
+		   * @param {array} list    The list of elements
+		   * @param activeElement   The active element
+		   * @param shouldGetNext   Choose to get next or previous element
+		   * @param isCycleAllowed
+		   * @return {Element|elem} The proper element
+		   */
+		  const getNextActiveElement = (list, activeElement, shouldGetNext, isCycleAllowed) => {
+		    const listLength = list.length;
+		    let index = list.indexOf(activeElement);
+
+		    // if the element does not exist in the list return an element
+		    // depending on the direction and if cycle is allowed
+		    if (index === -1) {
+		      return !shouldGetNext && isCycleAllowed ? list[listLength - 1] : list[0];
+		    }
+		    index += shouldGetNext ? 1 : -1;
+		    if (isCycleAllowed) {
+		      index = (index + listLength) % listLength;
+		    }
+		    return list[Math.max(0, Math.min(index, listLength - 1))];
+		  };
+
+		  exports.defineJQueryPlugin = defineJQueryPlugin;
+		  exports.execute = execute;
+		  exports.executeAfterTransition = executeAfterTransition;
+		  exports.findShadowRoot = findShadowRoot;
+		  exports.getElement = getElement;
+		  exports.getNextActiveElement = getNextActiveElement;
+		  exports.getTransitionDurationFromElement = getTransitionDurationFromElement;
+		  exports.getUID = getUID;
+		  exports.getjQuery = getjQuery;
+		  exports.isDisabled = isDisabled;
+		  exports.isElement = isElement;
+		  exports.isRTL = isRTL;
+		  exports.isVisible = isVisible;
+		  exports.noop = noop;
+		  exports.onDOMContentLoaded = onDOMContentLoaded;
+		  exports.parseSelector = parseSelector;
+		  exports.reflow = reflow;
+		  exports.toType = toType;
+		  exports.triggerTransitionEnd = triggerTransitionEnd;
+
+		  Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+
+		}));
+		
+} (util, utilExports));
+	return utilExports;
+}
+
+/*!
+  * Bootstrap event-handler.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredEventHandler;
+
+function requireEventHandler () {
+	if (hasRequiredEventHandler) return eventHandlerExports;
+	hasRequiredEventHandler = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory(requireUtil()) ;
+		})(commonjsGlobal, (function (index_js) {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap dom/event-handler.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+
+		  /**
+		   * Constants
+		   */
+
+		  const namespaceRegex = /[^.]*(?=\..*)\.|.*/;
+		  const stripNameRegex = /\..*/;
+		  const stripUidRegex = /::\d+$/;
+		  const eventRegistry = {}; // Events storage
+		  let uidEvent = 1;
+		  const customEvents = {
+		    mouseenter: 'mouseover',
+		    mouseleave: 'mouseout'
+		  };
+		  const nativeEvents = new Set(['click', 'dblclick', 'mouseup', 'mousedown', 'contextmenu', 'mousewheel', 'DOMMouseScroll', 'mouseover', 'mouseout', 'mousemove', 'selectstart', 'selectend', 'keydown', 'keypress', 'keyup', 'orientationchange', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'pointerdown', 'pointermove', 'pointerup', 'pointerleave', 'pointercancel', 'gesturestart', 'gesturechange', 'gestureend', 'focus', 'blur', 'change', 'reset', 'select', 'submit', 'focusin', 'focusout', 'load', 'unload', 'beforeunload', 'resize', 'move', 'DOMContentLoaded', 'readystatechange', 'error', 'abort', 'scroll']);
+
+		  /**
+		   * Private methods
+		   */
+
+		  function makeEventUid(element, uid) {
+		    return uid && `${uid}::${uidEvent++}` || element.uidEvent || uidEvent++;
+		  }
+		  function getElementEvents(element) {
+		    const uid = makeEventUid(element);
+		    element.uidEvent = uid;
+		    eventRegistry[uid] = eventRegistry[uid] || {};
+		    return eventRegistry[uid];
+		  }
+		  function bootstrapHandler(element, fn) {
+		    return function handler(event) {
+		      hydrateObj(event, {
+		        delegateTarget: element
+		      });
+		      if (handler.oneOff) {
+		        EventHandler.off(element, event.type, fn);
+		      }
+		      return fn.apply(element, [event]);
+		    };
+		  }
+		  function bootstrapDelegationHandler(element, selector, fn) {
+		    return function handler(event) {
+		      const domElements = element.querySelectorAll(selector);
+		      for (let {
+		        target
+		      } = event; target && target !== this; target = target.parentNode) {
+		        for (const domElement of domElements) {
+		          if (domElement !== target) {
+		            continue;
+		          }
+		          hydrateObj(event, {
+		            delegateTarget: target
+		          });
+		          if (handler.oneOff) {
+		            EventHandler.off(element, event.type, selector, fn);
+		          }
+		          return fn.apply(target, [event]);
+		        }
+		      }
+		    };
+		  }
+		  function findHandler(events, callable, delegationSelector = null) {
+		    return Object.values(events).find(event => event.callable === callable && event.delegationSelector === delegationSelector);
+		  }
+		  function normalizeParameters(originalTypeEvent, handler, delegationFunction) {
+		    const isDelegated = typeof handler === 'string';
+		    // TODO: tooltip passes `false` instead of selector, so we need to check
+		    const callable = isDelegated ? delegationFunction : handler || delegationFunction;
+		    let typeEvent = getTypeEvent(originalTypeEvent);
+		    if (!nativeEvents.has(typeEvent)) {
+		      typeEvent = originalTypeEvent;
+		    }
+		    return [isDelegated, callable, typeEvent];
+		  }
+		  function addHandler(element, originalTypeEvent, handler, delegationFunction, oneOff) {
+		    if (typeof originalTypeEvent !== 'string' || !element) {
+		      return;
+		    }
+		    let [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
+
+		    // in case of mouseenter or mouseleave wrap the handler within a function that checks for its DOM position
+		    // this prevents the handler from being dispatched the same way as mouseover or mouseout does
+		    if (originalTypeEvent in customEvents) {
+		      const wrapFunction = fn => {
+		        return function (event) {
+		          if (!event.relatedTarget || event.relatedTarget !== event.delegateTarget && !event.delegateTarget.contains(event.relatedTarget)) {
+		            return fn.call(this, event);
+		          }
+		        };
+		      };
+		      callable = wrapFunction(callable);
+		    }
+		    const events = getElementEvents(element);
+		    const handlers = events[typeEvent] || (events[typeEvent] = {});
+		    const previousFunction = findHandler(handlers, callable, isDelegated ? handler : null);
+		    if (previousFunction) {
+		      previousFunction.oneOff = previousFunction.oneOff && oneOff;
+		      return;
+		    }
+		    const uid = makeEventUid(callable, originalTypeEvent.replace(namespaceRegex, ''));
+		    const fn = isDelegated ? bootstrapDelegationHandler(element, handler, callable) : bootstrapHandler(element, callable);
+		    fn.delegationSelector = isDelegated ? handler : null;
+		    fn.callable = callable;
+		    fn.oneOff = oneOff;
+		    fn.uidEvent = uid;
+		    handlers[uid] = fn;
+		    element.addEventListener(typeEvent, fn, isDelegated);
+		  }
+		  function removeHandler(element, events, typeEvent, handler, delegationSelector) {
+		    const fn = findHandler(events[typeEvent], handler, delegationSelector);
+		    if (!fn) {
+		      return;
+		    }
+		    element.removeEventListener(typeEvent, fn, Boolean(delegationSelector));
+		    delete events[typeEvent][fn.uidEvent];
+		  }
+		  function removeNamespacedHandlers(element, events, typeEvent, namespace) {
+		    const storeElementEvent = events[typeEvent] || {};
+		    for (const [handlerKey, event] of Object.entries(storeElementEvent)) {
+		      if (handlerKey.includes(namespace)) {
+		        removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+		      }
+		    }
+		  }
+		  function getTypeEvent(event) {
+		    // allow to get the native events from namespaced events ('click.bs.button' --> 'click')
+		    event = event.replace(stripNameRegex, '');
+		    return customEvents[event] || event;
+		  }
+		  const EventHandler = {
+		    on(element, event, handler, delegationFunction) {
+		      addHandler(element, event, handler, delegationFunction, false);
+		    },
+		    one(element, event, handler, delegationFunction) {
+		      addHandler(element, event, handler, delegationFunction, true);
+		    },
+		    off(element, originalTypeEvent, handler, delegationFunction) {
+		      if (typeof originalTypeEvent !== 'string' || !element) {
+		        return;
+		      }
+		      const [isDelegated, callable, typeEvent] = normalizeParameters(originalTypeEvent, handler, delegationFunction);
+		      const inNamespace = typeEvent !== originalTypeEvent;
+		      const events = getElementEvents(element);
+		      const storeElementEvent = events[typeEvent] || {};
+		      const isNamespace = originalTypeEvent.startsWith('.');
+		      if (typeof callable !== 'undefined') {
+		        // Simplest case: handler is passed, remove that listener ONLY.
+		        if (!Object.keys(storeElementEvent).length) {
+		          return;
+		        }
+		        removeHandler(element, events, typeEvent, callable, isDelegated ? handler : null);
+		        return;
+		      }
+		      if (isNamespace) {
+		        for (const elementEvent of Object.keys(events)) {
+		          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1));
+		        }
+		      }
+		      for (const [keyHandlers, event] of Object.entries(storeElementEvent)) {
+		        const handlerKey = keyHandlers.replace(stripUidRegex, '');
+		        if (!inNamespace || originalTypeEvent.includes(handlerKey)) {
+		          removeHandler(element, events, typeEvent, event.callable, event.delegationSelector);
+		        }
+		      }
+		    },
+		    trigger(element, event, args) {
+		      if (typeof event !== 'string' || !element) {
+		        return null;
+		      }
+		      const $ = index_js.getjQuery();
+		      const typeEvent = getTypeEvent(event);
+		      const inNamespace = event !== typeEvent;
+		      let jQueryEvent = null;
+		      let bubbles = true;
+		      let nativeDispatch = true;
+		      let defaultPrevented = false;
+		      if (inNamespace && $) {
+		        jQueryEvent = $.Event(event, args);
+		        $(element).trigger(jQueryEvent);
+		        bubbles = !jQueryEvent.isPropagationStopped();
+		        nativeDispatch = !jQueryEvent.isImmediatePropagationStopped();
+		        defaultPrevented = jQueryEvent.isDefaultPrevented();
+		      }
+		      const evt = hydrateObj(new Event(event, {
+		        bubbles,
+		        cancelable: true
+		      }), args);
+		      if (defaultPrevented) {
+		        evt.preventDefault();
+		      }
+		      if (nativeDispatch) {
+		        element.dispatchEvent(evt);
+		      }
+		      if (evt.defaultPrevented && jQueryEvent) {
+		        jQueryEvent.preventDefault();
+		      }
+		      return evt;
+		    }
+		  };
+		  function hydrateObj(obj, meta = {}) {
+		    for (const [key, value] of Object.entries(meta)) {
+		      try {
+		        obj[key] = value;
+		      } catch (_unused) {
+		        Object.defineProperty(obj, key, {
+		          configurable: true,
+		          get() {
+		            return value;
+		          }
+		        });
+		      }
+		    }
+		    return obj;
+		  }
+
+		  return EventHandler;
+
+		}));
+		
+} (eventHandler));
+	return eventHandlerExports;
+}
+
+var configExports = {};
+var config = {
+  get exports(){ return configExports; },
+  set exports(v){ configExports = v; },
+};
+
+var manipulatorExports = {};
+var manipulator = {
+  get exports(){ return manipulatorExports; },
+  set exports(v){ manipulatorExports = v; },
+};
+
+/*!
+  * Bootstrap manipulator.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredManipulator;
+
+function requireManipulator () {
+	if (hasRequiredManipulator) return manipulatorExports;
+	hasRequiredManipulator = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory() ;
+		})(commonjsGlobal, (function () {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap dom/manipulator.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+		  function normalizeData(value) {
+		    if (value === 'true') {
+		      return true;
+		    }
+		    if (value === 'false') {
+		      return false;
+		    }
+		    if (value === Number(value).toString()) {
+		      return Number(value);
+		    }
+		    if (value === '' || value === 'null') {
+		      return null;
+		    }
+		    if (typeof value !== 'string') {
+		      return value;
+		    }
+		    try {
+		      return JSON.parse(decodeURIComponent(value));
+		    } catch (_unused) {
+		      return value;
+		    }
+		  }
+		  function normalizeDataKey(key) {
+		    return key.replace(/[A-Z]/g, chr => `-${chr.toLowerCase()}`);
+		  }
+		  const Manipulator = {
+		    setDataAttribute(element, key, value) {
+		      element.setAttribute(`data-bs-${normalizeDataKey(key)}`, value);
+		    },
+		    removeDataAttribute(element, key) {
+		      element.removeAttribute(`data-bs-${normalizeDataKey(key)}`);
+		    },
+		    getDataAttributes(element) {
+		      if (!element) {
+		        return {};
+		      }
+		      const attributes = {};
+		      const bsKeys = Object.keys(element.dataset).filter(key => key.startsWith('bs') && !key.startsWith('bsConfig'));
+		      for (const key of bsKeys) {
+		        let pureKey = key.replace(/^bs/, '');
+		        pureKey = pureKey.charAt(0).toLowerCase() + pureKey.slice(1, pureKey.length);
+		        attributes[pureKey] = normalizeData(element.dataset[key]);
+		      }
+		      return attributes;
+		    },
+		    getDataAttribute(element, key) {
+		      return normalizeData(element.getAttribute(`data-bs-${normalizeDataKey(key)}`));
+		    }
+		  };
+
+		  return Manipulator;
+
+		}));
+		
+} (manipulator));
+	return manipulatorExports;
+}
+
+/*!
+  * Bootstrap config.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredConfig;
+
+function requireConfig () {
+	if (hasRequiredConfig) return configExports;
+	hasRequiredConfig = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory(requireManipulator(), requireUtil()) ;
+		})(commonjsGlobal, (function (Manipulator, index_js) {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap util/config.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+
+		  /**
+		   * Class definition
+		   */
+
+		  class Config {
+		    // Getters
+		    static get Default() {
+		      return {};
+		    }
+		    static get DefaultType() {
+		      return {};
+		    }
+		    static get NAME() {
+		      throw new Error('You have to implement the static method "NAME", for each component!');
+		    }
+		    _getConfig(config) {
+		      config = this._mergeConfigObj(config);
+		      config = this._configAfterMerge(config);
+		      this._typeCheckConfig(config);
+		      return config;
+		    }
+		    _configAfterMerge(config) {
+		      return config;
+		    }
+		    _mergeConfigObj(config, element) {
+		      const jsonConfig = index_js.isElement(element) ? Manipulator.getDataAttribute(element, 'config') : {}; // try to parse
+
+		      return {
+		        ...this.constructor.Default,
+		        ...(typeof jsonConfig === 'object' ? jsonConfig : {}),
+		        ...(index_js.isElement(element) ? Manipulator.getDataAttributes(element) : {}),
+		        ...(typeof config === 'object' ? config : {})
+		      };
+		    }
+		    _typeCheckConfig(config, configTypes = this.constructor.DefaultType) {
+		      for (const [property, expectedTypes] of Object.entries(configTypes)) {
+		        const value = config[property];
+		        const valueType = index_js.isElement(value) ? 'element' : index_js.toType(value);
+		        if (!new RegExp(expectedTypes).test(valueType)) {
+		          throw new TypeError(`${this.constructor.NAME.toUpperCase()}: Option "${property}" provided type "${valueType}" but expected type "${expectedTypes}".`);
+		        }
+		      }
+		    }
+		  }
+
+		  return Config;
+
+		}));
+		
+} (config));
+	return configExports;
+}
+
+/*!
+  * Bootstrap base-component.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredBaseComponent;
+
+function requireBaseComponent () {
+	if (hasRequiredBaseComponent) return baseComponentExports;
+	hasRequiredBaseComponent = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory(requireData(), requireEventHandler(), requireConfig(), requireUtil()) ;
+		})(commonjsGlobal, (function (Data, EventHandler, Config, index_js) {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap base-component.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+
+		  /**
+		   * Constants
+		   */
+
+		  const VERSION = '5.3.3';
+
+		  /**
+		   * Class definition
+		   */
+
+		  class BaseComponent extends Config {
+		    constructor(element, config) {
+		      super();
+		      element = index_js.getElement(element);
+		      if (!element) {
+		        return;
+		      }
+		      this._element = element;
+		      this._config = this._getConfig(config);
+		      Data.set(this._element, this.constructor.DATA_KEY, this);
+		    }
+
+		    // Public
+		    dispose() {
+		      Data.remove(this._element, this.constructor.DATA_KEY);
+		      EventHandler.off(this._element, this.constructor.EVENT_KEY);
+		      for (const propertyName of Object.getOwnPropertyNames(this)) {
+		        this[propertyName] = null;
+		      }
+		    }
+		    _queueCallback(callback, element, isAnimated = true) {
+		      index_js.executeAfterTransition(callback, element, isAnimated);
+		    }
+		    _getConfig(config) {
+		      config = this._mergeConfigObj(config, this._element);
+		      config = this._configAfterMerge(config);
+		      this._typeCheckConfig(config);
+		      return config;
+		    }
+
+		    // Static
+		    static getInstance(element) {
+		      return Data.get(index_js.getElement(element), this.DATA_KEY);
+		    }
+		    static getOrCreateInstance(element, config = {}) {
+		      return this.getInstance(element) || new this(element, typeof config === 'object' ? config : null);
+		    }
+		    static get VERSION() {
+		      return VERSION;
+		    }
+		    static get DATA_KEY() {
+		      return `bs.${this.NAME}`;
+		    }
+		    static get EVENT_KEY() {
+		      return `.${this.DATA_KEY}`;
+		    }
+		    static eventName(name) {
+		      return `${name}${this.EVENT_KEY}`;
+		    }
+		  }
+
+		  return BaseComponent;
+
+		}));
+		
+} (baseComponent));
+	return baseComponentExports;
+}
+
+var selectorEngineExports = {};
+var selectorEngine = {
+  get exports(){ return selectorEngineExports; },
+  set exports(v){ selectorEngineExports = v; },
+};
+
+/*!
+  * Bootstrap selector-engine.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+var hasRequiredSelectorEngine;
+
+function requireSelectorEngine () {
+	if (hasRequiredSelectorEngine) return selectorEngineExports;
+	hasRequiredSelectorEngine = 1;
+	(function (module, exports) {
+		(function (global, factory) {
+		  module.exports = factory(requireUtil()) ;
+		})(commonjsGlobal, (function (index_js) {
+		  /**
+		   * --------------------------------------------------------------------------
+		   * Bootstrap dom/selector-engine.js
+		   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+		   * --------------------------------------------------------------------------
+		   */
+
+		  const getSelector = element => {
+		    let selector = element.getAttribute('data-bs-target');
+		    if (!selector || selector === '#') {
+		      let hrefAttribute = element.getAttribute('href');
+
+		      // The only valid content that could double as a selector are IDs or classes,
+		      // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
+		      // `document.querySelector` will rightfully complain it is invalid.
+		      // See https://github.com/twbs/bootstrap/issues/32273
+		      if (!hrefAttribute || !hrefAttribute.includes('#') && !hrefAttribute.startsWith('.')) {
+		        return null;
+		      }
+
+		      // Just in case some CMS puts out a full URL with the anchor appended
+		      if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
+		        hrefAttribute = `#${hrefAttribute.split('#')[1]}`;
+		      }
+		      selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null;
+		    }
+		    return selector ? selector.split(',').map(sel => index_js.parseSelector(sel)).join(',') : null;
+		  };
+		  const SelectorEngine = {
+		    find(selector, element = document.documentElement) {
+		      return [].concat(...Element.prototype.querySelectorAll.call(element, selector));
+		    },
+		    findOne(selector, element = document.documentElement) {
+		      return Element.prototype.querySelector.call(element, selector);
+		    },
+		    children(element, selector) {
+		      return [].concat(...element.children).filter(child => child.matches(selector));
+		    },
+		    parents(element, selector) {
+		      const parents = [];
+		      let ancestor = element.parentNode.closest(selector);
+		      while (ancestor) {
+		        parents.push(ancestor);
+		        ancestor = ancestor.parentNode.closest(selector);
+		      }
+		      return parents;
+		    },
+		    prev(element, selector) {
+		      let previous = element.previousElementSibling;
+		      while (previous) {
+		        if (previous.matches(selector)) {
+		          return [previous];
+		        }
+		        previous = previous.previousElementSibling;
+		      }
+		      return [];
+		    },
+		    // TODO: this is now unused; remove later along with prev()
+		    next(element, selector) {
+		      let next = element.nextElementSibling;
+		      while (next) {
+		        if (next.matches(selector)) {
+		          return [next];
+		        }
+		        next = next.nextElementSibling;
+		      }
+		      return [];
+		    },
+		    focusableChildren(element) {
+		      const focusables = ['a', 'button', 'input', 'textarea', 'select', 'details', '[tabindex]', '[contenteditable="true"]'].map(selector => `${selector}:not([tabindex^="-"])`).join(',');
+		      return this.find(focusables, element).filter(el => !index_js.isDisabled(el) && index_js.isVisible(el));
+		    },
+		    getSelectorFromElement(element) {
+		      const selector = getSelector(element);
+		      if (selector) {
+		        return SelectorEngine.findOne(selector) ? selector : null;
+		      }
+		      return null;
+		    },
+		    getElementFromSelector(element) {
+		      const selector = getSelector(element);
+		      return selector ? SelectorEngine.findOne(selector) : null;
+		    },
+		    getMultipleElementsFromSelector(element) {
+		      const selector = getSelector(element);
+		      return selector ? SelectorEngine.find(selector) : [];
+		    }
+		  };
+
+		  return SelectorEngine;
+
+		}));
+		
+} (selectorEngine));
+	return selectorEngineExports;
+}
+
+/*!
+  * Bootstrap tab.js v5.3.3 (https://getbootstrap.com/)
+  * Copyright 2011-2024 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)
+  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+  */
+
+(function (module, exports) {
+	(function (global, factory) {
+	  module.exports = factory(requireBaseComponent(), requireEventHandler(), requireSelectorEngine(), requireUtil()) ;
+	})(commonjsGlobal, (function (BaseComponent, EventHandler, SelectorEngine, index_js) {
+	  /**
+	   * --------------------------------------------------------------------------
+	   * Bootstrap tab.js
+	   * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+	   * --------------------------------------------------------------------------
+	   */
+
+
+	  /**
+	   * Constants
+	   */
+
+	  const NAME = 'tab';
+	  const DATA_KEY = 'bs.tab';
+	  const EVENT_KEY = `.${DATA_KEY}`;
+	  const EVENT_HIDE = `hide${EVENT_KEY}`;
+	  const EVENT_HIDDEN = `hidden${EVENT_KEY}`;
+	  const EVENT_SHOW = `show${EVENT_KEY}`;
+	  const EVENT_SHOWN = `shown${EVENT_KEY}`;
+	  const EVENT_CLICK_DATA_API = `click${EVENT_KEY}`;
+	  const EVENT_KEYDOWN = `keydown${EVENT_KEY}`;
+	  const EVENT_LOAD_DATA_API = `load${EVENT_KEY}`;
+	  const ARROW_LEFT_KEY = 'ArrowLeft';
+	  const ARROW_RIGHT_KEY = 'ArrowRight';
+	  const ARROW_UP_KEY = 'ArrowUp';
+	  const ARROW_DOWN_KEY = 'ArrowDown';
+	  const HOME_KEY = 'Home';
+	  const END_KEY = 'End';
+	  const CLASS_NAME_ACTIVE = 'active';
+	  const CLASS_NAME_FADE = 'fade';
+	  const CLASS_NAME_SHOW = 'show';
+	  const CLASS_DROPDOWN = 'dropdown';
+	  const SELECTOR_DROPDOWN_TOGGLE = '.dropdown-toggle';
+	  const SELECTOR_DROPDOWN_MENU = '.dropdown-menu';
+	  const NOT_SELECTOR_DROPDOWN_TOGGLE = `:not(${SELECTOR_DROPDOWN_TOGGLE})`;
+	  const SELECTOR_TAB_PANEL = '.list-group, .nav, [role="tablist"]';
+	  const SELECTOR_OUTER = '.nav-item, .list-group-item';
+	  const SELECTOR_INNER = `.nav-link${NOT_SELECTOR_DROPDOWN_TOGGLE}, .list-group-item${NOT_SELECTOR_DROPDOWN_TOGGLE}, [role="tab"]${NOT_SELECTOR_DROPDOWN_TOGGLE}`;
+	  const SELECTOR_DATA_TOGGLE = '[data-bs-toggle="tab"], [data-bs-toggle="pill"], [data-bs-toggle="list"]'; // TODO: could only be `tab` in v6
+	  const SELECTOR_INNER_ELEM = `${SELECTOR_INNER}, ${SELECTOR_DATA_TOGGLE}`;
+	  const SELECTOR_DATA_TOGGLE_ACTIVE = `.${CLASS_NAME_ACTIVE}[data-bs-toggle="tab"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="pill"], .${CLASS_NAME_ACTIVE}[data-bs-toggle="list"]`;
+
+	  /**
+	   * Class definition
+	   */
+
+	  class Tab extends BaseComponent {
+	    constructor(element) {
+	      super(element);
+	      this._parent = this._element.closest(SELECTOR_TAB_PANEL);
+	      if (!this._parent) {
+	        return;
+	        // TODO: should throw exception in v6
+	        // throw new TypeError(`${element.outerHTML} has not a valid parent ${SELECTOR_INNER_ELEM}`)
+	      }
+
+	      // Set up initial aria attributes
+	      this._setInitialAttributes(this._parent, this._getChildren());
+	      EventHandler.on(this._element, EVENT_KEYDOWN, event => this._keydown(event));
+	    }
+
+	    // Getters
+	    static get NAME() {
+	      return NAME;
+	    }
+
+	    // Public
+	    show() {
+	      // Shows this elem and deactivate the active sibling if exists
+	      const innerElem = this._element;
+	      if (this._elemIsActive(innerElem)) {
+	        return;
+	      }
+
+	      // Search for active tab on same parent to deactivate it
+	      const active = this._getActiveElem();
+	      const hideEvent = active ? EventHandler.trigger(active, EVENT_HIDE, {
+	        relatedTarget: innerElem
+	      }) : null;
+	      const showEvent = EventHandler.trigger(innerElem, EVENT_SHOW, {
+	        relatedTarget: active
+	      });
+	      if (showEvent.defaultPrevented || hideEvent && hideEvent.defaultPrevented) {
+	        return;
+	      }
+	      this._deactivate(active, innerElem);
+	      this._activate(innerElem, active);
+	    }
+
+	    // Private
+	    _activate(element, relatedElem) {
+	      if (!element) {
+	        return;
+	      }
+	      element.classList.add(CLASS_NAME_ACTIVE);
+	      this._activate(SelectorEngine.getElementFromSelector(element)); // Search and activate/show the proper section
+
+	      const complete = () => {
+	        if (element.getAttribute('role') !== 'tab') {
+	          element.classList.add(CLASS_NAME_SHOW);
+	          return;
+	        }
+	        element.removeAttribute('tabindex');
+	        element.setAttribute('aria-selected', true);
+	        this._toggleDropDown(element, true);
+	        EventHandler.trigger(element, EVENT_SHOWN, {
+	          relatedTarget: relatedElem
+	        });
+	      };
+	      this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE));
+	    }
+	    _deactivate(element, relatedElem) {
+	      if (!element) {
+	        return;
+	      }
+	      element.classList.remove(CLASS_NAME_ACTIVE);
+	      element.blur();
+	      this._deactivate(SelectorEngine.getElementFromSelector(element)); // Search and deactivate the shown section too
+
+	      const complete = () => {
+	        if (element.getAttribute('role') !== 'tab') {
+	          element.classList.remove(CLASS_NAME_SHOW);
+	          return;
+	        }
+	        element.setAttribute('aria-selected', false);
+	        element.setAttribute('tabindex', '-1');
+	        this._toggleDropDown(element, false);
+	        EventHandler.trigger(element, EVENT_HIDDEN, {
+	          relatedTarget: relatedElem
+	        });
+	      };
+	      this._queueCallback(complete, element, element.classList.contains(CLASS_NAME_FADE));
+	    }
+	    _keydown(event) {
+	      if (![ARROW_LEFT_KEY, ARROW_RIGHT_KEY, ARROW_UP_KEY, ARROW_DOWN_KEY, HOME_KEY, END_KEY].includes(event.key)) {
+	        return;
+	      }
+	      event.stopPropagation(); // stopPropagation/preventDefault both added to support up/down keys without scrolling the page
+	      event.preventDefault();
+	      const children = this._getChildren().filter(element => !index_js.isDisabled(element));
+	      let nextActiveElement;
+	      if ([HOME_KEY, END_KEY].includes(event.key)) {
+	        nextActiveElement = children[event.key === HOME_KEY ? 0 : children.length - 1];
+	      } else {
+	        const isNext = [ARROW_RIGHT_KEY, ARROW_DOWN_KEY].includes(event.key);
+	        nextActiveElement = index_js.getNextActiveElement(children, event.target, isNext, true);
+	      }
+	      if (nextActiveElement) {
+	        nextActiveElement.focus({
+	          preventScroll: true
+	        });
+	        Tab.getOrCreateInstance(nextActiveElement).show();
+	      }
+	    }
+	    _getChildren() {
+	      // collection of inner elements
+	      return SelectorEngine.find(SELECTOR_INNER_ELEM, this._parent);
+	    }
+	    _getActiveElem() {
+	      return this._getChildren().find(child => this._elemIsActive(child)) || null;
+	    }
+	    _setInitialAttributes(parent, children) {
+	      this._setAttributeIfNotExists(parent, 'role', 'tablist');
+	      for (const child of children) {
+	        this._setInitialAttributesOnChild(child);
+	      }
+	    }
+	    _setInitialAttributesOnChild(child) {
+	      child = this._getInnerElement(child);
+	      const isActive = this._elemIsActive(child);
+	      const outerElem = this._getOuterElement(child);
+	      child.setAttribute('aria-selected', isActive);
+	      if (outerElem !== child) {
+	        this._setAttributeIfNotExists(outerElem, 'role', 'presentation');
+	      }
+	      if (!isActive) {
+	        child.setAttribute('tabindex', '-1');
+	      }
+	      this._setAttributeIfNotExists(child, 'role', 'tab');
+
+	      // set attributes to the related panel too
+	      this._setInitialAttributesOnTargetPanel(child);
+	    }
+	    _setInitialAttributesOnTargetPanel(child) {
+	      const target = SelectorEngine.getElementFromSelector(child);
+	      if (!target) {
+	        return;
+	      }
+	      this._setAttributeIfNotExists(target, 'role', 'tabpanel');
+	      if (child.id) {
+	        this._setAttributeIfNotExists(target, 'aria-labelledby', `${child.id}`);
+	      }
+	    }
+	    _toggleDropDown(element, open) {
+	      const outerElem = this._getOuterElement(element);
+	      if (!outerElem.classList.contains(CLASS_DROPDOWN)) {
+	        return;
+	      }
+	      const toggle = (selector, className) => {
+	        const element = SelectorEngine.findOne(selector, outerElem);
+	        if (element) {
+	          element.classList.toggle(className, open);
+	        }
+	      };
+	      toggle(SELECTOR_DROPDOWN_TOGGLE, CLASS_NAME_ACTIVE);
+	      toggle(SELECTOR_DROPDOWN_MENU, CLASS_NAME_SHOW);
+	      outerElem.setAttribute('aria-expanded', open);
+	    }
+	    _setAttributeIfNotExists(element, attribute, value) {
+	      if (!element.hasAttribute(attribute)) {
+	        element.setAttribute(attribute, value);
+	      }
+	    }
+	    _elemIsActive(elem) {
+	      return elem.classList.contains(CLASS_NAME_ACTIVE);
+	    }
+
+	    // Try to get the inner element (usually the .nav-link)
+	    _getInnerElement(elem) {
+	      return elem.matches(SELECTOR_INNER_ELEM) ? elem : SelectorEngine.findOne(SELECTOR_INNER_ELEM, elem);
+	    }
+
+	    // Try to get the outer element (usually the .nav-item)
+	    _getOuterElement(elem) {
+	      return elem.closest(SELECTOR_OUTER) || elem;
+	    }
+
+	    // Static
+	    static jQueryInterface(config) {
+	      return this.each(function () {
+	        const data = Tab.getOrCreateInstance(this);
+	        if (typeof config !== 'string') {
+	          return;
+	        }
+	        if (data[config] === undefined || config.startsWith('_') || config === 'constructor') {
+	          throw new TypeError(`No method named "${config}"`);
+	        }
+	        data[config]();
+	      });
+	    }
+	  }
+
+	  /**
+	   * Data API implementation
+	   */
+
+	  EventHandler.on(document, EVENT_CLICK_DATA_API, SELECTOR_DATA_TOGGLE, function (event) {
+	    if (['A', 'AREA'].includes(this.tagName)) {
+	      event.preventDefault();
+	    }
+	    if (index_js.isDisabled(this)) {
+	      return;
+	    }
+	    Tab.getOrCreateInstance(this).show();
+	  });
+
+	  /**
+	   * Initialize on focus
+	   */
+	  EventHandler.on(window, EVENT_LOAD_DATA_API, () => {
+	    for (const element of SelectorEngine.find(SELECTOR_DATA_TOGGLE_ACTIVE)) {
+	      Tab.getOrCreateInstance(element);
+	    }
+	  });
+	  /**
+	   * jQuery
+	   */
+
+	  index_js.defineJQueryPlugin(Tab);
+
+	  return Tab;
+
+	}));
+	
+} (tab));
 
 /**
  * lodash (Custom Build) <https://lodash.com/>
@@ -1537,7 +1679,7 @@ function toNumber(value) {
 
 var lodash_debounce = debounce;
 
-var script$2 = defineComponent({
+var script$7 = defineComponent({
   props: ['value'],
 
   setup(props) {
@@ -1562,11 +1704,9 @@ var script$2 = defineComponent({
   }
 });
 
-const _hoisted_1$2 = ["innerHTML"];
-const _hoisted_2$2 = /*#__PURE__*/createTextVNode(" Copied ");
-const _hoisted_3$2 = /*#__PURE__*/createTextVNode(" Copy to clipboard ");
+const _hoisted_1$7 = ["innerHTML"];
 
-function render$2(_ctx, _cache, $props, $setup, $data, $options) {
+function render$3(_ctx, _cache, $props, $setup, $data, $options) {
   return (openBlock(), createElementBlock("button", mergeProps({
     type: "button",
     onClick: _cache[0] || (_cache[0] = $event => (_ctx.copyToClipboard()))
@@ -1575,19 +1715,23 @@ function render$2(_ctx, _cache, $props, $setup, $data, $options) {
       ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
           createBaseVNode("span", {
             innerHTML: _ctx.checkIcon.toSVG({height: 19})
-          }, null, 8 /* PROPS */, _hoisted_1$2),
-          _hoisted_2$2
+          }, null, 8 /* PROPS */, _hoisted_1$7),
+          _cache[1] || (_cache[1] = createTextVNode(" Copied "))
         ], 64 /* STABLE_FRAGMENT */))
       : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-          _hoisted_3$2
-        ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
+          createTextVNode(" Copy to clipboard ")
+        ], 64 /* STABLE_FRAGMENT */))
   ], 16 /* FULL_PROPS */))
 }
 
-script$2.render = render$2;
-script$2.__file = "node_modules/togostanza/src/components/CopyButton.vue";
+script$7.render = render$3;
+script$7.__file = "node_modules/togostanza/src/components/CopyButton.vue";
 
-var handlebars_runtime = {exports: {}};
+var handlebars_runtimeExports = {};
+var handlebars_runtime = {
+  get exports(){ return handlebars_runtimeExports; },
+  set exports(v){ handlebars_runtimeExports = v; },
+};
 
 var base = {};
 
@@ -1715,402 +1859,434 @@ function appendContextPath(contextPath, id) {
   return (contextPath ? contextPath + '.' : '') + id;
 }
 
-var exception = {exports: {}};
+var exceptionExports = {};
+var exception = {
+  get exports(){ return exceptionExports; },
+  set exports(v){ exceptionExports = v; },
+};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-var errorProps = ['description', 'fileName', 'lineNumber', 'endLineNumber', 'message', 'name', 'number', 'stack'];
+	exports.__esModule = true;
+	var errorProps = ['description', 'fileName', 'lineNumber', 'endLineNumber', 'message', 'name', 'number', 'stack'];
 
-function Exception(message, node) {
-  var loc = node && node.loc,
-      line = undefined,
-      endLineNumber = undefined,
-      column = undefined,
-      endColumn = undefined;
+	function Exception(message, node) {
+	  var loc = node && node.loc,
+	      line = undefined,
+	      endLineNumber = undefined,
+	      column = undefined,
+	      endColumn = undefined;
 
-  if (loc) {
-    line = loc.start.line;
-    endLineNumber = loc.end.line;
-    column = loc.start.column;
-    endColumn = loc.end.column;
+	  if (loc) {
+	    line = loc.start.line;
+	    endLineNumber = loc.end.line;
+	    column = loc.start.column;
+	    endColumn = loc.end.column;
 
-    message += ' - ' + line + ':' + column;
-  }
+	    message += ' - ' + line + ':' + column;
+	  }
 
-  var tmp = Error.prototype.constructor.call(this, message);
+	  var tmp = Error.prototype.constructor.call(this, message);
 
-  // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
-  for (var idx = 0; idx < errorProps.length; idx++) {
-    this[errorProps[idx]] = tmp[errorProps[idx]];
-  }
+	  // Unfortunately errors are not enumerable in Chrome (at least), so `for prop in tmp` doesn't work.
+	  for (var idx = 0; idx < errorProps.length; idx++) {
+	    this[errorProps[idx]] = tmp[errorProps[idx]];
+	  }
 
-  /* istanbul ignore else */
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, Exception);
-  }
+	  /* istanbul ignore else */
+	  if (Error.captureStackTrace) {
+	    Error.captureStackTrace(this, Exception);
+	  }
 
-  try {
-    if (loc) {
-      this.lineNumber = line;
-      this.endLineNumber = endLineNumber;
+	  try {
+	    if (loc) {
+	      this.lineNumber = line;
+	      this.endLineNumber = endLineNumber;
 
-      // Work around issue under safari where we can't directly set the column value
-      /* istanbul ignore next */
-      if (Object.defineProperty) {
-        Object.defineProperty(this, 'column', {
-          value: column,
-          enumerable: true
-        });
-        Object.defineProperty(this, 'endColumn', {
-          value: endColumn,
-          enumerable: true
-        });
-      } else {
-        this.column = column;
-        this.endColumn = endColumn;
-      }
-    }
-  } catch (nop) {
-    /* Ignore if the browser is very particular */
-  }
-}
+	      // Work around issue under safari where we can't directly set the column value
+	      /* istanbul ignore next */
+	      if (Object.defineProperty) {
+	        Object.defineProperty(this, 'column', {
+	          value: column,
+	          enumerable: true
+	        });
+	        Object.defineProperty(this, 'endColumn', {
+	          value: endColumn,
+	          enumerable: true
+	        });
+	      } else {
+	        this.column = column;
+	        this.endColumn = endColumn;
+	      }
+	    }
+	  } catch (nop) {
+	    /* Ignore if the browser is very particular */
+	  }
+	}
 
-Exception.prototype = new Error();
+	Exception.prototype = new Error();
 
-exports['default'] = Exception;
-module.exports = exports['default'];
-
-}(exception, exception.exports));
+	exports['default'] = Exception;
+	module.exports = exports['default'];
+	
+} (exception, exceptionExports));
 
 var helpers = {};
 
-var blockHelperMissing = {exports: {}};
+var blockHelperMissingExports = {};
+var blockHelperMissing = {
+  get exports(){ return blockHelperMissingExports; },
+  set exports(v){ blockHelperMissingExports = v; },
+};
 
 (function (module, exports) {
 
-exports.__esModule = true;
+	exports.__esModule = true;
 
-var _utils = utils;
+	var _utils = utils;
 
-exports['default'] = function (instance) {
-  instance.registerHelper('blockHelperMissing', function (context, options) {
-    var inverse = options.inverse,
-        fn = options.fn;
+	exports['default'] = function (instance) {
+	  instance.registerHelper('blockHelperMissing', function (context, options) {
+	    var inverse = options.inverse,
+	        fn = options.fn;
 
-    if (context === true) {
-      return fn(this);
-    } else if (context === false || context == null) {
-      return inverse(this);
-    } else if (_utils.isArray(context)) {
-      if (context.length > 0) {
-        if (options.ids) {
-          options.ids = [options.name];
-        }
+	    if (context === true) {
+	      return fn(this);
+	    } else if (context === false || context == null) {
+	      return inverse(this);
+	    } else if (_utils.isArray(context)) {
+	      if (context.length > 0) {
+	        if (options.ids) {
+	          options.ids = [options.name];
+	        }
 
-        return instance.helpers.each(context, options);
-      } else {
-        return inverse(this);
-      }
-    } else {
-      if (options.data && options.ids) {
-        var data = _utils.createFrame(options.data);
-        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.name);
-        options = { data: data };
-      }
+	        return instance.helpers.each(context, options);
+	      } else {
+	        return inverse(this);
+	      }
+	    } else {
+	      if (options.data && options.ids) {
+	        var data = _utils.createFrame(options.data);
+	        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.name);
+	        options = { data: data };
+	      }
 
-      return fn(context, options);
-    }
-  });
+	      return fn(context, options);
+	    }
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (blockHelperMissing, blockHelperMissingExports));
+
+var eachExports = {};
+var each = {
+  get exports(){ return eachExports; },
+  set exports(v){ eachExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(blockHelperMissing, blockHelperMissing.exports));
-
-var each = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-// istanbul ignore next
+	exports.__esModule = true;
+	// istanbul ignore next
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _utils = utils;
+	var _utils = utils;
 
-var _exception = exception.exports;
+	var _exception = exceptionExports;
 
-var _exception2 = _interopRequireDefault(_exception);
+	var _exception2 = _interopRequireDefault(_exception);
 
-exports['default'] = function (instance) {
-  instance.registerHelper('each', function (context, options) {
-    if (!options) {
-      throw new _exception2['default']('Must pass iterator to #each');
-    }
+	exports['default'] = function (instance) {
+	  instance.registerHelper('each', function (context, options) {
+	    if (!options) {
+	      throw new _exception2['default']('Must pass iterator to #each');
+	    }
 
-    var fn = options.fn,
-        inverse = options.inverse,
-        i = 0,
-        ret = '',
-        data = undefined,
-        contextPath = undefined;
+	    var fn = options.fn,
+	        inverse = options.inverse,
+	        i = 0,
+	        ret = '',
+	        data = undefined,
+	        contextPath = undefined;
 
-    if (options.data && options.ids) {
-      contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
-    }
+	    if (options.data && options.ids) {
+	      contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]) + '.';
+	    }
 
-    if (_utils.isFunction(context)) {
-      context = context.call(this);
-    }
+	    if (_utils.isFunction(context)) {
+	      context = context.call(this);
+	    }
 
-    if (options.data) {
-      data = _utils.createFrame(options.data);
-    }
+	    if (options.data) {
+	      data = _utils.createFrame(options.data);
+	    }
 
-    function execIteration(field, index, last) {
-      if (data) {
-        data.key = field;
-        data.index = index;
-        data.first = index === 0;
-        data.last = !!last;
+	    function execIteration(field, index, last) {
+	      if (data) {
+	        data.key = field;
+	        data.index = index;
+	        data.first = index === 0;
+	        data.last = !!last;
 
-        if (contextPath) {
-          data.contextPath = contextPath + field;
-        }
-      }
+	        if (contextPath) {
+	          data.contextPath = contextPath + field;
+	        }
+	      }
 
-      ret = ret + fn(context[field], {
-        data: data,
-        blockParams: _utils.blockParams([context[field], field], [contextPath + field, null])
-      });
-    }
+	      ret = ret + fn(context[field], {
+	        data: data,
+	        blockParams: _utils.blockParams([context[field], field], [contextPath + field, null])
+	      });
+	    }
 
-    if (context && typeof context === 'object') {
-      if (_utils.isArray(context)) {
-        for (var j = context.length; i < j; i++) {
-          if (i in context) {
-            execIteration(i, i, i === context.length - 1);
-          }
-        }
-      } else if (commonjsGlobal.Symbol && context[commonjsGlobal.Symbol.iterator]) {
-        var newContext = [];
-        var iterator = context[commonjsGlobal.Symbol.iterator]();
-        for (var it = iterator.next(); !it.done; it = iterator.next()) {
-          newContext.push(it.value);
-        }
-        context = newContext;
-        for (var j = context.length; i < j; i++) {
-          execIteration(i, i, i === context.length - 1);
-        }
-      } else {
-        (function () {
-          var priorKey = undefined;
+	    if (context && typeof context === 'object') {
+	      if (_utils.isArray(context)) {
+	        for (var j = context.length; i < j; i++) {
+	          if (i in context) {
+	            execIteration(i, i, i === context.length - 1);
+	          }
+	        }
+	      } else if (commonjsGlobal.Symbol && context[commonjsGlobal.Symbol.iterator]) {
+	        var newContext = [];
+	        var iterator = context[commonjsGlobal.Symbol.iterator]();
+	        for (var it = iterator.next(); !it.done; it = iterator.next()) {
+	          newContext.push(it.value);
+	        }
+	        context = newContext;
+	        for (var j = context.length; i < j; i++) {
+	          execIteration(i, i, i === context.length - 1);
+	        }
+	      } else {
+	        (function () {
+	          var priorKey = undefined;
 
-          Object.keys(context).forEach(function (key) {
-            // We're running the iterations one step out of sync so we can detect
-            // the last iteration without have to scan the object twice and create
-            // an itermediate keys array.
-            if (priorKey !== undefined) {
-              execIteration(priorKey, i - 1);
-            }
-            priorKey = key;
-            i++;
-          });
-          if (priorKey !== undefined) {
-            execIteration(priorKey, i - 1, true);
-          }
-        })();
-      }
-    }
+	          Object.keys(context).forEach(function (key) {
+	            // We're running the iterations one step out of sync so we can detect
+	            // the last iteration without have to scan the object twice and create
+	            // an itermediate keys array.
+	            if (priorKey !== undefined) {
+	              execIteration(priorKey, i - 1);
+	            }
+	            priorKey = key;
+	            i++;
+	          });
+	          if (priorKey !== undefined) {
+	            execIteration(priorKey, i - 1, true);
+	          }
+	        })();
+	      }
+	    }
 
-    if (i === 0) {
-      ret = inverse(this);
-    }
+	    if (i === 0) {
+	      ret = inverse(this);
+	    }
 
-    return ret;
-  });
+	    return ret;
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (each, eachExports));
+
+var helperMissingExports = {};
+var helperMissing = {
+  get exports(){ return helperMissingExports; },
+  set exports(v){ helperMissingExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(each, each.exports));
-
-var helperMissing = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-// istanbul ignore next
+	exports.__esModule = true;
+	// istanbul ignore next
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _exception = exception.exports;
+	var _exception = exceptionExports;
 
-var _exception2 = _interopRequireDefault(_exception);
+	var _exception2 = _interopRequireDefault(_exception);
 
-exports['default'] = function (instance) {
-  instance.registerHelper('helperMissing', function () /* [args, ]options */{
-    if (arguments.length === 1) {
-      // A missing field in a {{foo}} construct.
-      return undefined;
-    } else {
-      // Someone is actually trying to call something, blow up.
-      throw new _exception2['default']('Missing helper: "' + arguments[arguments.length - 1].name + '"');
-    }
-  });
+	exports['default'] = function (instance) {
+	  instance.registerHelper('helperMissing', function () /* [args, ]options */{
+	    if (arguments.length === 1) {
+	      // A missing field in a {{foo}} construct.
+	      return undefined;
+	    } else {
+	      // Someone is actually trying to call something, blow up.
+	      throw new _exception2['default']('Missing helper: "' + arguments[arguments.length - 1].name + '"');
+	    }
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (helperMissing, helperMissingExports));
+
+var _ifExports = {};
+var _if = {
+  get exports(){ return _ifExports; },
+  set exports(v){ _ifExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(helperMissing, helperMissing.exports));
-
-var _if = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-// istanbul ignore next
+	exports.__esModule = true;
+	// istanbul ignore next
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _utils = utils;
+	var _utils = utils;
 
-var _exception = exception.exports;
+	var _exception = exceptionExports;
 
-var _exception2 = _interopRequireDefault(_exception);
+	var _exception2 = _interopRequireDefault(_exception);
 
-exports['default'] = function (instance) {
-  instance.registerHelper('if', function (conditional, options) {
-    if (arguments.length != 2) {
-      throw new _exception2['default']('#if requires exactly one argument');
-    }
-    if (_utils.isFunction(conditional)) {
-      conditional = conditional.call(this);
-    }
+	exports['default'] = function (instance) {
+	  instance.registerHelper('if', function (conditional, options) {
+	    if (arguments.length != 2) {
+	      throw new _exception2['default']('#if requires exactly one argument');
+	    }
+	    if (_utils.isFunction(conditional)) {
+	      conditional = conditional.call(this);
+	    }
 
-    // Default behavior is to render the positive path if the value is truthy and not empty.
-    // The `includeZero` option may be set to treat the condtional as purely not empty based on the
-    // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
-    if (!options.hash.includeZero && !conditional || _utils.isEmpty(conditional)) {
-      return options.inverse(this);
-    } else {
-      return options.fn(this);
-    }
-  });
+	    // Default behavior is to render the positive path if the value is truthy and not empty.
+	    // The `includeZero` option may be set to treat the condtional as purely not empty based on the
+	    // behavior of isEmpty. Effectively this determines if 0 is handled by the positive path or negative.
+	    if (!options.hash.includeZero && !conditional || _utils.isEmpty(conditional)) {
+	      return options.inverse(this);
+	    } else {
+	      return options.fn(this);
+	    }
+	  });
 
-  instance.registerHelper('unless', function (conditional, options) {
-    if (arguments.length != 2) {
-      throw new _exception2['default']('#unless requires exactly one argument');
-    }
-    return instance.helpers['if'].call(this, conditional, {
-      fn: options.inverse,
-      inverse: options.fn,
-      hash: options.hash
-    });
-  });
+	  instance.registerHelper('unless', function (conditional, options) {
+	    if (arguments.length != 2) {
+	      throw new _exception2['default']('#unless requires exactly one argument');
+	    }
+	    return instance.helpers['if'].call(this, conditional, {
+	      fn: options.inverse,
+	      inverse: options.fn,
+	      hash: options.hash
+	    });
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (_if, _ifExports));
+
+var logExports = {};
+var log$1 = {
+  get exports(){ return logExports; },
+  set exports(v){ logExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(_if, _if.exports));
-
-var log$1 = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
+	exports.__esModule = true;
 
-exports['default'] = function (instance) {
-  instance.registerHelper('log', function () /* message, options */{
-    var args = [undefined],
-        options = arguments[arguments.length - 1];
-    for (var i = 0; i < arguments.length - 1; i++) {
-      args.push(arguments[i]);
-    }
+	exports['default'] = function (instance) {
+	  instance.registerHelper('log', function () /* message, options */{
+	    var args = [undefined],
+	        options = arguments[arguments.length - 1];
+	    for (var i = 0; i < arguments.length - 1; i++) {
+	      args.push(arguments[i]);
+	    }
 
-    var level = 1;
-    if (options.hash.level != null) {
-      level = options.hash.level;
-    } else if (options.data && options.data.level != null) {
-      level = options.data.level;
-    }
-    args[0] = level;
+	    var level = 1;
+	    if (options.hash.level != null) {
+	      level = options.hash.level;
+	    } else if (options.data && options.data.level != null) {
+	      level = options.data.level;
+	    }
+	    args[0] = level;
 
-    instance.log.apply(instance, args);
-  });
+	    instance.log.apply(instance, args);
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (log$1, logExports));
+
+var lookupExports = {};
+var lookup = {
+  get exports(){ return lookupExports; },
+  set exports(v){ lookupExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(log$1, log$1.exports));
-
-var lookup = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
+	exports.__esModule = true;
 
-exports['default'] = function (instance) {
-  instance.registerHelper('lookup', function (obj, field, options) {
-    if (!obj) {
-      // Note for 5.0: Change to "obj == null" in 5.0
-      return obj;
-    }
-    return options.lookupProperty(obj, field);
-  });
+	exports['default'] = function (instance) {
+	  instance.registerHelper('lookup', function (obj, field, options) {
+	    if (!obj) {
+	      // Note for 5.0: Change to "obj == null" in 5.0
+	      return obj;
+	    }
+	    return options.lookupProperty(obj, field);
+	  });
+	};
+
+	module.exports = exports['default'];
+	
+} (lookup, lookupExports));
+
+var _withExports = {};
+var _with = {
+  get exports(){ return _withExports; },
+  set exports(v){ _withExports = v; },
 };
-
-module.exports = exports['default'];
-
-}(lookup, lookup.exports));
-
-var _with = {exports: {}};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-// istanbul ignore next
+	exports.__esModule = true;
+	// istanbul ignore next
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _utils = utils;
+	var _utils = utils;
 
-var _exception = exception.exports;
+	var _exception = exceptionExports;
 
-var _exception2 = _interopRequireDefault(_exception);
+	var _exception2 = _interopRequireDefault(_exception);
 
-exports['default'] = function (instance) {
-  instance.registerHelper('with', function (context, options) {
-    if (arguments.length != 2) {
-      throw new _exception2['default']('#with requires exactly one argument');
-    }
-    if (_utils.isFunction(context)) {
-      context = context.call(this);
-    }
+	exports['default'] = function (instance) {
+	  instance.registerHelper('with', function (context, options) {
+	    if (arguments.length != 2) {
+	      throw new _exception2['default']('#with requires exactly one argument');
+	    }
+	    if (_utils.isFunction(context)) {
+	      context = context.call(this);
+	    }
 
-    var fn = options.fn;
+	    var fn = options.fn;
 
-    if (!_utils.isEmpty(context)) {
-      var data = options.data;
-      if (options.data && options.ids) {
-        data = _utils.createFrame(options.data);
-        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]);
-      }
+	    if (!_utils.isEmpty(context)) {
+	      var data = options.data;
+	      if (options.data && options.ids) {
+	        data = _utils.createFrame(options.data);
+	        data.contextPath = _utils.appendContextPath(options.data.contextPath, options.ids[0]);
+	      }
 
-      return fn(context, {
-        data: data,
-        blockParams: _utils.blockParams([context], [data && data.contextPath])
-      });
-    } else {
-      return options.inverse(this);
-    }
-  });
-};
+	      return fn(context, {
+	        data: data,
+	        blockParams: _utils.blockParams([context], [data && data.contextPath])
+	      });
+	    } else {
+	      return options.inverse(this);
+	    }
+	  });
+	};
 
-module.exports = exports['default'];
-
-}(_with, _with.exports));
+	module.exports = exports['default'];
+	
+} (_with, _withExports));
 
 helpers.__esModule = true;
 helpers.registerDefaultHelpers = registerDefaultHelpers;
@@ -2119,31 +2295,31 @@ helpers.moveHelperToHooks = moveHelperToHooks;
 
 function _interopRequireDefault$3(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _helpersBlockHelperMissing = blockHelperMissing.exports;
+var _helpersBlockHelperMissing = blockHelperMissingExports;
 
 var _helpersBlockHelperMissing2 = _interopRequireDefault$3(_helpersBlockHelperMissing);
 
-var _helpersEach = each.exports;
+var _helpersEach = eachExports;
 
 var _helpersEach2 = _interopRequireDefault$3(_helpersEach);
 
-var _helpersHelperMissing = helperMissing.exports;
+var _helpersHelperMissing = helperMissingExports;
 
 var _helpersHelperMissing2 = _interopRequireDefault$3(_helpersHelperMissing);
 
-var _helpersIf = _if.exports;
+var _helpersIf = _ifExports;
 
 var _helpersIf2 = _interopRequireDefault$3(_helpersIf);
 
-var _helpersLog = log$1.exports;
+var _helpersLog = logExports;
 
 var _helpersLog2 = _interopRequireDefault$3(_helpersLog);
 
-var _helpersLookup = lookup.exports;
+var _helpersLookup = lookupExports;
 
 var _helpersLookup2 = _interopRequireDefault$3(_helpersLookup);
 
-var _helpersWith = _with.exports;
+var _helpersWith = _withExports;
 
 var _helpersWith2 = _interopRequireDefault$3(_helpersWith);
 
@@ -2168,38 +2344,42 @@ function moveHelperToHooks(instance, helperName, keepHelper) {
 
 var decorators = {};
 
-var inline = {exports: {}};
+var inlineExports = {};
+var inline = {
+  get exports(){ return inlineExports; },
+  set exports(v){ inlineExports = v; },
+};
 
 (function (module, exports) {
 
-exports.__esModule = true;
+	exports.__esModule = true;
 
-var _utils = utils;
+	var _utils = utils;
 
-exports['default'] = function (instance) {
-  instance.registerDecorator('inline', function (fn, props, container, options) {
-    var ret = fn;
-    if (!props.partials) {
-      props.partials = {};
-      ret = function (context, options) {
-        // Create a new partials stack frame prior to exec.
-        var original = container.partials;
-        container.partials = _utils.extend({}, original, props.partials);
-        var ret = fn(context, options);
-        container.partials = original;
-        return ret;
-      };
-    }
+	exports['default'] = function (instance) {
+	  instance.registerDecorator('inline', function (fn, props, container, options) {
+	    var ret = fn;
+	    if (!props.partials) {
+	      props.partials = {};
+	      ret = function (context, options) {
+	        // Create a new partials stack frame prior to exec.
+	        var original = container.partials;
+	        container.partials = _utils.extend({}, original, props.partials);
+	        var ret = fn(context, options);
+	        container.partials = original;
+	        return ret;
+	      };
+	    }
 
-    props.partials[options.args[0]] = options.fn;
+	    props.partials[options.args[0]] = options.fn;
 
-    return ret;
-  });
-};
+	    return ret;
+	  });
+	};
 
-module.exports = exports['default'];
-
-}(inline, inline.exports));
+	module.exports = exports['default'];
+	
+} (inline, inlineExports));
 
 decorators.__esModule = true;
 decorators.registerDefaultDecorators = registerDefaultDecorators;
@@ -2207,7 +2387,7 @@ decorators.registerDefaultDecorators = registerDefaultDecorators;
 
 function _interopRequireDefault$2(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _decoratorsInline = inline.exports;
+var _decoratorsInline = inlineExports;
 
 var _decoratorsInline2 = _interopRequireDefault$2(_decoratorsInline);
 
@@ -2215,56 +2395,60 @@ function registerDefaultDecorators(instance) {
   _decoratorsInline2['default'](instance);
 }
 
-var logger$1 = {exports: {}};
+var loggerExports = {};
+var logger$1 = {
+  get exports(){ return loggerExports; },
+  set exports(v){ loggerExports = v; },
+};
 
 (function (module, exports) {
 
-exports.__esModule = true;
+	exports.__esModule = true;
 
-var _utils = utils;
+	var _utils = utils;
 
-var logger = {
-  methodMap: ['debug', 'info', 'warn', 'error'],
-  level: 'info',
+	var logger = {
+	  methodMap: ['debug', 'info', 'warn', 'error'],
+	  level: 'info',
 
-  // Maps a given level value to the `methodMap` indexes above.
-  lookupLevel: function lookupLevel(level) {
-    if (typeof level === 'string') {
-      var levelMap = _utils.indexOf(logger.methodMap, level.toLowerCase());
-      if (levelMap >= 0) {
-        level = levelMap;
-      } else {
-        level = parseInt(level, 10);
-      }
-    }
+	  // Maps a given level value to the `methodMap` indexes above.
+	  lookupLevel: function lookupLevel(level) {
+	    if (typeof level === 'string') {
+	      var levelMap = _utils.indexOf(logger.methodMap, level.toLowerCase());
+	      if (levelMap >= 0) {
+	        level = levelMap;
+	      } else {
+	        level = parseInt(level, 10);
+	      }
+	    }
 
-    return level;
-  },
+	    return level;
+	  },
 
-  // Can be overridden in the host environment
-  log: function log(level) {
-    level = logger.lookupLevel(level);
+	  // Can be overridden in the host environment
+	  log: function log(level) {
+	    level = logger.lookupLevel(level);
 
-    if (typeof console !== 'undefined' && logger.lookupLevel(logger.level) <= level) {
-      var method = logger.methodMap[level];
-      // eslint-disable-next-line no-console
-      if (!console[method]) {
-        method = 'log';
-      }
+	    if (typeof console !== 'undefined' && logger.lookupLevel(logger.level) <= level) {
+	      var method = logger.methodMap[level];
+	      // eslint-disable-next-line no-console
+	      if (!console[method]) {
+	        method = 'log';
+	      }
 
-      for (var _len = arguments.length, message = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        message[_key - 1] = arguments[_key];
-      }
+	      for (var _len = arguments.length, message = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+	        message[_key - 1] = arguments[_key];
+	      }
 
-      console[method].apply(console, message); // eslint-disable-line no-console
-    }
-  }
-};
+	      console[method].apply(console, message); // eslint-disable-line no-console
+	    }
+	  }
+	};
 
-exports['default'] = logger;
-module.exports = exports['default'];
-
-}(logger$1, logger$1.exports));
+	exports['default'] = logger;
+	module.exports = exports['default'];
+	
+} (logger$1, loggerExports));
 
 var protoAccess = {};
 
@@ -2300,7 +2484,7 @@ function _interopRequireWildcard$1(obj) { if (obj && obj.__esModule) { return ob
 
 var _createNewLookupObject = createNewLookupObject$1;
 
-var _logger$1 = logger$1.exports;
+var _logger$1 = loggerExports;
 
 var logger = _interopRequireWildcard$1(_logger$1);
 
@@ -2369,7 +2553,7 @@ function _interopRequireDefault$1(obj) { return obj && obj.__esModule ? obj : { 
 
 var _utils$1 = utils;
 
-var _exception$1 = exception.exports;
+var _exception$1 = exceptionExports;
 
 var _exception2$1 = _interopRequireDefault$1(_exception$1);
 
@@ -2377,7 +2561,7 @@ var _helpers$1 = helpers;
 
 var _decorators = decorators;
 
-var _logger = logger$1.exports;
+var _logger = loggerExports;
 
 var _logger2 = _interopRequireDefault$1(_logger);
 
@@ -2475,23 +2659,27 @@ base.log = log;
 base.createFrame = _utils$1.createFrame;
 base.logger = _logger2['default'];
 
-var safeString = {exports: {}};
+var safeStringExports = {};
+var safeString = {
+  get exports(){ return safeStringExports; },
+  set exports(v){ safeStringExports = v; },
+};
 
 (function (module, exports) {
 
-exports.__esModule = true;
-function SafeString(string) {
-  this.string = string;
-}
+	exports.__esModule = true;
+	function SafeString(string) {
+	  this.string = string;
+	}
 
-SafeString.prototype.toString = SafeString.prototype.toHTML = function () {
-  return '' + this.string;
-};
+	SafeString.prototype.toString = SafeString.prototype.toHTML = function () {
+	  return '' + this.string;
+	};
 
-exports['default'] = SafeString;
-module.exports = exports['default'];
-
-}(safeString, safeString.exports));
+	exports['default'] = SafeString;
+	module.exports = exports['default'];
+	
+} (safeString, safeStringExports));
 
 var runtime$1 = {};
 
@@ -2533,7 +2721,7 @@ var _utils = utils;
 
 var Utils = _interopRequireWildcard(_utils);
 
-var _exception = exception.exports;
+var _exception = exceptionExports;
 
 var _exception2 = _interopRequireDefault(_exception);
 
@@ -2884,100 +3072,104 @@ function passLookupPropertyOption(helper, container) {
   });
 }
 
-var noConflict = {exports: {}};
-
-(function (module, exports) {
-
-exports.__esModule = true;
-
-exports['default'] = function (Handlebars) {
-  /* istanbul ignore next */
-  var root = typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : window,
-      $Handlebars = root.Handlebars;
-  /* istanbul ignore next */
-  Handlebars.noConflict = function () {
-    if (root.Handlebars === Handlebars) {
-      root.Handlebars = $Handlebars;
-    }
-    return Handlebars;
-  };
+var noConflictExports = {};
+var noConflict = {
+  get exports(){ return noConflictExports; },
+  set exports(v){ noConflictExports = v; },
 };
 
-module.exports = exports['default'];
+(function (module, exports) {
 
-}(noConflict, noConflict.exports));
+	exports.__esModule = true;
+
+	exports['default'] = function (Handlebars) {
+	  /* istanbul ignore next */
+	  var root = typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : window,
+	      $Handlebars = root.Handlebars;
+	  /* istanbul ignore next */
+	  Handlebars.noConflict = function () {
+	    if (root.Handlebars === Handlebars) {
+	      root.Handlebars = $Handlebars;
+	    }
+	    return Handlebars;
+	  };
+	};
+
+	module.exports = exports['default'];
+	
+} (noConflict, noConflictExports));
 
 (function (module, exports) {
 
-exports.__esModule = true;
-// istanbul ignore next
+	exports.__esModule = true;
+	// istanbul ignore next
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-// istanbul ignore next
+	// istanbul ignore next
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
-var _handlebarsBase = base;
+	var _handlebarsBase = base;
 
-var base$1 = _interopRequireWildcard(_handlebarsBase);
+	var base$1 = _interopRequireWildcard(_handlebarsBase);
 
-// Each of these augment the Handlebars object. No need to setup here.
-// (This is done to easily share code between commonjs and browse envs)
+	// Each of these augment the Handlebars object. No need to setup here.
+	// (This is done to easily share code between commonjs and browse envs)
 
-var _handlebarsSafeString = safeString.exports;
+	var _handlebarsSafeString = safeStringExports;
 
-var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
+	var _handlebarsSafeString2 = _interopRequireDefault(_handlebarsSafeString);
 
-var _handlebarsException = exception.exports;
+	var _handlebarsException = exceptionExports;
 
-var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
+	var _handlebarsException2 = _interopRequireDefault(_handlebarsException);
 
-var _handlebarsUtils = utils;
+	var _handlebarsUtils = utils;
 
-var Utils = _interopRequireWildcard(_handlebarsUtils);
+	var Utils = _interopRequireWildcard(_handlebarsUtils);
 
-var _handlebarsRuntime = runtime$1;
+	var _handlebarsRuntime = runtime$1;
 
-var runtime = _interopRequireWildcard(_handlebarsRuntime);
+	var runtime = _interopRequireWildcard(_handlebarsRuntime);
 
-var _handlebarsNoConflict = noConflict.exports;
+	var _handlebarsNoConflict = noConflictExports;
 
-var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
+	var _handlebarsNoConflict2 = _interopRequireDefault(_handlebarsNoConflict);
 
-// For compatibility and usage outside of module systems, make the Handlebars object a namespace
-function create() {
-  var hb = new base$1.HandlebarsEnvironment();
+	// For compatibility and usage outside of module systems, make the Handlebars object a namespace
+	function create() {
+	  var hb = new base$1.HandlebarsEnvironment();
 
-  Utils.extend(hb, base$1);
-  hb.SafeString = _handlebarsSafeString2['default'];
-  hb.Exception = _handlebarsException2['default'];
-  hb.Utils = Utils;
-  hb.escapeExpression = Utils.escapeExpression;
+	  Utils.extend(hb, base$1);
+	  hb.SafeString = _handlebarsSafeString2['default'];
+	  hb.Exception = _handlebarsException2['default'];
+	  hb.Utils = Utils;
+	  hb.escapeExpression = Utils.escapeExpression;
 
-  hb.VM = runtime;
-  hb.template = function (spec) {
-    return runtime.template(spec, hb);
-  };
+	  hb.VM = runtime;
+	  hb.template = function (spec) {
+	    return runtime.template(spec, hb);
+	  };
 
-  return hb;
-}
+	  return hb;
+	}
 
-var inst = create();
-inst.create = create;
+	var inst = create();
+	inst.create = create;
 
-_handlebarsNoConflict2['default'](inst);
+	_handlebarsNoConflict2['default'](inst);
 
-inst['default'] = inst;
+	inst['default'] = inst;
 
-exports['default'] = inst;
-module.exports = exports['default'];
-
-}(handlebars_runtime, handlebars_runtime.exports));
+	exports['default'] = inst;
+	module.exports = exports['default'];
+	
+} (handlebars_runtime, handlebars_runtimeExports));
 
 // Create a simple path alias to allow browserify to resolve
 // the runtime on a supported path.
-var runtime = handlebars_runtime.exports['default'];
+var runtime = handlebars_runtimeExports['default'];
 
 function Helpers0 (Handlebars) {
   Handlebars.registerHelper('eq', (a, b) => a === b);
@@ -3134,11 +3326,11 @@ function loaderSnippetTemplate(data, options, asString) {
   return (asString || true) ? html : $(html);
 }
 
-var script$1 = defineComponent({
+var script$6 = defineComponent({
   props: ['metadata', 'params', 'styleVars'],
 
   components: {
-    CopyButton: script$2,
+    CopyButton: script$7,
   },
 
   setup(props) {
@@ -3179,68 +3371,669 @@ var script$1 = defineComponent({
         .join('\n');
     });
 
+    const stanzaContainer = ref();
+
+    watch(styleSnippet, () => {
+      const stanzaElement = stanzaContainer.value.childNodes[0];
+      stanzaElement.render();
+    });
+
     return {
       tagName,
       props: stanzaProps,
       styleSnippet,
       stanzaSnippet,
       combinedSnippet,
+      stanzaContainer,
     };
   },
 });
 
-const _hoisted_1$1 = { class: "bg-dark" };
-const _hoisted_2$1 = { class: "text-end p-2" };
-const _hoisted_3$1 = { class: "overflow-auto p-3 pt-0 text-white" };
-const _hoisted_4$1 = { class: "overflow-auto p-3 bg-light" };
-const _hoisted_5$1 = ["innerHTML"];
+const _hoisted_1$6 = { class: "p-3 bg-light" };
+const _hoisted_2$6 = ["innerHTML"];
+const _hoisted_3$6 = { ref: "stanzaContainer" };
+const _hoisted_4$6 = { class: "bg-dark mt-3" };
+const _hoisted_5$6 = { class: "text-end p-2" };
+const _hoisted_6$5 = { class: "overflow-auto p-3 pt-0 text-white" };
 
-function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+function render$2(_ctx, _cache, $props, $setup, $data, $options) {
   const _component_CopyButton = resolveComponent("CopyButton");
 
   return (openBlock(), createElementBlock(Fragment, null, [
-    createBaseVNode("div", _hoisted_1$1, [
-      createBaseVNode("div", _hoisted_2$1, [
+    createBaseVNode("div", _hoisted_1$6, [
+      createBaseVNode("div", { innerHTML: _ctx.styleSnippet }, null, 8 /* PROPS */, _hoisted_2$6),
+      createBaseVNode("div", _hoisted_3$6, [
+        (openBlock(), createBlock(resolveDynamicComponent(_ctx.tagName), normalizeProps(guardReactiveProps(_ctx.props)), null, 16 /* FULL_PROPS */))
+      ], 512 /* NEED_PATCH */)
+    ]),
+    createBaseVNode("div", _hoisted_4$6, [
+      createBaseVNode("div", _hoisted_5$6, [
         createVNode(_component_CopyButton, {
           value: _ctx.combinedSnippet,
           class: "btn btn-sm btn-light"
         }, null, 8 /* PROPS */, ["value"])
       ]),
-      createBaseVNode("pre", _hoisted_3$1, [
+      createBaseVNode("pre", _hoisted_6$5, [
         createBaseVNode("code", null, toDisplayString(_ctx.combinedSnippet), 1 /* TEXT */)
       ])
-    ]),
-    createBaseVNode("div", _hoisted_4$1, [
-      createBaseVNode("div", { innerHTML: _ctx.styleSnippet }, null, 8 /* PROPS */, _hoisted_5$1),
-      (openBlock(), createBlock(resolveDynamicComponent(_ctx.tagName), normalizeProps(guardReactiveProps(_ctx.props)), null, 16 /* FULL_PROPS */))
     ])
   ], 64 /* STABLE_FRAGMENT */))
 }
 
-script$1.render = render$1;
-script$1.__file = "node_modules/togostanza/src/components/StanzaPreviewer.vue";
+script$6.render = render$2;
+script$6.__file = "node_modules/togostanza/src/components/StanzaPreviewer.vue";
+
+const _hoisted_1$5 = { class: "table table-borderless border mb-1" };
+const _hoisted_2$5 = { class: "mb-0" };
+const _hoisted_3$5 = {
+  key: 0,
+  class: "list-unstyled mb-0"
+};
+const _hoisted_4$5 = { class: "text-end" };
+const _hoisted_5$5 = ["href"];
+const _hoisted_6$4 = ["innerHTML"];
+
+
+var script$5 = {
+  __name: 'HelpAboutPane',
+  props: {
+  metadata: {
+    type: Object,
+    required: true,
+  },
+  readme: String,
+},
+  setup(__props) {
+
+
+
+return (_ctx, _cache) => {
+  return (openBlock(), createElementBlock(Fragment, null, [
+    createBaseVNode("table", _hoisted_1$5, [
+      createBaseVNode("tbody", null, [
+        createBaseVNode("tr", null, [
+          _cache[0] || (_cache[0] = createBaseVNode("th", null, "Author", -1 /* HOISTED */)),
+          createBaseVNode("td", null, [
+            createBaseVNode("address", _hoisted_2$5, toDisplayString(__props.metadata['stanza:author'] || '-'), 1 /* TEXT */)
+          ])
+        ]),
+        createBaseVNode("tr", null, [
+          _cache[1] || (_cache[1] = createBaseVNode("th", null, "Contributors", -1 /* HOISTED */)),
+          createBaseVNode("td", null, [
+            (
+              __props.metadata['stanza:contributor'] &&
+              __props.metadata['stanza:contributor'].length > 0
+            )
+              ? (openBlock(), createElementBlock("ul", _hoisted_3$5, [
+                  (openBlock(true), createElementBlock(Fragment, null, renderList(__props.metadata['stanza:contributor'], (contributor) => {
+                    return (openBlock(), createElementBlock("li", { key: contributor }, toDisplayString(contributor), 1 /* TEXT */))
+                  }), 128 /* KEYED_FRAGMENT */))
+                ]))
+              : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
+                  createTextVNode(" - ")
+                ], 64 /* STABLE_FRAGMENT */))
+          ])
+        ]),
+        createBaseVNode("tr", null, [
+          _cache[2] || (_cache[2] = createBaseVNode("th", null, "License", -1 /* HOISTED */)),
+          createBaseVNode("td", null, toDisplayString(__props.metadata['stanza:license'] || '-'), 1 /* TEXT */)
+        ]),
+        createBaseVNode("tr", null, [
+          _cache[3] || (_cache[3] = createBaseVNode("th", null, "Created", -1 /* HOISTED */)),
+          createBaseVNode("td", null, toDisplayString(__props.metadata['stanza:created'] || '-'), 1 /* TEXT */)
+        ]),
+        createBaseVNode("tr", null, [
+          _cache[4] || (_cache[4] = createBaseVNode("th", null, "Updated", -1 /* HOISTED */)),
+          createBaseVNode("td", null, toDisplayString(__props.metadata['stanza:updated'] || '-'), 1 /* TEXT */)
+        ])
+      ])
+    ]),
+    createBaseVNode("div", _hoisted_4$5, [
+      createBaseVNode("a", {
+        href: `./${__props.metadata['@id']}/metadata.json`
+      }, "Download JSON", 8 /* PROPS */, _hoisted_5$5)
+    ]),
+    createBaseVNode("div", {
+      innerHTML: __props.readme,
+      class: "mt-4"
+    }, null, 8 /* PROPS */, _hoisted_6$4)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+}
+
+};
+
+var css = "\nth[data-v-43688ce6] {\n  background-color: var(--bs-light);\n  text-align: center;\n  white-space: nowrap;\n  width: 1%;\n}\nth[data-v-43688ce6],\ntd[data-v-43688ce6] {\n  padding-left: 1.5rem;\n  padding-right: 1.5rem;\n}\n";
+n(css,{});
+
+script$5.__scopeId = "data-v-43688ce6";
+script$5.__file = "node_modules/togostanza/src/components/HelpAboutPane.vue";
+
+function removePrefix(str, prefix) {
+  if (prefix === str) {
+    return '';
+  } else if (str.startsWith(prefix + '-')) {
+    return str.slice(prefix.length + 1);
+  }
+  return str;
+}
+
+var script$4 = defineComponent({
+  props: [
+    'choices',
+    'helpText',
+    'input',
+    'name',
+    'required',
+    'type',
+    'label',
+    'pathPrefix',
+  ],
+  setup(props) {
+    const shortName = computed(() => {
+      return removePrefix(props.name, props.pathPrefix);
+    });
+    const prefix = computed(() => {
+      return props.name === props.pathPrefix
+        ? props.pathPrefix
+        : props.pathPrefix + '-';
+    });
+    const formType = computed(() => {
+      return props.type === 'datetime' ? 'datetime-local' : props.type;
+    });
+    return { ...props, formType, shortName, prefix };
+  },
+});
+
+const _hoisted_1$4 = { class: "form-label d-flex" };
+const _hoisted_2$4 = { class: "me-auto" };
+const _hoisted_3$4 = {
+  key: 0,
+  class: "text-danger"
+};
+const _hoisted_4$4 = { class: "text-muted" };
+const _hoisted_5$4 = { class: "fs-5" };
+const _hoisted_6$3 = { class: "text-muted" };
+const _hoisted_7$1 = { class: "input-group" };
+const _hoisted_8$1 = ["value"];
+const _hoisted_9$1 = ["value"];
+const _hoisted_10$1 = { class: "input-group-text" };
+const _hoisted_11 = ["checked", "id"];
+const _hoisted_12 = ["for"];
+const _hoisted_13 = ["type", "value"];
+const _hoisted_14 = ["disabled"];
+const _hoisted_15 = { class: "form-text text-muted" };
+
+function render$1(_ctx, _cache, $props, $setup, $data, $options) {
+  return (openBlock(), createElementBlock(Fragment, null, [
+    createBaseVNode("label", _hoisted_1$4, [
+      createBaseVNode("span", _hoisted_2$4, [
+        (_ctx.required)
+          ? (openBlock(), createElementBlock("span", _hoisted_3$4, "*"))
+          : createCommentVNode("v-if", true),
+        createBaseVNode("span", _hoisted_4$4, toDisplayString(_ctx.prefix), 1 /* TEXT */),
+        createBaseVNode("span", _hoisted_5$4, toDisplayString(_ctx.shortName), 1 /* TEXT */)
+      ]),
+      createBaseVNode("small", _hoisted_6$3, toDisplayString(_ctx.type || 'string'), 1 /* TEXT */)
+    ]),
+    createBaseVNode("div", _hoisted_7$1, [
+      (_ctx.formType === 'single-choice')
+        ? (openBlock(), createElementBlock("select", {
+            key: 0,
+            value: _ctx.input.valueStr.value,
+            onChange: _cache[0] || (_cache[0] = $event => (_ctx.input.setValueStr($event.target.value))),
+            class: "form-select"
+          }, [
+            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.choices, (choice) => {
+              return (openBlock(), createElementBlock("option", {
+                value: choice,
+                key: choice
+              }, toDisplayString(choice), 9 /* TEXT, PROPS */, _hoisted_9$1))
+            }), 128 /* KEYED_FRAGMENT */))
+          ], 40 /* PROPS, NEED_HYDRATION */, _hoisted_8$1))
+        : (_ctx.formType === 'boolean')
+          ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [
+              createBaseVNode("div", _hoisted_10$1, [
+                createBaseVNode("input", {
+                  class: "form-check-input mt-0",
+                  type: "checkbox",
+                  checked: _ctx.input.valueParsed.value,
+                  onChange: _cache[1] || (_cache[1] = $event => (_ctx.input.setValueStr($event.target.checked.toString()))),
+                  id: _ctx.name
+                }, null, 40 /* PROPS, NEED_HYDRATION */, _hoisted_11)
+              ]),
+              createBaseVNode("label", {
+                class: "input-group-text flex-fill bg-body",
+                for: _ctx.name
+              }, toDisplayString(_ctx.label), 9 /* TEXT, PROPS */, _hoisted_12)
+            ], 64 /* STABLE_FRAGMENT */))
+          : (openBlock(), createElementBlock("input", {
+              key: 2,
+              type: _ctx.formType,
+              value: _ctx.input.valueStr.value,
+              onInput: _cache[2] || (_cache[2] = $event => (_ctx.input.setValueStr($event.target.value))),
+              class: normalizeClass(["form-control mw-100", { 'form-control-color': _ctx.formType === 'color' }])
+            }, null, 42 /* CLASS, PROPS, NEED_HYDRATION */, _hoisted_13)),
+      (_ctx.input.hasDefault)
+        ? (openBlock(), createElementBlock("button", {
+            key: 3,
+            onClick: _cache[3] || (_cache[3] = $event => (_ctx.input.resetToDefault())),
+            disabled: _ctx.input.isDefault.value,
+            type: "button",
+            class: "btn btn-light border"
+          }, " Reset ", 8 /* PROPS */, _hoisted_14))
+        : createCommentVNode("v-if", true)
+    ]),
+    createBaseVNode("small", _hoisted_15, toDisplayString(_ctx.helpText), 1 /* TEXT */)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+
+script$4.render = render$1;
+script$4.__file = "node_modules/togostanza/src/components/FormField.vue";
+
+const _hoisted_1$3 = { class: "d-flex align-items-start" };
+const _hoisted_2$3 = {
+  class: "nav flex-column nav-pills me-3",
+  id: "params-pills-tab",
+  role: "tablist",
+  "aria-orientation": "vertical"
+};
+const _hoisted_3$3 = ["data-bs-target"];
+const _hoisted_4$3 = {
+  class: "tab-content flex-grow-1",
+  id: "params-pills-tabContent"
+};
+const _hoisted_5$3 = ["id"];
+
+
+var script$3 = {
+  __name: 'HelpParametersPane',
+  props: {
+  paramFieldGroups: {
+    type: Array,
+    required: true,
+  },
+},
+  setup(__props) {
+
+
+
+// paramFieldGroups:
+//   [['data', [ParamField, ParamField, ...]], ['axis', undefined], ...]
+
+const firstActiveParamFieldGroupPath = __props.paramFieldGroups
+  .find(([_, parameters]) => parameters && parameters.length > 0)[0]
+  .join('-');
+
+return (_ctx, _cache) => {
+  return (openBlock(), createElementBlock("div", _hoisted_1$3, [
+    createBaseVNode("div", _hoisted_2$3, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(__props.paramFieldGroups, ([path, params]) => {
+        return (openBlock(), createElementBlock("button", {
+          key: path.join('-'),
+          class: normalizeClass(
+            `nav-link text-start` +
+            (path.join('-') === unref(firstActiveParamFieldGroupPath)
+              ? ' active'
+              : '') +
+            (params ? '' : ' disabled')
+          ),
+          "data-bs-toggle": "pill",
+          "data-bs-target": `#params-pills-${path.join('-')}`,
+          type: "button",
+          role: "tab",
+          style: normalizeStyle({ 'padding-left': `${path.length * 2}rem` })
+        }, toDisplayString(path[path.length - 1]), 15 /* TEXT, CLASS, STYLE, PROPS */, _hoisted_3$3))
+      }), 128 /* KEYED_FRAGMENT */))
+    ]),
+    createBaseVNode("div", _hoisted_4$3, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(__props.paramFieldGroups, ([path, params]) => {
+        return (openBlock(), createElementBlock("div", {
+          key: path.join('-'),
+          class: normalizeClass(
+            `tab-pane` +
+            (path.join('-') === unref(firstActiveParamFieldGroupPath)
+              ? ' show active'
+              : '')
+          ),
+          id: `params-pills-${path.join('-')}`,
+          role: "tabpanel",
+          "aria-labelledby": "params-pills-home-tab",
+          tabindex: "0"
+        }, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(params, ({ param, input }) => {
+            return (openBlock(), createElementBlock("div", {
+              key: param['stanza:key'],
+              class: "col mb-2"
+            }, [
+              createVNode(script$4, {
+                input: input,
+                "path-prefix": path.join('-'),
+                name: param['stanza:key'],
+                type: param['stanza:type'],
+                choices: param['stanza:choice'],
+                required: param['stanza:required'],
+                "help-text": param['stanza:description'],
+                label: param['stanza:label']
+              }, null, 8 /* PROPS */, ["input", "path-prefix", "name", "type", "choices", "required", "help-text", "label"])
+            ]))
+          }), 128 /* KEYED_FRAGMENT */))
+        ], 10 /* CLASS, PROPS */, _hoisted_5$3))
+      }), 128 /* KEYED_FRAGMENT */))
+    ])
+  ]))
+}
+}
+
+};
+
+script$3.__file = "node_modules/togostanza/src/components/HelpParametersPane.vue";
+
+const _hoisted_1$2 = {
+  key: 0,
+  class: "fst-italic"
+};
+const _hoisted_2$2 = {
+  key: 1,
+  class: "d-flex align-items-start"
+};
+const _hoisted_3$2 = {
+  class: "nav flex-column nav-pills me-3",
+  id: "styles-pills-tab",
+  role: "tablist",
+  "aria-orientation": "vertical"
+};
+const _hoisted_4$2 = ["data-bs-target"];
+const _hoisted_5$2 = {
+  class: "tab-content flex-grow-1",
+  id: "styles-pills-tabContent"
+};
+const _hoisted_6$2 = ["id"];
+
+
+var script$2 = {
+  __name: 'HelpStylesPane',
+  props: {
+  styleFieldGroups: {
+    type: Array,
+    required: true,
+  },
+},
+  setup(__props) {
+
+
+const first = __props.styleFieldGroups.find(
+  ([_, styleField]) => styleField && styleField.length > 0
+);
+const firstActiveStyleFieldGroupPath = first ? first[0].join('-') : null;
+
+return (_ctx, _cache) => {
+  return (__props.styleFieldGroups.length === 0)
+    ? (openBlock(), createElementBlock("p", _hoisted_1$2, " No styles defined. "))
+    : (openBlock(), createElementBlock("div", _hoisted_2$2, [
+        createBaseVNode("div", _hoisted_3$2, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(__props.styleFieldGroups, ([path, styles]) => {
+            return (openBlock(), createElementBlock("button", {
+              key: path.join('-'),
+              class: normalizeClass(
+            `nav-link text-start` +
+            (path.join('-') === unref(firstActiveStyleFieldGroupPath)
+              ? ' active'
+              : '') +
+            (styles ? '' : ' disabled')
+          ),
+              "data-bs-toggle": "pill",
+              "data-bs-target": `#styles-pills-${path.join('-')}`,
+              type: "button",
+              role: "tab",
+              style: normalizeStyle({ 'padding-left': `${path.length * 2}rem` })
+            }, toDisplayString(path[path.length - 1]), 15 /* TEXT, CLASS, STYLE, PROPS */, _hoisted_4$2))
+          }), 128 /* KEYED_FRAGMENT */))
+        ]),
+        createBaseVNode("div", _hoisted_5$2, [
+          (openBlock(true), createElementBlock(Fragment, null, renderList(__props.styleFieldGroups, ([path, styles]) => {
+            return (openBlock(), createElementBlock("div", {
+              key: path.join('-'),
+              class: normalizeClass(
+            `tab-pane` +
+            (path.join('-') === unref(firstActiveStyleFieldGroupPath)
+              ? ' show active'
+              : '')
+          ),
+              id: `styles-pills-${path.join('-')}`,
+              role: "tabpanel",
+              tabindex: "0"
+            }, [
+              (openBlock(true), createElementBlock(Fragment, null, renderList(styles, ({ style, input }) => {
+                return (openBlock(), createElementBlock("div", {
+                  key: style['stanza:key'],
+                  class: "col mb-2"
+                }, [
+                  createVNode(script$4, {
+                    input: input,
+                    "path-prefix": '--togostanza-' + path.join('-'),
+                    name: style['stanza:key'],
+                    type: style['stanza:type'],
+                    choices: style['stanza:choice'],
+                    required: style['stanza:required'],
+                    "help-text": style['stanza:description'],
+                    label: style['stanza:label']
+                  }, null, 8 /* PROPS */, ["input", "path-prefix", "name", "type", "choices", "required", "help-text", "label"])
+                ]))
+              }), 128 /* KEYED_FRAGMENT */))
+            ], 10 /* CLASS, PROPS */, _hoisted_6$2))
+          }), 128 /* KEYED_FRAGMENT */))
+        ])
+      ]))
+}
+}
+
+};
+
+script$2.__file = "node_modules/togostanza/src/components/HelpStylesPane.vue";
+
+const _hoisted_1$1 = { class: "row row-cols-2" };
+const _hoisted_2$1 = { class: "text-muted" };
+const _hoisted_3$1 = {
+  key: 0,
+  class: "fst-italic"
+};
+const _hoisted_4$1 = { class: "row row-cols-2" };
+const _hoisted_5$1 = { class: "text-muted" };
+const _hoisted_6$1 = {
+  key: 1,
+  class: "fst-italic"
+};
+
+
+var script$1 = {
+  __name: 'HelpEventsPane',
+  props: {
+  metadata: {
+    type: Object,
+    required: true,
+  },
+},
+  setup(__props) {
+
+
+
+const outgoingEvents = (__props.metadata['stanza:outgoingEvent'] || []).map((event) => {
+  return {
+    name: event['stanza:key'],
+    description: event['stanza:description'],
+  };
+});
+
+const incomingEvents = (__props.metadata['stanza:incomingEvent'] || []).map((event) => {
+  return {
+    name: event['stanza:key'],
+    description: event['stanza:description'],
+  };
+});
+
+return (_ctx, _cache) => {
+  return (openBlock(), createElementBlock(Fragment, null, [
+    _cache[0] || (_cache[0] = createBaseVNode("h2", { class: "my-3" }, "Outgoing Events", -1 /* HOISTED */)),
+    createBaseVNode("div", _hoisted_1$1, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(unref(outgoingEvents), ({ name, description }) => {
+        return (openBlock(), createElementBlock("div", {
+          key: name,
+          class: "col"
+        }, [
+          createBaseVNode("div", null, toDisplayString(name), 1 /* TEXT */),
+          createBaseVNode("div", _hoisted_2$1, toDisplayString(description), 1 /* TEXT */)
+        ]))
+      }), 128 /* KEYED_FRAGMENT */))
+    ]),
+    (unref(outgoingEvents).length === 0)
+      ? (openBlock(), createElementBlock("p", _hoisted_3$1, " No events defined. "))
+      : createCommentVNode("v-if", true),
+    _cache[1] || (_cache[1] = createBaseVNode("h2", { class: "my-3" }, "Incoming Events", -1 /* HOISTED */)),
+    createBaseVNode("div", _hoisted_4$1, [
+      (openBlock(true), createElementBlock(Fragment, null, renderList(unref(incomingEvents), ({ name, description }) => {
+        return (openBlock(), createElementBlock("div", {
+          key: name,
+          class: "col"
+        }, [
+          createBaseVNode("div", null, toDisplayString(name), 1 /* TEXT */),
+          createBaseVNode("div", _hoisted_5$1, toDisplayString(description), 1 /* TEXT */)
+        ]))
+      }), 128 /* KEYED_FRAGMENT */))
+    ]),
+    (unref(incomingEvents).length === 0)
+      ? (openBlock(), createElementBlock("p", _hoisted_6$1, " No events defined. "))
+      : createCommentVNode("v-if", true)
+  ], 64 /* STABLE_FRAGMENT */))
+}
+}
+
+};
+
+script$1.__file = "node_modules/togostanza/src/components/HelpEventsPane.vue";
+
+function buildParameterTree(paramFields) {
+  const tree = new Map();
+
+  for (const paramField of paramFields) {
+    const tmp = paramField.key.split('-', 3);
+    const k = tmp.slice(0, Math.max(tmp.length - 1, 1));
+
+    const a = tree.get(k[0]) || new Map();
+    tree.set(k[0], a);
+
+    if (k[1]) {
+      const b = a.get(k[1]) || new Map();
+      a.set(k[1], b);
+    }
+  }
+
+  return tree;
+}
+
+function commonPrefixLength(a, b) {
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) {
+    i++;
+  }
+  return i;
+}
+
+function buildParamFieldGroups(paramFields) {
+  // Build a hierarchy of parameters
+  const tree = buildParameterTree(paramFields);
+
+  // Given a hierarchy `tree` to be displayed, compute at which level each parameter should appear.
+  const placements = new Map();
+  for (const paramField of paramFields) {
+    const key = paramField.key;
+    const k = key.split('-', 3);
+    let max = -1;
+    let argmaxPath = null;
+
+    const paths = [];
+    for (const [a, ta] of tree.entries()) {
+      paths.push([a]);
+      for (const b of ta.keys()) {
+        paths.push([a, b]);
+      }
+    }
+
+    for (const path of paths) {
+      const l = commonPrefixLength(k, path);
+      if (l > max) {
+        max = l;
+        argmaxPath = path;
+      }
+    }
+
+    const placementKey = argmaxPath.join('-');
+    const placement = placements.get(placementKey);
+    if (placement) {
+      placement.push(paramField);
+    } else {
+      placements.set(placementKey, [paramField]);
+    }
+  }
+
+  // Compose a list containing a hierarchy with no parameters
+  // (Note that placements only contains hierarchies with parameters)
+  const results = [];
+  for (const [a, ta] of tree.entries()) {
+    results.push([[a], placements.get(a)]);
+    for (const b of ta.keys()) {
+      const key = [a, b].join('-');
+      results.push([[a, b], placements.get(key)]);
+    }
+  }
+
+  return results;
+}
 
 var script = defineComponent({
   components: {
-    FormField: script$3,
-    Layout: script$4,
-    StanzaPreviewer: script$1,
+    Layout: script$8,
+    StanzaPreviewer: script$6,
+    HelpAboutPane: script$5,
+    HelpParametersPane: script$3,
+    HelpStylesPane: script$2,
+    HelpEventsPane: script$1,
   },
 
   props: ['metadata', 'readme'],
 
   setup({ metadata, readme }) {
-    const paramFields = (metadata['stanza:parameter'] || []).map((param) => {
+    const stanzaParameter = metadata['stanza:parameter'] || [];
+    const paramFields = stanzaParameter.map((param) => {
       return {
+        key: param['stanza:key'],
         param,
         input: useInput(param['stanza:example'], param['stanza:type'], false),
       };
     });
-
     const menuPlacement = useInput(
       metadata['stanza:menu-placement'] || 'bottom-right',
       'string'
     );
+    paramFields.push({
+      key: 'togostanza-menu_placement',
+      param: {
+        'stanza:key': 'togostanza-menu_placement',
+        'stanza:type': 'single-choice',
+        'stanza:choice': [
+          'top-left',
+          'top-right',
+          'bottom-left',
+          'bottom-right',
+          'none',
+        ],
+        'stanza:description':
+          'Placement of the information icon which links to this page.',
+      },
+      input: menuPlacement,
+    });
+
+    const paramFieldGroups = buildParamFieldGroups(paramFields);
 
     const params = computed(() => {
       return [
@@ -3251,10 +4044,6 @@ var script = defineComponent({
             input,
           };
         }),
-        {
-          name: 'togostanza-menu-placement',
-          input: menuPlacement,
-        },
       ]
         .filter(({ input }) => !input.isDefault.value)
         .map(({ name, input, type }) => {
@@ -3268,10 +4057,12 @@ var script = defineComponent({
 
     const styleFields = (metadata['stanza:style'] || []).map((style) => {
       return {
+        key: style['stanza:key'].replace(/^--togostanza-/, ''),
         style,
         input: useInput(style['stanza:default'], style['stanza:type']),
       };
     });
+    const styleFieldGroups = buildParamFieldGroups(styleFields);
 
     const styleVars = computed(() => {
       return styleFields
@@ -3284,34 +4075,24 @@ var script = defineComponent({
         });
     });
 
-    const outgoingEvents = (metadata['stanza:outgoingEvent'] || []).map(
-      (event) => {
-        return {
-          name: event['stanza:key'],
-          description: event['stanza:description'],
-        };
+    // set initial parameters from query parameters if specified
+    onMounted(() => {
+      const url = new URL(window.location.href);
+      for (const [k, v] of url.searchParams.entries()) {
+        const param = paramFields.find((param) => param.key === k);
+        if (!param) continue;
+        param.input.valueStr.value = v;
       }
-    );
-
-    const incomingEvents = (metadata['stanza:incomingEvent'] || []).map(
-      (event) => {
-        return {
-          name: event['stanza:key'],
-          description: event['stanza:description'],
-        };
-      }
-    );
+    });
 
     return {
       metadata,
       readme,
-      paramFields,
+      paramFieldGroups,
       menuPlacement,
       params,
-      styleFields,
+      styleFieldGroups,
       styleVars,
-      outgoingEvents,
-      incomingEvents,
     };
   },
 });
@@ -3380,94 +4161,38 @@ function parse(valueStr, type) {
   }
 }
 
-const _withScopeId = n => (pushScopeId("data-v-0732abc2"),n=n(),popScopeId(),n);
 const _hoisted_1 = { class: "display-4" };
 const _hoisted_2 = { class: "lead" };
 const _hoisted_3 = { class: "row" };
 const _hoisted_4 = { class: "col-lg-6" };
-const _hoisted_5 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("nav", {
-  class: "nav nav-tabs",
-  role: "tablist"
-}, [
-  /*#__PURE__*/createBaseVNode("a", {
-    class: "nav-link active",
-    href: "#overview",
-    "data-bs-toggle": "tab",
-    role: "tab"
-  }, "Overview"),
-  /*#__PURE__*/createBaseVNode("a", {
-    class: "nav-link",
-    href: "#customize",
-    "data-bs-toggle": "tab",
-    role: "tab"
-  }, "Customize"),
-  /*#__PURE__*/createBaseVNode("a", {
-    class: "nav-link",
-    href: "#event",
-    "data-bs-toggle": "tab",
-    role: "tab"
-  }, "Event")
-], -1 /* HOISTED */));
-const _hoisted_6 = { class: "tab-content mt-3" };
+const _hoisted_5 = { class: "tab-content mt-3" };
+const _hoisted_6 = {
+  class: "tab-pane px-lg-5",
+  id: "tabpane-about",
+  role: "tabpanel"
+};
 const _hoisted_7 = {
-  class: "tab-pane active px-lg-5",
-  id: "overview",
+  class: "tab-pane active",
+  id: "tabpane-parameters",
   role: "tabpanel"
 };
-const _hoisted_8 = { class: "table table-borderless border mb-1" };
-const _hoisted_9 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("th", null, "Author", -1 /* HOISTED */));
-const _hoisted_10 = { class: "mb-0" };
-const _hoisted_11 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("th", null, "Contributors", -1 /* HOISTED */));
-const _hoisted_12 = {
-  key: 0,
-  class: "list-unstyled mb-0"
-};
-const _hoisted_13 = /*#__PURE__*/createTextVNode(" - ");
-const _hoisted_14 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("th", null, "License", -1 /* HOISTED */));
-const _hoisted_15 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("th", null, "Created", -1 /* HOISTED */));
-const _hoisted_16 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("th", null, "Updated", -1 /* HOISTED */));
-const _hoisted_17 = { class: "text-end" };
-const _hoisted_18 = ["href"];
-const _hoisted_19 = ["innerHTML"];
-const _hoisted_20 = {
+const _hoisted_8 = {
   class: "tab-pane",
-  id: "customize",
+  id: "tabpane-styles",
   role: "tabpanel"
 };
-const _hoisted_21 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("h2", { class: "my-3" }, "Parameters", -1 /* HOISTED */));
-const _hoisted_22 = { class: "row row-cols-1 row-cols-sm-2 row-cols-lg-1 row-cols-xl-2 gx-4 gy-3" };
-const _hoisted_23 = { class: "col" };
-const _hoisted_24 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("hr", { class: "mt-4 mb-3" }, null, -1 /* HOISTED */));
-const _hoisted_25 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("h2", { class: "my-3" }, "Styles", -1 /* HOISTED */));
-const _hoisted_26 = { class: "row row-cols-1 row-cols-sm-2 row-cols-lg-1 row-cols-xl-2 gx-4 gy-3" };
-const _hoisted_27 = {
-  key: 0,
-  class: "fst-italic"
-};
-const _hoisted_28 = {
+const _hoisted_9 = {
   class: "tab-pane",
-  id: "event",
+  id: "tabpane-events",
   role: "tabpanel"
 };
-const _hoisted_29 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("h2", { class: "my-3" }, "Outgoing Events", -1 /* HOISTED */));
-const _hoisted_30 = { class: "row row-cols-2" };
-const _hoisted_31 = { class: "text-muted" };
-const _hoisted_32 = {
-  key: 0,
-  class: "fst-italic"
-};
-const _hoisted_33 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("h2", { class: "my-3" }, "Incoming Events", -1 /* HOISTED */));
-const _hoisted_34 = { class: "row row-cols-2" };
-const _hoisted_35 = { class: "text-muted" };
-const _hoisted_36 = {
-  key: 1,
-  class: "fst-italic"
-};
-const _hoisted_37 = { class: "col-lg-6" };
-const _hoisted_38 = /*#__PURE__*/ _withScopeId(() => /*#__PURE__*/createBaseVNode("hr", { class: "d-lg-none mb-4" }, null, -1 /* HOISTED */));
+const _hoisted_10 = { class: "col-lg-6" };
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  const _component_FormField = resolveComponent("FormField");
+  const _component_HelpAboutPane = resolveComponent("HelpAboutPane");
+  const _component_HelpParametersPane = resolveComponent("HelpParametersPane");
+  const _component_HelpStylesPane = resolveComponent("HelpStylesPane");
+  const _component_HelpEventsPane = resolveComponent("HelpEventsPane");
   const _component_StanzaPreviewer = resolveComponent("StanzaPreviewer");
   const _component_Layout = resolveComponent("Layout");
 
@@ -3477,154 +4202,55 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       createBaseVNode("p", _hoisted_2, toDisplayString(_ctx.metadata['stanza:definition']), 1 /* TEXT */),
       createBaseVNode("div", _hoisted_3, [
         createBaseVNode("div", _hoisted_4, [
-          _hoisted_5,
-          createBaseVNode("div", _hoisted_6, [
+          _cache[0] || (_cache[0] = createBaseVNode("nav", {
+            class: "nav nav-tabs",
+            role: "tablist"
+          }, [
+            createBaseVNode("a", {
+              class: "nav-link active",
+              href: "#tabpane-parameters",
+              "data-bs-toggle": "tab",
+              role: "tab"
+            }, "Parameters"),
+            createBaseVNode("a", {
+              class: "nav-link",
+              href: "#tabpane-styles",
+              "data-bs-toggle": "tab",
+              role: "tab"
+            }, "Styles"),
+            createBaseVNode("a", {
+              class: "nav-link",
+              href: "#tabpane-events",
+              "data-bs-toggle": "tab",
+              role: "tab"
+            }, "Events"),
+            createBaseVNode("a", {
+              class: "nav-link",
+              href: "#tabpane-about",
+              "data-bs-toggle": "tab",
+              role: "tab"
+            }, "About")
+          ], -1 /* HOISTED */)),
+          createBaseVNode("div", _hoisted_5, [
+            createBaseVNode("div", _hoisted_6, [
+              createVNode(_component_HelpAboutPane, {
+                metadata: _ctx.metadata,
+                readme: _ctx.readme
+              }, null, 8 /* PROPS */, ["metadata", "readme"])
+            ]),
             createBaseVNode("div", _hoisted_7, [
-              createBaseVNode("table", _hoisted_8, [
-                createBaseVNode("tbody", null, [
-                  createBaseVNode("tr", null, [
-                    _hoisted_9,
-                    createBaseVNode("td", null, [
-                      createBaseVNode("address", _hoisted_10, toDisplayString(_ctx.metadata['stanza:author'] || '-'), 1 /* TEXT */)
-                    ])
-                  ]),
-                  createBaseVNode("tr", null, [
-                    _hoisted_11,
-                    createBaseVNode("td", null, [
-                      (
-                        _ctx.metadata['stanza:contributor'] &&
-                        _ctx.metadata['stanza:contributor'].length > 0
-                      )
-                        ? (openBlock(), createElementBlock("ul", _hoisted_12, [
-                            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.metadata['stanza:contributor'], (contributor) => {
-                              return (openBlock(), createElementBlock("li", { key: contributor }, toDisplayString(contributor), 1 /* TEXT */))
-                            }), 128 /* KEYED_FRAGMENT */))
-                          ]))
-                        : (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-                            _hoisted_13
-                          ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
-                    ])
-                  ]),
-                  createBaseVNode("tr", null, [
-                    _hoisted_14,
-                    createBaseVNode("td", null, toDisplayString(_ctx.metadata['stanza:license'] || '-'), 1 /* TEXT */)
-                  ]),
-                  createBaseVNode("tr", null, [
-                    _hoisted_15,
-                    createBaseVNode("td", null, toDisplayString(_ctx.metadata['stanza:created'] || '-'), 1 /* TEXT */)
-                  ]),
-                  createBaseVNode("tr", null, [
-                    _hoisted_16,
-                    createBaseVNode("td", null, toDisplayString(_ctx.metadata['stanza:updated'] || '-'), 1 /* TEXT */)
-                  ])
-                ])
-              ]),
-              createBaseVNode("div", _hoisted_17, [
-                createBaseVNode("a", {
-                  href: `./${_ctx.metadata['@id']}/metadata.json`
-                }, "Download JSON", 8 /* PROPS */, _hoisted_18)
-              ]),
-              createBaseVNode("div", {
-                innerHTML: _ctx.readme,
-                class: "mt-4"
-              }, null, 8 /* PROPS */, _hoisted_19)
+              createVNode(_component_HelpParametersPane, { paramFieldGroups: _ctx.paramFieldGroups }, null, 8 /* PROPS */, ["paramFieldGroups"])
             ]),
-            createBaseVNode("div", _hoisted_20, [
-              createBaseVNode("section", null, [
-                _hoisted_21,
-                createBaseVNode("div", _hoisted_22, [
-                  (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.paramFields, ({ param, input }) => {
-                    return (openBlock(), createElementBlock("div", {
-                      key: param['stanza:key'],
-                      class: "col"
-                    }, [
-                      createVNode(_component_FormField, {
-                        input: input,
-                        name: param['stanza:key'],
-                        type: param['stanza:type'],
-                        choices: param['stanza:choice'],
-                        required: param['stanza:required'],
-                        "help-text": param['stanza:description']
-                      }, null, 8 /* PROPS */, ["input", "name", "type", "choices", "required", "help-text"])
-                    ]))
-                  }), 128 /* KEYED_FRAGMENT */)),
-                  createBaseVNode("div", _hoisted_23, [
-                    createVNode(_component_FormField, {
-                      input: _ctx.menuPlacement,
-                      name: "togostanza-menu-placement",
-                      type: "single-choice",
-                      choices: [
-                      'top-left',
-                      'top-right',
-                      'bottom-left',
-                      'bottom-right',
-                      'none',
-                    ],
-                      "help-text": 'Placement of the information icon which links to this page.'
-                    }, null, 8 /* PROPS */, ["input", "help-text"])
-                  ])
-                ])
-              ]),
-              _hoisted_24,
-              createBaseVNode("section", null, [
-                _hoisted_25,
-                createBaseVNode("div", _hoisted_26, [
-                  (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.styleFields, ({ style, input }) => {
-                    return (openBlock(), createElementBlock("div", {
-                      key: style['stanza:key'],
-                      class: "col"
-                    }, [
-                      createVNode(_component_FormField, {
-                        input: input,
-                        name: style['stanza:key'],
-                        type: style['stanza:type'],
-                        choices: style['stanza:choice'],
-                        "help-text": style['stanza:description']
-                      }, null, 8 /* PROPS */, ["input", "name", "type", "choices", "help-text"])
-                    ]))
-                  }), 128 /* KEYED_FRAGMENT */))
-                ]),
-                (_ctx.styleFields.length === 0)
-                  ? (openBlock(), createElementBlock("p", _hoisted_27, " No styles defined. "))
-                  : createCommentVNode("v-if", true)
-              ])
+            createBaseVNode("div", _hoisted_8, [
+              createVNode(_component_HelpStylesPane, { styleFieldGroups: _ctx.styleFieldGroups }, null, 8 /* PROPS */, ["styleFieldGroups"])
             ]),
-            createBaseVNode("div", _hoisted_28, [
-              _hoisted_29,
-              createBaseVNode("div", _hoisted_30, [
-                (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.outgoingEvents, ({ name, description }) => {
-                  return (openBlock(), createElementBlock("div", {
-                    key: name,
-                    class: "col"
-                  }, [
-                    createBaseVNode("div", null, toDisplayString(name), 1 /* TEXT */),
-                    createBaseVNode("div", _hoisted_31, toDisplayString(description), 1 /* TEXT */)
-                  ]))
-                }), 128 /* KEYED_FRAGMENT */))
-              ]),
-              (_ctx.outgoingEvents.length === 0)
-                ? (openBlock(), createElementBlock("p", _hoisted_32, " No events defined. "))
-                : createCommentVNode("v-if", true),
-              _hoisted_33,
-              createBaseVNode("div", _hoisted_34, [
-                (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.incomingEvents, ({ name, description }) => {
-                  return (openBlock(), createElementBlock("div", {
-                    key: name,
-                    class: "col"
-                  }, [
-                    createBaseVNode("div", null, toDisplayString(name), 1 /* TEXT */),
-                    createBaseVNode("div", _hoisted_35, toDisplayString(description), 1 /* TEXT */)
-                  ]))
-                }), 128 /* KEYED_FRAGMENT */))
-              ]),
-              (_ctx.incomingEvents.length === 0)
-                ? (openBlock(), createElementBlock("p", _hoisted_36, " No events defined. "))
-                : createCommentVNode("v-if", true)
+            createBaseVNode("div", _hoisted_9, [
+              createVNode(_component_HelpEventsPane, { metadata: _ctx.metadata }, null, 8 /* PROPS */, ["metadata"])
             ])
           ])
         ]),
-        createBaseVNode("div", _hoisted_37, [
-          _hoisted_38,
+        createBaseVNode("div", _hoisted_10, [
+          _cache[1] || (_cache[1] = createBaseVNode("hr", { class: "d-lg-none mb-4" }, null, -1 /* HOISTED */)),
           createVNode(_component_StanzaPreviewer, {
             metadata: _ctx.metadata,
             params: _ctx.params,
@@ -3637,11 +4263,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }))
 }
 
-var css = "\nth[data-v-0732abc2] {\n  background-color: var(--bs-light);\n  text-align: center;\n  white-space: nowrap;\n  width: 1%;\n}\nth[data-v-0732abc2],\ntd[data-v-0732abc2] {\n  padding-left: 1.5rem;\n  padding-right: 1.5rem;\n}\n";
-n(css,{});
-
 script.render = render;
-script.__scopeId = "data-v-0732abc2";
 script.__file = "node_modules/togostanza/src/components/Help.vue";
 
 function helpApp({metadata, readme}) {

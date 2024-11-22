@@ -1,0 +1,120 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap");
+main {
+  font-family: var(--togostanza-fonts-font_family);
+  height: calc(var(--togostanza-canvas-height) * 1px);
+  position: relative;
+  --transition-duration: 0.2s;
+  --long-transition-duration: 0.5s;
+  --selected-color: #2a71ff;
+  overflow: auto;
+}
+
+#RelateViewer text {
+  fill: var(--togostanza-fonts-font_color_primary);
+  font-size: calc(var(--togostanza-fonts-font_size_primary) * 1px);
+  font-weight: var(--togostanza-fonts-font_weight_primary);
+}
+#RelateViewer:has(.region-indicator-view:hover), #RelateViewer.-selectedregion {
+  --fadeout-opacity: 0.1;
+}
+#RelateViewer:has(.region-indicator-view:hover) .haplotype-view > g[data-region],
+#RelateViewer:has(.region-indicator-view:hover) #RegionSelectorView > .scale,
+#RelateViewer:has(.region-indicator-view:hover) .region-indicator-view, #RelateViewer.-selectedregion .haplotype-view > g[data-region],
+#RelateViewer.-selectedregion #RegionSelectorView > .scale,
+#RelateViewer.-selectedregion .region-indicator-view {
+  opacity: var(--fadeout-opacity);
+}
+
+#DendrogramView > g {
+  position: relative;
+}
+#DendrogramView > g > line {
+  stroke: black;
+  stroke-width: 1px;
+}
+#DendrogramView > g > line.-hovered {
+  stroke: var(--selected-color);
+}
+#DendrogramView > g > circle {
+  fill: black;
+  cursor: pointer;
+}
+#DendrogramView .labels {
+  transition: ease-in-out var(--transition-duration);
+}
+#DendrogramView .labels-bg {
+  fill: white;
+  opacity: 0.8;
+}
+
+#HaplotypesView:has(.haplotype-view:hover) > .haplotype-view {
+  opacity: 0.2;
+}
+#HaplotypesView g[data-index] {
+  transition: ease-in-out var(--long-transition-duration);
+}
+#HaplotypesView .haplotype-view:hover {
+  opacity: 1 !important;
+}
+#HaplotypesView .haplotype-view > g > .bg {
+  fill: #f8f8f8;
+}
+#HaplotypesView .haplotype-view .checkbox {
+  cursor: pointer;
+  user-select: none;
+  transition: ease-in-out var(--long-transition-duration);
+}
+#HaplotypesView .haplotype-view .checkbox > text > tspan:nth-child(1) {
+  font-weight: bold;
+}
+#HaplotypesView .haplotype-view .checkbox > text > tspan.haplotype {
+  font-weight: 350;
+  font-size: 0.85em;
+}
+#HaplotypesView .haplotype-view .checkbox > text.-selected {
+  fill: white;
+}
+#HaplotypesView .haplotype-view .checkbox > rect.checkbox-bg {
+  fill: transparent;
+}
+#HaplotypesView .haplotype-view .checkbox > rect.checkbox-bg.-selected {
+  fill: var(--selected-color);
+}
+
+#RegionSelectorView > path.scale {
+  stroke: rgba(0, 0, 0, 0.5333333333);
+  stroke-width: 0.5px;
+  stroke-dasharray: 1, 1;
+}
+#RegionSelectorView > .region-indicator-view {
+  cursor: pointer;
+}
+#RegionSelectorView > .region-indicator-view > path {
+  stroke: rgba(0, 0, 0, 0.5333333333);
+  stroke-width: 0.5px;
+  fill: transparent;
+}
+#RegionSelectorView > .region-indicator-view > text {
+  text-anchor: start;
+  dominant-baseline: middle;
+}
+#RegionSelectorView > .region-indicator-view > text > tspan:nth-child(1) {
+  font-weight: bold;
+}
+
+#Tooltip {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+}
+#Tooltip > div#TooltipText {
+  padding: 5px;
+  background: #fff;
+  border: 1px solid #000;
+  font-size: 10px;
+}
+#Tooltip.-visible {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s;
+}
