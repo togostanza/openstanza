@@ -1,10 +1,14 @@
-import { Dataset, type Branch } from "./Dataset";
+import { Dataset, Mutation, type Branch } from "./Dataset";
 import { HaploEthnicities } from "./HaploEthnicities";
 import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
 import { Tooltip } from "./Tooltip";
 
 const numberFormatter = new Intl.NumberFormat("en-US");
+
+type BranchClickTarget = SVGLineElement & { branch: Branch };
+
+type MutationCLickTarget = SVGCircleElement & { mutation: Mutation };
 
 function debounce(
   func: (...args: any[]) => any,
@@ -112,14 +116,13 @@ class DendrogramView {
     this.#inner.addEventListener("mouseout", this.#handleMutationUnhover);
   }
 
-  #handleBranchClick = (e: any) => {
+  #handleBranchClick = (e: MouseEvent) => {
     e.stopPropagation();
 
-    if (
-      e.target.tagName === "rect" &&
-      e.target.dataset.type === "click-handle"
-    ) {
-      const leaves = Dataset.instance.getLeafBranches(e.target.branch);
+    const target = e.target as BranchClickTarget;
+
+    if (target.tagName === "rect" && target.dataset.type === "click-handle") {
+      const leaves = Dataset.instance.getLeafBranches(target.branch);
       const branchIds = leaves.map((leaf) => leaf.branchId);
 
       this.#el?.dispatchEvent(
@@ -131,14 +134,10 @@ class DendrogramView {
     }
   };
 
-  #handleBranchHover = (e: any) => {
-    if (
-      e.target.tagName === "rect" &&
-      e.target.dataset.type === "click-handle"
-    ) {
-      const decendants = Dataset.instance.getDescendantsBranches(
-        e.target.branch
-      );
+  #handleBranchHover = (e: MouseEvent) => {
+    const target = e.target as BranchClickTarget;
+    if (target.tagName === "rect" && target.dataset.type === "click-handle") {
+      const decendants = Dataset.instance.getDescendantsBranches(target.branch);
       decendants.forEach((branch) => {
         branch.line?.classList.add("-hovered");
         if (branch.beam) {
@@ -148,14 +147,10 @@ class DendrogramView {
     }
   };
 
-  #handleBranchUnhover = (e: any) => {
-    if (
-      e.target.tagName === "rect" &&
-      e.target.dataset.type === "click-handle"
-    ) {
-      const decendants = Dataset.instance.getDescendantsBranches(
-        e.target.branch
-      );
+  #handleBranchUnhover = (e: MouseEvent) => {
+    const target = e.target as BranchClickTarget;
+    if (target.tagName === "rect" && target.dataset.type === "click-handle") {
+      const decendants = Dataset.instance.getDescendantsBranches(target.branch);
       decendants.forEach((branch) => {
         branch.line?.classList.remove("-hovered");
         if (branch.beam) {
@@ -165,25 +160,29 @@ class DendrogramView {
     }
   };
 
-  #handleMutationHover = (e: any) => {
-    if (e.target.tagName !== "circle" || !e.target.mutation) {
+  #handleMutationHover = (e: MouseEvent) => {
+    const target = e.target as MutationCLickTarget;
+    if (target.tagName !== "circle" || !target.mutation) {
       return;
     }
 
-    const mutation = e.target.mutation;
+    const mutation = target.mutation;
 
-    const x = e.target.cx.baseVal.value;
-    const y = e.target.cy.baseVal.value;
+    const x = target.cx.baseVal.value;
+    const y = target.cy.baseVal.value;
 
     Tooltip.instance?.show(
-      `Alleles: ${mutation.alleles.join(", ")}\nPosition: ${mutation.snp}`,
+      `Alleles: ${mutation.alleles.join(", ")}\nPosition: ${
+        Dataset.instance.chromosome
+      }:${mutation.posOfSnp}`,
       x + Conf.instance.stagePadding.left,
       y + Conf.instance.haplotypeViewWidth / 2
     );
   };
 
-  #handleMutationUnhover = (e: any) => {
-    if (e.target.tagName !== "circle" || !e.target.mutation) {
+  #handleMutationUnhover = (e: MouseEvent) => {
+    const target = e.target as MutationCLickTarget;
+    if (target.tagName !== "circle" || !target.mutation) {
       return;
     }
     Tooltip.instance?.hide();

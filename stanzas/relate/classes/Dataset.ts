@@ -44,6 +44,7 @@ class Dataset {
   #mutations: Mutation[] = [];
   #ancestors: Ancestor[] = [];
   #mutationsByHaplotype: number[][] = [];
+  #chromosome: string | null = null;
 
   static #instance: Dataset | null = null;
 
@@ -68,14 +69,19 @@ class Dataset {
     return this.instance;
   }
 
+  static #getChromosome(dataId: string) {
+    const match = /_(chr([XY]|\d{1,2}))_/.exec(dataId);
+    return match ? match[1] : null;
+  }
+
   /**
    * Defines the dataset by loading and parsing the data files.
    *
    * @param {string} id - The identifier for the dataset files.
    */
   async init(id: string, folderURL: string) {
-    console.log("init", id, folderURL);
     const path = `${folderURL}${id}`;
+    this.#chromosome = Dataset.#getChromosome(id);
     try {
       const [ancData, mutData, hapData] = await loadFiles(
         [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
@@ -275,6 +281,10 @@ class Dataset {
 
   get mutationsByHaplotype() {
     return this.#mutationsByHaplotype;
+  }
+
+  get chromosome() {
+    return this.#chromosome;
   }
 }
 

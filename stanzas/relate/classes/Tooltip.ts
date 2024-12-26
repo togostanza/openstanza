@@ -15,6 +15,9 @@ class Tooltip {
   }
 
   static initialise(root: HTMLElement | null) {
+    if (this.#instance) {
+      return this.#instance;
+    }
     if (!root) {
       throw new Error("Root element not found");
     }
