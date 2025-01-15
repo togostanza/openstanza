@@ -85,8 +85,8 @@ class Dataset {
     try {
       const [ancData, mutData, hapData] = await loadFiles(
         [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
-          (ext) => path + ext
-        )
+          (ext) => path + ext,
+        ),
       );
       this.#parseHaprotypes(hapData);
       this.#parseMutations(mutData);
@@ -163,7 +163,7 @@ class Dataset {
           // Restore the closing parenthesis lost during split
           branch = branch.trim().endsWith(")") ? branch : branch + ")";
           const branchParts = branch.match(
-            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/
+            /(-?\d+):\(([\d.]+) ([\d.]+) (-?\d+) (-?\d+)\)/,
           );
           return {
             branchId: index,
@@ -177,7 +177,7 @@ class Dataset {
 
       for (const branch of branches) {
         const children = branches.filter(
-          (child) => child.parentBranchId === branch.branchId
+          (child) => child.parentBranchId === branch.branchId,
         );
         if (children.length > 0) {
           branch.children = children;
@@ -194,11 +194,11 @@ class Dataset {
     const findChildren = (
       branchId: number,
       treeIndex: number,
-      mutatedBranches: number[]
+      mutatedBranches: number[],
     ) => {
       mutatedBranches.push(branchId);
       const branches = this.#ancestors[treeIndex].branches.filter(
-        (branch) => branch.parentBranchId === branchId
+        (branch) => branch.parentBranchId === branchId,
       );
       if (branches.length !== 0) {
         for (const branch of branches) {

@@ -35,14 +35,14 @@ export async function init({
 
 function makeStyleSheet(root: Element) {
   const popnames = Array.from(HaploEthnicities.instance.data.values()).map(
-    (d) => d.popname
+    (d) => d.popname,
   );
   // Create style sheet
   const colors = Object.fromEntries(
     popnames.map((popname, index) => [
       popname,
       `hsl(${(index * 360) / popnames.length}, 50%, 50%)`,
-    ])
+    ]),
   );
 
   const existingStyle: HTMLStyleElement | null = (
@@ -60,10 +60,10 @@ function makeStyleSheet(root: Element) {
   const styleSheet = style.sheet;
   for (const popname in colors) {
     styleSheet?.insertRule(
-      `path[data-ethnic="${popname}"] { fill: ${colors[popname]}; }`
+      `path[data-ethnic="${popname}"] { stroke: ${colors[popname]}; }`,
     );
     styleSheet?.insertRule(
-      `text > tspan[data-ethnic=${popname}] { fill: ${colors[popname]}; }`
+      `text > tspan[data-ethnic=${popname}] { fill: ${colors[popname]}; }`,
     );
   }
 }

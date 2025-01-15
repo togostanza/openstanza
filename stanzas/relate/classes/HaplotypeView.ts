@@ -1,8 +1,8 @@
-import { Dataset } from "./Dataset";
 import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
-import { CheckboxInSVG } from "./SVGCheckbox";
+import { Dataset } from "./Dataset";
 import { EthnicityDatum } from "./HaploEthnicities";
+import { CheckboxInSVG } from "./SVGCheckbox";
 
 export default class HaplotypeView {
   #el = document.createElementNS("http://www.w3.org/2000/svg", "g");
@@ -37,7 +37,7 @@ export default class HaplotypeView {
       `translate(0,${
         (Conf.instance.haplotypeViewWidth + Conf.instance.haplotypeViewGap) *
         index
-      })`
+      })`,
     );
     this.#el.setAttribute("data-haplotype", haplotype);
     this.#el.setAttribute("data-index", `${index}`);
@@ -75,10 +75,11 @@ export default class HaplotypeView {
             originalX,
             0,
             unitHeight,
-            Conf.instance.haplotypeViewWidth
+            Conf.instance.haplotypeViewWidth,
           );
         }
       }
+
       path2.setAttribute("d", d);
 
       const isMutationInRegion =
@@ -138,7 +139,7 @@ export default class HaplotypeView {
           shiftKey,
         },
         bubbles: true,
-      })
+      }),
     );
   }
 

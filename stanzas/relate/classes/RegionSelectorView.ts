@@ -1,12 +1,12 @@
-import { Dataset } from "./Dataset";
-import { DendrogramView } from "./DendrogramView.js";
 import { Conf } from "../conf";
 import { createSVGElement } from "../util.js";
+import { Dataset } from "./Dataset";
+import { DendrogramView } from "./DendrogramView.js";
 
 class RegionSelectorView {
   #el: HTMLElement;
   #RelateViewer: HTMLElement;
-  #style: HTMLStyleElement;
+  #style: CSSStyleSheet;
   #totalWidth = 0;
   static #instance: RegionSelectorView | null = null;
 
@@ -15,14 +15,14 @@ class RegionSelectorView {
     this.#RelateViewer = root.querySelector("#RelateViewer")!;
 
     const existingStyle = (root.getRootNode() as ShadowRoot).querySelector(
-      "style#dynamic-css"
+      "style#dynamic-css",
     );
     if (existingStyle) {
       existingStyle.remove();
     }
 
-    this.#style = document.createElement("style");
-    this.#style.id = "dynamic-css";
+    this.#style = new CSSStyleSheet();
+    // this.#style.id = "dynamic-css";
   }
 
   static initialise(root: HTMLElement) {
@@ -45,9 +45,15 @@ class RegionSelectorView {
   private init() {
     this.#el.setAttribute(
       "transform",
-      `translate(0 ${Conf.instance.mutationTop})`
+      `translate(0 ${Conf.instance.mutationTop})`,
     );
-    (this.#el.getRootNode() as ShadowRoot).appendChild(this.#style);
+
+    // document.adoptedStyleSheets = [
+    //       ...document.adoptedStyleSheets,
+    //       this.#sheet
+    //     ];
+
+    (this.#el.getRootNode() as ShadowRoot).adoptedStyleSheets.push(this.#style);
   }
 
   /**
@@ -88,12 +94,12 @@ class RegionSelectorView {
 
       // Add region selector
       const regionIndicator = regionIndicatorTemplate.cloneNode(
-        true
+        true,
       ) as Element;
       const path = regionIndicator.querySelector("path");
       this.#totalWidth = Math.max(
         this.#totalWidth + Conf.instance.haplotypeViewWidth,
-        x2
+        x2,
       );
 
       path?.setAttribute("d", `M ${x2} 0 L ${this.#totalWidth} -20`);
@@ -101,7 +107,7 @@ class RegionSelectorView {
       const text = regionIndicator.querySelector("text")!;
       text.setAttribute(
         "transform",
-        `translate(${this.#totalWidth} -20) rotate(-90)`
+        `translate(${this.#totalWidth} -20) rotate(-90)`,
       );
       text.innerHTML = `<tspan>${i}</tspan><tspan> ${ancestor.region.start}-${ancestor.region.end}</tspan>`;
 
@@ -121,7 +127,7 @@ class RegionSelectorView {
           this.#RelateViewer.classList.add("-selectedregion");
           DendrogramView.instance?.draw(
             i,
-            x3 - Conf.instance.stagePadding.left
+            x3 - Conf.instance.stagePadding.left,
           );
         }
       });
@@ -142,23 +148,34 @@ class RegionSelectorView {
    * @param {Array} ancestors - The list of ancestors with regions.
    */
   generateDynamicCSS(ancestors: any) {
-    if (!this.#style || !this.#style.sheet) return;
+    if (!this.#style) return;
 
-    const sheet = this.#style.sheet;
-    while (sheet.cssRules?.length > 0) {
-      sheet.deleteRule(0);
-    }
+    // const sheet = this.#style.sheet;
+    // while (sheet.cssRules?.length > 0) {
+    //   sheet.deleteRule(0);
+    // }
+
+    let cssRules: string = "";
 
     ancestors.forEach((_: any, i: number) => {
-      sheet?.insertRule(`
-        #RelateViewer:has(.region-indicator-view[data-region="${i}"]:hover), #RelateViewer[data-selected-region="${i}"] {
-          .haplotype-view > g[data-region="${i}"],
-          .region-indicator-view[data-region="${i}"] {
-            opacity: 1;
-          }
+      // This is (:has(...)) quite heavy for large number of nodes (for some datasets it's 80k ?!)
+      cssRules += `#RelateViewer:has(.region-indicator-view[data-region="${i}"]:hover), #RelateViewer[data-selected-region="${i}"] {
+        .haplotype-view > g[data-region="${i}"],
+        .region-indicator-view[data-region="${i}"] {
+          opacity: 1;
         }
-      `);
+      }`;
+      // sheet?.insertRule(`
+      //   #RelateViewer:has(.region-indicator-view[data-region="${i}"]:hover), #RelateViewer[data-selected-region="${i}"] {
+      //     .haplotype-view > g[data-region="${i}"],
+      //     .region-indicator-view[data-region="${i}"] {
+      //       opacity: 1;
+      //     }
+      //   }
+      // `);
     });
+
+    this.#style.replace(cssRules);
   }
 
   /**
