@@ -32,7 +32,7 @@
     },
     {
       "stanza:key": "data-id",
-      "stanza:example": "A2M_chr12_9062708_9120919",
+      "stanza:example": "ALDH2_chr12_111761933_111822532",
       "stanza:description": "ID of the analysis data",
       "stanza:required": true
     },
