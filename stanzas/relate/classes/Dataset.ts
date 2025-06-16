@@ -84,7 +84,8 @@ class Dataset {
     this.#chromosome = Dataset.#getChromosome(id);
     try {
       const [ancData, mutData, hapData] = await loadFiles(
-        [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
+        // [".anc", ".mut", ".haploidid.fullassembled.BOTH.txt"].map(
+        [".anc", ".mut", ".ids"].map(
           (ext) => path + ext,
         ),
       );
